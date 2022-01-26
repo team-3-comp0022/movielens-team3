@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    volumes:
+      - './frontend:/usr/src/app'
+      - '/usr/src/app/node_modules'
+    ports:
+      - 3001:3000
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+
+  backend:
+    container_name: backend
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    volumes:
+      - './express:/usr/src/app'
+      - '/usr/src/app/node_modules'
+    ports:
+      - 8081:8080
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+
+  db:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+  # We need to set persistant store - possibly via this option (see: https://tecadmin.net/docker-compose-persistent-mysql-data/)
+  #  volumes:
+  #    - dbdata:/var/lib/mysql
+  #  networks:
+  #    - backend
+
+  # We can use adminer or phpmyadmin
+  #adminer:
+  #  image: adminer
+  #  restart: always
+  #  ports:
+  #    - 8080:8080
+
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    ports:
+      - 8080:80
+    environment:
+      - PMA_ARBITRARY=1
+
+#volumes: 
+#  dbdata:
+
+#networks:
+#  backend:
+#  frontend:
+
+# Sources: https://hub.docker.com/_/mysql, https://hub.docker.com/r/phpmyadmin/phpmyadmin/, https://www.bezkoder.com/docker-compose-react-nodejs-mysql/, https://mherman.org/blog/dockerizing-a-react-app/
