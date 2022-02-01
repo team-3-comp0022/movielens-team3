@@ -35,8 +35,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: example
   # We need to set persistant store - possibly via this option (see: https://tecadmin.net/docker-compose-persistent-mysql-data/)
-  #  volumes:
-  #    - dbdata:/var/lib/mysql
+    volumes:
+      - dbdata:/var/lib/mysql
   #  networks:
   #    - backend
 
@@ -55,8 +55,8 @@ services:
     environment:
       - PMA_ARBITRARY=1
 
-#volumes: 
-#  dbdata:
+volumes: 
+  dbdata:
 
 #networks:
 #  backend:
