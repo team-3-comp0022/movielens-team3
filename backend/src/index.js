@@ -1,17 +1,21 @@
-const { Pool } = require('pg');
+var mysql = require('mysql')
+var express = require('express')
 
-const pool = new Pool({
-    user: 'root',
-    host: 'localhost',
-    database: 'films',
-    password: 'example',
-    port: 8080,
+var connection = mysql.createConnection({
+    host: "127.0.0.1",
+    user: "root",
+    password: "example",
+    database: "sys",
+    port: '8086'
+  })
+
+connection.connect()
+
+connection.query('SELECT 1 + 1 AS solution', function (err, rows, fields) {
+  if (err) throw err
+
+  console.log('The solution is: ', rows[0].solution)
 })
-
-pool.on('error', (err, client) => {
-    console.error('Error:', err)
-})
-
 
 const query = `
 CREATE TABLE ratings (
@@ -22,18 +26,10 @@ CREATE TABLE ratings (
 )
 `;
 
-(async () => {
-    try {
-        console.log("HI! Hello!!");
-        const client = await pool.connect();
-        console.log("Hello!!");
-        const res = await client.query(query);
-        
-
-        // for (let row of res.rows) {
-        //     console.log(row)
-        // }
-    } catch (err) {
-        console.error(err);
-    }
-})();
+connection.query(query, function (err, rows, fields) {
+    if (err) throw err
+  
+    console.log('Success')
+  })
+  
+connection.end()
