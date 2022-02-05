@@ -34,18 +34,10 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: example
-  # We need to set persistant store - possibly via this option (see: https://tecadmin.net/docker-compose-persistent-mysql-data/)
     volumes:
       - ./data/db:/var/lib/mysql
   #  networks:
   #    - backend
-
-  # We can use adminer or phpmyadmin
-  #adminer:
-  #  image: adminer
-  #  restart: always
-  #  ports:
-  #    - 8080:8080
 
   phpmyadmin:
     image: phpmyadmin
@@ -53,13 +45,14 @@ services:
     ports:
       - 8080:80
     environment:
-      - PMA_ARBITRARY=1
+      - PMA_HOST=db
 
 #volumes: 
 #  dbdata:
 
+# TODO: Setup networks
 #networks:
 #  backend:
 #  frontend:
 
-# Sources: https://hub.docker.com/_/mysql, https://hub.docker.com/r/phpmyadmin/phpmyadmin/, https://www.bezkoder.com/docker-compose-react-nodejs-mysql/, https://mherman.org/blog/dockerizing-a-react-app/
+# Sources: https://hub.docker.com/_/mysql, https://hub.docker.com/r/phpmyadmin/phpmyadmin/, https://www.bezkoder.com/docker-compose-react-nodejs-mysql/, https://mherman.org/blog/dockerizing-a-react-app/, https://tecadmin.net/docker-compose-persistent-mysql-data/
