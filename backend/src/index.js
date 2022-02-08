@@ -15,6 +15,15 @@ var connection = mysql.createConnection({
     database: "films",
     port: '8086'
   })
+deleteTables()
+makeTables()
+addData()
+const sleep = (waitTimeInMs) => new Promise(resolve => setTimeout(resolve, waitTimeInMs));
+sleep(4000).then(() => {
+    makeSecondTables()
+    makeSplitTable()
+});
+
 
 //connection.connect()
 function test(){
@@ -73,6 +82,37 @@ function addData(){
         //stream.pipe(csvStream);
     });
 }
+
+function makeSecondTables(){
+    const makeSecond = queries.create_movies_genre
+
+    connection.query(makeSecond, function (err, rows, fields) {
+        if (err) throw err
+    
+        console.log('Success')
+    })
+
+    const makeThird = queries.create_movies_title
+
+    connection.query(makeThird, function (err, rows, fields) {
+        if (err) throw err
+    
+        console.log('Success')
+    })
+}
+
+function makeSplitTable(){
+    const makeFinal = queries.create_movies_genres_sep
+
+    connection.query(makeFinal, function (err, rows, fields) {
+        if (err) throw err
+    
+        console.log('Success')
+    })
+}
+
+function first
+
 //connection.end();
 
 

@@ -80,7 +80,7 @@ CREATE TABLE personality_data (
 `];
 
 
-const drop_all = `DROP TABLE IF EXISTS links, ratings, movies, tags, ratings_personality, personality_data`
+const drop_all = `DROP TABLE IF EXISTS links, ratings, movies, tags, ratings_personality, personality_data, movies_titles, movies_genres, movies_genres_sep`
 
 
 const filenames = ["./ml-latest-small/movies.csv","./ml-latest-small/links.csv", "./ml-latest-small/ratings.csv","./ml-latest-small/tags.csv", "./personality-isf2018/personality-data.csv","./personality-isf2018/ratings.csv"]
@@ -137,12 +137,36 @@ const csv_queres = [`INSERT IGNORE INTO movies (movieId, title, genres) VALUES ?
 ) VALUES ?`
 ]
 
+const create_movies_title=`
+CREATE TABLE movies_titles AS 
+(SELECT movieId, title FROM films.movies)` 
+ 
+const create_movies_genre=`
+CREATE TABLE movies_genres AS 
+(SELECT movieId, genres FROM films.movies)` 
+
+
+const create_movies_genres_sep=`
+CREATE TABLE movies_genres_sep AS 
+(select 
+films.movies_genres.movieId, 
+SUBSTRING_INDEX(SUBSTRING_INDEX(films.movies_genres.genres, '|', numbers.n), '|', -1) name 
+from 
+(select 1 n union all 
+select 2 union all select 3 union all 
+select 4 union all select 5) numbers INNER JOIN films.movies_genres 
+on CHAR_LENGTH(films.movies_genres.genres) 
+-CHAR_LENGTH(REPLACE(films.movies_genres.genres, '|', ''))>=numbers.n-1 
+order by 
+films.movies_genres.movieId, n); 
+`
 
 // //substitute the Fair Game for %s
 const case_one = `
 SELECT MT.movieID, AVG(R.rating) as average_rating 
 FROM films.movies_titles MT, films.ratings R 
-WHERE MT.title = "Fair Game (1995)" and MT.movieID = R.movieId;
+WHERE MT.title = "Fair Game (1995)" and MT.movieID = R.movieId
+GROUP BY MT.movieID;
 `;
 
 //rate movies by average popularity
@@ -157,47 +181,28 @@ ORDER BY AVG(R.rating) DESC;
 
 // //polarity
 const case_three = `
-CREATE TABLE movies_genres_sep AS 
-(select 
-films.movies_genres.movieId, 
-SUBSTRING_INDEX(SUBSTRING_INDEX(films.movies_genres.genres, '|', numbers.n), '|', -1) name 
-from 
-(select 1 n union all 
-select 2 union all select 3 union all 
-select 4 union all select 5) numbers INNER JOIN films.movies_genres 
-on CHAR_LENGTH(films.movies_genres.genres) 
--CHAR_LENGTH(REPLACE(films.movies_genres.genres, '|', ''))>=numbers.n-1 
-order by 
-films.movies_genres.movieId, n);
+SELECT MG.name, variance(R.rating) as VR 
+FROM films.movies_genres_sep MG, films.ratings R 
+WHERE MG.movieId = R.movieId 
+GROUP BY MG.name 
+ORDER BY VR DESC
 `;
 
 //predict how a film
 const case_four = `
-SELECT hello.title, AVG(hello.rating), averages.avg_rating, ABS(averages.avg_rating - hello.rating) as difference 
-
+SELECT hello.title, AVG(hello.rating), ABS(averages.avg_rating - hello.rating) as difference 
 FROM ( 
-
 SELECT R.userId, R.movieId, MT.title, SUBSTRING_INDEX(SUBSTRING_INDEX(MT.title, '(', -1), ')', 1) as year, FROM_UNIXTIME(R.timestamp) as rating_time_stamp, R.rating 
-
 FROM films.ratings R, films.movies_titles MT 
-
 WHERE R.movieId = MT.movieId  
-
 AND SUBSTRING_INDEX(SUBSTRING_INDEX(MT.title, '(', -1), ')', 1) = YEAR(FROM_UNIXTIME(R.timestamp)) 
-
-) AS hello, (SELECT MT.title, AVG(R.rating) as avg_rating, MT.movieId 
-
+) AS hello, (SELECT MT.movieId, AVG(R.rating) as avg_rating 
 FROM films.movies_titles MT, films.ratings R  
-
 WHERE MT.movieId = R.movieId 
-
-GROUP BY MT.title  
-
+GROUP BY MT.movieId  
 ORDER BY AVG(R.rating) DESC) AS averages 
-
 WHERE hello.movieId = averages.movieId 
-
-GROUP BY hello.movieId ;
+GROUP BY hello.title, difference ; 
 `;
 
-module.exports = {create_list, drop_all, filenames, csv_queres}
+module.exports = {create_list, drop_all, filenames, csv_queres, case_one, case_two, case_three, case_four, create_movies_genre, create_movies_title, create_movies_genres_sep}
