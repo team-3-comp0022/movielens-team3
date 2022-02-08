@@ -9,7 +9,7 @@ RUN npm install
 RUN npm install react-scripts@3.4.1 -g
 
 # Bundle app source
-COPY . ./
+COPY . ./src
 
 EXPOSE 3001:3000
 
