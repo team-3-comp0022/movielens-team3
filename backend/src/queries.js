@@ -160,6 +160,10 @@ on CHAR_LENGTH(films.movies_genres.genres)
 order by 
 films.movies_genres.movieId, n); 
 `
+const search =`
+SELECT links.tmdbId FROM links where links.movieId IN (
+  SELECT movies_titles.movieId FROM movies_titles WHERE movies_titles.title LIKE "%@%")
+`
 
 // //substitute the Fair Game for %s
 const case_one = `
@@ -205,4 +209,4 @@ WHERE hello.movieId = averages.movieId
 GROUP BY hello.title, difference ; 
 `;
 
-module.exports = {create_list, drop_all, filenames, csv_queres, case_one, case_two, case_three, case_four, create_movies_genre, create_movies_title, create_movies_genres_sep}
+module.exports = {create_list, drop_all, filenames, csv_queres, case_one, case_two, case_three, case_four, create_movies_genre, create_movies_title, create_movies_genres_sep, search}

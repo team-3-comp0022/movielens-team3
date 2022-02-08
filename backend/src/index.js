@@ -28,10 +28,18 @@ sleep(4000).then(() => {
 
 
 //get query result data on frontend
-var stuff_i_want = [];
+/*var stuff_i_want = [];
 firstQuery("Fair Game (1995)", function(result){
     stuff_i_want = result;
     console.log(stuff_i_want)
+ });*/
+
+
+ //example usage
+ var solution = [];
+searchQuery("Story", function(result){
+    solution = result;//returns array of Ids
+    console.log(solution)//use it
  });
 
 
@@ -121,6 +129,16 @@ function makeSplitTable(){
     })
 }
 
+function searchQuery(title, callback){
+    
+    let search = queries.search.replace('@', title)
+    connection.query(search, function (err, rows, fields) {
+        if (err) throw err
+        let res = rows.map(function(X) {return X.tmdbId;})
+        return callback(res);
+    })
+}
+
 function firstQuery(title, callback){
     
     let caseOne = util.format(queries.case_one, title)
@@ -129,13 +147,27 @@ function firstQuery(title, callback){
     
         console.log('Success')
         console.log(rows)
-        stuff_i_want = rows[0].average_rating;  // Scope is larger than function
         return callback(rows[0].average_rating);
     })
 }
+/*
+function secondQuery(title, callback){
+    
+    let caseTwo = util.format(queries.case_two, title)
+    connection.query(caseTwo, function (err, rows, fields) {
+        if (err) throw err
+    
+        console.log('Success')
+        console.log(rows)
+        stuff_i_want = rows[0].tmdbId;  // Scope is larger than function
+        //console.log(stuff_i_want)
+        return callback(rows[0].tmdbId);
+    })
+}*/
 
 //connection.end();
 
 module.exports= {
+    searchQuery,
     firstQuery,
 }
