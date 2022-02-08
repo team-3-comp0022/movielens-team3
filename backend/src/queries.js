@@ -165,7 +165,7 @@ films.movies_genres.movieId, n);
 const case_one = `
 SELECT MT.movieID, AVG(R.rating) as average_rating 
 FROM films.movies_titles MT, films.ratings R 
-WHERE MT.title = "Fair Game (1995)" and MT.movieID = R.movieId
+WHERE MT.title = "%s" and MT.movieID = R.movieId
 GROUP BY MT.movieID;
 `;
 

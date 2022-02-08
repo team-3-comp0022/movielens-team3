@@ -2,11 +2,12 @@
 const queries = require('./queries.js')
 const fs = require("fs");
 const fastcsv = require("fast-csv");
+const util = require('util');
+var mysql = require('mysql')
+var express = require('express')
 
 const filenames = queries.filenames
 const csv_queres = queries.csv_queres
-var mysql = require('mysql')
-var express = require('express')
 
 var connection = mysql.createConnection({
     host: "127.0.0.1",
@@ -15,6 +16,7 @@ var connection = mysql.createConnection({
     database: "films",
     port: '8086'
   })
+  /*
 deleteTables()
 makeTables()
 addData()
@@ -22,14 +24,22 @@ const sleep = (waitTimeInMs) => new Promise(resolve => setTimeout(resolve, waitT
 sleep(4000).then(() => {
     makeSecondTables()
     makeSplitTable()
-});
+});*/
+
+
+//get query result data on frontend
+var stuff_i_want = [];
+firstQuery("Fair Game (1995)", function(result){
+    stuff_i_want = result;
+    console.log(stuff_i_want)
+ });
 
 
 //connection.connect()
 function test(){
     connection.query('SELECT 1 + 1 AS solution', function (err, rows, fields) {
     if (err) throw err
-
+    //console.log(rows[0])
     console.log('The solution is: ', rows[0].solution)
     })
 }
@@ -111,7 +121,18 @@ function makeSplitTable(){
     })
 }
 
-function first
+function firstQuery(title, callback){
+    
+    let caseOne = util.format(queries.case_one, title)
+    connection.query(caseOne, function (err, rows, fields) {
+        if (err) throw err
+    
+        console.log('Success')
+        console.log(rows)
+        stuff_i_want = rows[0].average_rating;  // Scope is larger than function
+        return callback(rows[0].average_rating);
+    })
+}
 
 //connection.end();
 
