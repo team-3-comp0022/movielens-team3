@@ -79,33 +79,8 @@ CREATE TABLE personality_data (
 )
 `];
 
-// create_list.forEach(function (query) {
-//     connection.query(query, function (err, rows, fields) {
-//         if (err) throw err
-      
-//         console.log('Success')
-//       });
-// });
-
 
 const drop_all = `DROP TABLE IF EXISTS links, ratings, movies, tags, ratings_personality, personality_data`
-
-// const drop_list = [`DROP TABLE IF EXISTS links`, 
-// `DROP TABLE IF EXISTS ratings`,
-// `DROP TABLE IF EXISTS movies`,
-// `DROP TABLE IF EXISTS tags`
-// `DROP TABLE IF EXISTS ratings_personality`]
-
-// connection.end()
-
-
-// connection.query(query, function (err, rows, fields) {
-//     if (err) throw err
-  
-//     console.log('Success')
-//   })
-  
-// connection.end()
 
 
 const filenames = ["./ml-latest-small/movies.csv","./ml-latest-small/links.csv", "./ml-latest-small/ratings.csv","./ml-latest-small/tags.csv", "./personality-isf2018/personality-data.csv","./personality-isf2018/ratings.csv"]
@@ -161,110 +136,68 @@ const csv_queres = [`INSERT IGNORE INTO movies (movieId, title, genres) VALUES ?
     tstamp
 ) VALUES ?`
 ]
-/*
-const fs = require("fs");
-const mysql = require("mysql");
-const fastcsv = require("fast-csv");
-let stream = fs.createReadStream("./ml-latest-small/movies.csv");
-let csvData = [];
-let csvStream = fastcsv
-  .parse()
-  .on("data", function(data) {
-    csvData.push(data);
-  })
-  .on("end", function() {
-    // remove the first line: header
-    csvData.shift();
-    // create a new connection to the database
-    const connection = mysql.createConnection({
-      host: "localhost",
-      user: "root",
-      password: "123456",
-      database: "testdb"
-    });
-    // open the connection
-    connection.connect(error => {
-      if (error) {
-        console.error(error);
-      } else {
-        let query =
-          "INSERT INTO category (id, name, description, created_at) VALUES ?";
-        connection.query(query, [csvData], (error, response) => {
-          console.log(error || response);
-        });
-      }
-    });
-  });
-stream.pipe(csvStream);*/
-
-
-
-
-
-
-
 
 
 // //substitute the Fair Game for %s
-// const case_one = `
-// SELECT MT.movieID, AVG(R.rating) as average_rating 
-// FROM films.movies_titles MT, films.ratings R 
-// WHERE MT.title = "Fair Game (1995)" and MT.movieID = R.movieId;
-// `;
+const case_one = `
+SELECT MT.movieID, AVG(R.rating) as average_rating 
+FROM films.movies_titles MT, films.ratings R 
+WHERE MT.title = "Fair Game (1995)" and MT.movieID = R.movieId;
+`;
 
-// //rate movies by average popularity
-// const case_two = `
-// SELECT MT.title, AVG(R.rating) 
-// FROM films.movies_titles MT, films.ratings R 
-// WHERE MT.movieID = R.movieID 
-// GROUP BY MT.title 
-// ORDER BY AVG(R.rating) DESC; 
-// `;
+//rate movies by average popularity
+const case_two = `
+SELECT MT.title, AVG(R.rating) 
+FROM films.movies_titles MT, films.ratings R 
+WHERE MT.movieID = R.movieID 
+GROUP BY MT.title 
+ORDER BY AVG(R.rating) DESC; 
+`;
 
 
 // //polarity
-// const case_three = `
-// CREATE TABLE movies_genres_sep AS 
-// (select 
-// films.movies_genres.movieId, 
-// SUBSTRING_INDEX(SUBSTRING_INDEX(films.movies_genres.genres, '|', numbers.n), '|', -1) name 
-// from 
-// (select 1 n union all 
-// select 2 union all select 3 union all 
-// select 4 union all select 5) numbers INNER JOIN films.movies_genres 
-// on CHAR_LENGTH(films.movies_genres.genres) 
-// -CHAR_LENGTH(REPLACE(films.movies_genres.genres, '|', ''))>=numbers.n-1 
-// order by 
-// films.movies_genres.movieId, n);
-// `;
+const case_three = `
+CREATE TABLE movies_genres_sep AS 
+(select 
+films.movies_genres.movieId, 
+SUBSTRING_INDEX(SUBSTRING_INDEX(films.movies_genres.genres, '|', numbers.n), '|', -1) name 
+from 
+(select 1 n union all 
+select 2 union all select 3 union all 
+select 4 union all select 5) numbers INNER JOIN films.movies_genres 
+on CHAR_LENGTH(films.movies_genres.genres) 
+-CHAR_LENGTH(REPLACE(films.movies_genres.genres, '|', ''))>=numbers.n-1 
+order by 
+films.movies_genres.movieId, n);
+`;
 
-// //predict how a film
-// const case_four = `
-// SELECT hello.title, AVG(hello.rating), averages.avg_rating, ABS(averages.avg_rating - hello.rating) as difference 
+//predict how a film
+const case_four = `
+SELECT hello.title, AVG(hello.rating), averages.avg_rating, ABS(averages.avg_rating - hello.rating) as difference 
 
-// FROM ( 
+FROM ( 
 
-// SELECT R.userId, R.movieId, MT.title, SUBSTRING_INDEX(SUBSTRING_INDEX(MT.title, '(', -1), ')', 1) as year, FROM_UNIXTIME(R.timestamp) as rating_time_stamp, R.rating 
+SELECT R.userId, R.movieId, MT.title, SUBSTRING_INDEX(SUBSTRING_INDEX(MT.title, '(', -1), ')', 1) as year, FROM_UNIXTIME(R.timestamp) as rating_time_stamp, R.rating 
 
-// FROM films.ratings R, films.movies_titles MT 
+FROM films.ratings R, films.movies_titles MT 
 
-// WHERE R.movieId = MT.movieId  
+WHERE R.movieId = MT.movieId  
 
-// AND SUBSTRING_INDEX(SUBSTRING_INDEX(MT.title, '(', -1), ')', 1) = YEAR(FROM_UNIXTIME(R.timestamp)) 
+AND SUBSTRING_INDEX(SUBSTRING_INDEX(MT.title, '(', -1), ')', 1) = YEAR(FROM_UNIXTIME(R.timestamp)) 
 
-// ) AS hello, (SELECT MT.title, AVG(R.rating) as avg_rating, MT.movieId 
+) AS hello, (SELECT MT.title, AVG(R.rating) as avg_rating, MT.movieId 
 
-// FROM films.movies_titles MT, films.ratings R  
+FROM films.movies_titles MT, films.ratings R  
 
-// WHERE MT.movieId = R.movieId 
+WHERE MT.movieId = R.movieId 
 
-// GROUP BY MT.title  
+GROUP BY MT.title  
 
-// ORDER BY AVG(R.rating) DESC) AS averages 
+ORDER BY AVG(R.rating) DESC) AS averages 
 
-// WHERE hello.movieId = averages.movieId 
+WHERE hello.movieId = averages.movieId 
 
-// GROUP BY hello.movieId ;
-// `;
+GROUP BY hello.movieId ;
+`;
 
 module.exports = {create_list, drop_all, filenames, csv_queres}
