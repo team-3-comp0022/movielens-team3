@@ -40,13 +40,7 @@ services:
     ports:
       - 8086:3306
     volumes:
-<<<<<<< HEAD
-      - ./data/db:/var/lib/mysql
-  #  networks:
-  #    - backend
-=======
       - dbdata:/var/lib/mysql
->>>>>>> 975c82d7c92675934c4f478940f72708e1867a35
 
   phpmyadmin:
     image: phpmyadmin
@@ -56,15 +50,10 @@ services:
     environment:
       - PMA_HOST=db
 
-<<<<<<< HEAD
-#volumes: 
-#  dbdata:
-=======
 #networks:
 #    dbNetwork:
 
 volumes: 
   dbdata:
->>>>>>> 975c82d7c92675934c4f478940f72708e1867a35
 
 # Sources: https://hub.docker.com/_/mysql, https://hub.docker.com/r/phpmyadmin/phpmyadmin/, https://www.bezkoder.com/docker-compose-react-nodejs-mysql/, https://mherman.org/blog/dockerizing-a-react-app/, https://tecadmin.net/docker-compose-persistent-mysql-data/
