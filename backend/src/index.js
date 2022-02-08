@@ -136,4 +136,6 @@ function firstQuery(title, callback){
 
 //connection.end();
 
-
+module.exports= {
+    firstQuery,
+}
