@@ -69,10 +69,11 @@ const MovieGrid = props => {
 
     return (
         <>
-            <div className="section mb-3">
+            <div className="section mb-0" >
                <MovieSearch category={props.category} keyword={keyword}/>  
+             </div>
            
-             
+               <div className="section mb-3" >
                 <Collapsible category={props.category} collapse={collapse}/> 
              </div>
             <div className="movie-grid">
@@ -120,7 +121,7 @@ const MovieSearch = props => {
     }, [keyword, goToSearch]);
 
     return (
-        <div className="movie-search" style={{marginTop:-30, position:'left'}}>
+        <div className="movie-search" >
             <Input
                 type="text"
                 placeholder="Enter keyword"
@@ -130,6 +131,7 @@ const MovieSearch = props => {
             <Button className="small" onClick={goToSearch}>Search</Button>
 
         </div>
+      
     )
 }
 
@@ -157,25 +159,55 @@ return (
 	    <h5>   Display the movies <br/><br/> </h5>
         <div class="hr"></div>
 
-              <label class="container" style={{display:'block',textAlign:'left'}}> Not yet watched
+              <label class="specialcontainer" style={{display:'block',textAlign:'left'}}> Not yet watched
                         <input type="radio" name="radio"></input>
                         <span class="checkmark"></span>
                     </label>
-                    <label class="container" style={{display:'block',textAlign:'left'}}>Already watched
+                    <label class="specialcontainer" style={{display:'block',textAlign:'left'}}>Already watched
                         <input type="radio" name="radio"></input>
                         <span class="checkmark"></span>
                      </label>
-                    <label class="container" style={{display:'block',textAlign:'left'}}> Both watched and not watched
+                    <label class="specialcontainer" style={{display:'block',textAlign:'left'}}> Both watched and not watched
                         <input type="radio" name="radio"></input>
                         <span class="checkmark"></span>
                     </label>
 
         <div class="col2" style={{marginTop:38, marginLeft:-10,}}>
-         {/* <div class="col" style={{marginTop:20, width: '25%', height: '200px', padding: '10px', margin: '5px'}}>    */}
 	    <h5>   Runtime <br/><br/> </h5>
         <div class="hr"></div>
 
-             
+        {/* <div class="slider-wrapper">
+      <div id="slider-range"></div>
+
+      <div class="range-wrapper">
+        <div class="range"></div>
+        <div class="range-alert">+</div>
+
+        <div class="gear-wrapper">
+          <div class="gear-large gear-one">
+            <div class="gear-tooth"></div>
+            <div class="gear-tooth"></div>
+            <div class="gear-tooth"></div>
+            <div class="gear-tooth"></div>
+          </div>
+          <div class="gear-large gear-two">
+            <div class="gear-tooth"></div>
+            <div class="gear-tooth"></div>
+            <div class="gear-tooth"></div>
+            <div class="gear-tooth"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="marker marker-0"><sup>$</sup>10,000</div>
+      <div class="marker marker-25"><sup>$</sup>35,000</div>
+      <div class="marker marker-50"><sup>$</sup>60,000</div>
+      <div class="marker marker-75"><sup>$</sup>85,000</div>
+      <div class="marker marker-100"><sup>$</sup>110,000+</div>
+    </div> */}
+
+
              </div>
 	   </div>
        
@@ -185,29 +217,29 @@ return (
         <div class="grid">
 
 		    <div class="columnn"> 
-            <label class="container" style={{display:'block',textAlign:'left'}}> Stream
+            <label class="specialcontainer" style={{display:'block',textAlign:'left'}}> Stream
             <input type="checkbox" name="checkbox" />
             <span class="checkbox"></span>
             </label>
 
-            <label class="container" style={{display:'block',textAlign:'left'}}> Free
+            <label class="specialcontainer" style={{display:'block',textAlign:'left'}}> Free
             <input type="checkbox" name="checkbox-checked" /> 
             <span class="checkbox"></span>
             </label>
 
-            <label class="container" style={{display:'block',textAlign:'left'}}> Ads
+            <label class="specialcontainer" style={{display:'block',textAlign:'left'}}> Ads
             <input type="checkbox" name="checkbox-checked" /> 
             <span class="checkbox"></span>
             </label>
             </div>
 
             <div class="columnn"> 
-            <label class="container" style={{display:'block',textAlign:'left'}}> Buy
+            <label class="specialcontainer" style={{display:'block',textAlign:'left'}}> Buy
             <input type="checkbox" name="checkbox-checked" /> 
             <span class="checkbox"></span>
             </label>
 
-            <label class="container" style={{display:'block',textAlign:'left'}}> Rent
+            <label class="specialcontainer" style={{display:'block',textAlign:'left'}}> Rent
             <input type="checkbox" name="checkbox-checked" /> 
             <span class="checkbox"></span>
             </label>
@@ -218,32 +250,32 @@ return (
          {/* <div class="col" style={{marginTop:20, width: '25%', height: '200px', padding: '10px', margin: '5px'}}>    */}
 	    <h5>   Ratings <br/><br/> </h5>
         <div class="hr"></div>
-        <div class="grid">
+        <div class="grid" style={{align:'center'}}>
 
             
-            <label class="container" style={{display:'inline',textAlign:'left'}}> 
+            <label class="specialcontainer" style={{display:'inline',textAlign:'left', padding:20, marginLeft: 30}}> 
             <input type="radio" name="radio"></input>
-            <span class="checkmarkrating" style={{width:30, height:30,color:'black', textAlign:'center', fontWeight: 'bold' }}>1</span>
+            <span class="checkmarkrating" style={{padding:4,width:30, height:30,color:'black', textAlign:'center', fontWeight: 'bold' }}>1</span>
             </label>
             
-            <label class="container" style={{display:'inline',textAlign:'left'}}> 
+            <label class="specialcontainer" style={{display:'inline',textAlign:'left', padding:20}}> 
             <input type="radio" name="radio"></input>
-            <span class="checkmarkrating" style={{width:30, height:30,color:'black', textAlign:'center', fontWeight: 'bold' }}>2</span>
+            <span class="checkmarkrating" style={{padding:4,width:30, height:30,color:'black', textAlign:'center', fontWeight: 'bold' }}>2</span>
             </label>
 
-            <label class="container" style={{display:'inline',textAlign:'left'}}> 
+            <label class="specialcontainer" style={{display:'inline',textAlign:'left', padding:20}}> 
             <input type="radio" name="radio"></input>
-            <span class="checkmarkrating" style={{width:30, height:30,color:'black', textAlign:'center', fontWeight: 'bold' }}>3</span>
+            <span class="checkmarkrating" style={{padding:4,width:30, height:30,color:'black', textAlign:'center', fontWeight: 'bold' }}>3</span>
             </label>
 
-            <label class="container" style={{display:'inline',textAlign:'left'}}> 
+            <label class="specialcontainer" style={{display:'inline',textAlign:'left', padding:20}}> 
             <input type="radio" name="radio"></input>
-            <span class="checkmarkrating" style={{width:30, height:30,color:'black', textAlign:'center', fontWeight: 'bold' }}>4</span>
+            <span class="checkmarkrating" style={{padding:4,width:30, height:30,color:'black', textAlign:'center', fontWeight: 'bold' }}>4</span>
             </label>
 
-            <label class="container" style={{display:'inline',textAlign:'left'}}> 
+            <label class="specialcontainer" style={{display:'inline',textAlign:'left', padding:20}}> 
             <input type="radio" name="radio"></input>
-            <span class="checkmarkrating" style={{width:30, height:30,color:'black', textAlign:'center', fontWeight: 'bold' }}>5</span>
+            <span class="checkmarkrating" style={{padding:4,width:30, height:30,color:'black', textAlign:'center', fontWeight: 'bold' }}>5</span>
             </label>
             </div>
              
@@ -256,61 +288,61 @@ return (
        <div class="hr"></div>
          <div class="grid">
          <div class="columngen" style={{padding:0, marginLeft:20}}> 
-            <label class="container" style={{display:'block',textAlign:'left'}}>
+            <label class="specialcontainer" style={{display:'block',textAlign:'left'}}>
             <input type="checkbox" name="checkbox-checked" /> 
             <span class="checkbox" style={{width:80, height:30, borderRadius:'16px',color:'black' }}>Action</span>
             </label>
 
-            <label class="container" style={{display:'block',textAlign:'left', marginTop:50}}> 
+            <label class="specialcontainer" style={{display:'block',textAlign:'left', marginTop:50}}> 
             <input type="checkbox" name="checkbox-checked" /> 
             <span class="checkbox" style={{width:100, height:30, borderRadius:'16px',color:'black'}}>Adventure</span>
             </label>
 
-            <label class="container" style={{display:'block',textAlign:'left', marginTop:100}}> 
+            <label class="specialcontainer" style={{display:'block',textAlign:'left', marginTop:100}}> 
             <input type="checkbox" name="checkbox-checked" /> 
             <span class="checkbox" style={{width:80, height:30, borderRadius:'16px',color:'black'}}>Drama</span>
             </label>
 
-            <label class="container" style={{display:'block',textAlign:'left', marginTop:150}}> 
+            <label class="specialcontainer" style={{display:'block',textAlign:'left', marginTop:150}}> 
             <input type="checkbox" name="checkbox-checked" /> 
             <span class="checkbox" style={{width:80, height:30, borderRadius:'16px',color:'black'}}>History</span>
             </label>
 
-            <label class="container" style={{display:'block',textAlign:'left', marginTop:200}}> 
+            <label class="specialcontainer" style={{display:'block',textAlign:'left', marginTop:200}}> 
             <input type="checkbox" name="checkbox-checked" /> 
             <span class="checkbox" style={{width:40, height:30, borderRadius:'16px',color:'black'}}>War </span>
             </label>
-            <label class="container" style={{display:'block',textAlign:'left', marginTop:250}}> 
+            <label class="specialcontainer" style={{display:'block',textAlign:'left', marginTop:250}}> 
             <input type="checkbox" name="checkbox-checked" /> 
             <span class="checkbox" style={{width:80, height:30, borderRadius:'16px',color:'black'}}>Mystery</span>
             </label>
          </div>
         
          <div class="columngen" style={{padding:0, marginLeft:0}}> 
-         <label class="container" style={{display:'block',textAlign:'left'}}>
+         <label class="specialcontainer" style={{display:'block',textAlign:'left'}}>
             <input type="checkbox" name="checkbox-checked" /> 
             <span class="checkbox" style={{width:70, height:30, borderRadius:'16px',color:'black'}}>Crime</span>
             </label>
 
-            <label class="container" style={{display:'block',textAlign:'left', marginTop:50}}> 
+            <label class="specialcontainer" style={{display:'block',textAlign:'left', marginTop:50}}> 
             <input type="checkbox" name="checkbox-checked" /> 
             <span class="checkbox" style={{width:100, height:30, borderRadius:'16px',color:'black'}}>Comedy</span>
             </label>
 
-            <label class="container" style={{display:'block',textAlign:'left', marginTop:100}}> 
+            <label class="specialcontainer" style={{display:'block',textAlign:'left', marginTop:100}}> 
             <input type="checkbox" name="checkbox-checked" /> 
             <span class="checkbox" style={{width:90, height:30, borderRadius:'16px',color:'black'}}>Family</span>
             </label>
 
-            <label class="container" style={{display:'block',textAlign:'left', marginTop:150}}> 
+            <label class="specialcontainer" style={{display:'block',textAlign:'left', marginTop:150}}> 
             <input type="checkbox" name="checkbox-checked" /> 
             <span class="checkbox" style={{width:70, height:30, borderRadius:'16px',color:'black'}}>Horror</span>
             </label>
-            <label class="container" style={{display:'block',textAlign:'left', marginTop:200}}> 
+            <label class="specialcontainer" style={{display:'block',textAlign:'left', marginTop:200}}> 
             <input type="checkbox" name="checkbox-checked" /> 
             <span class="checkbox" style={{width:90, height:30, borderRadius:'16px',color:'black'}}>Romance</span>
             </label>
-            <label class="container" style={{display:'block',textAlign:'left', marginTop:250}}> 
+            <label class="specialcontainer" style={{display:'block',textAlign:'left', marginTop:250}}> 
             <input type="checkbox" name="checkbox-checked" /> 
             <span class="checkbox" style={{width:80, height:30, borderRadius:'16px',color:'black'}}>Thriller</span>
             </label>
@@ -319,32 +351,32 @@ return (
 
          <div class="columngen" style={{padding:0, marginLeft:30}}> 
            
-         <label class="container" style={{display:'block',textAlign:'left'}}>
+         <label class="specialcontainer" style={{display:'block',textAlign:'left'}}>
             <input type="checkbox" name="checkbox-checked" /> 
             <span class="checkbox" style={{width:110, height:30, borderRadius:'16px', marginLeft:-10, color:'black'}}>Animation</span>
             </label>
 
-            <label class="container" style={{display:'block',textAlign:'left', marginTop:50}}> 
+            <label class="specialcontainer" style={{display:'block',textAlign:'left', marginTop:50}}> 
             <input type="checkbox" name="checkbox-checked" /> 
             <span class="checkbox" style={{width:120, height:30, borderRadius:'16px', marginLeft:-10,color:'black'}}>Documentary</span>
             </label>
 
-            <label class="container" style={{display:'block',textAlign:'left', marginTop:100}}> 
+            <label class="specialcontainer" style={{display:'block',textAlign:'left', marginTop:100}}> 
             <input type="checkbox" name="checkbox-checked" /> 
             <span class="checkbox" style={{width:90, height:30, borderRadius:'16px', marginLeft:-10,color:'black'}}>Fantasy</span>
             </label>
 
-            <label class="container" style={{display:'block',textAlign:'left', marginTop:150}}> 
+            <label class="specialcontainer" style={{display:'block',textAlign:'left', marginTop:150}}> 
             <input type="checkbox" name="checkbox-checked" /> 
             <span class="checkbox" style={{width:70, height:30, borderRadius:'16px',color:'black'}}>Music</span>
             </label>
 
-            <label class="container" style={{display:'block',textAlign:'left', marginTop:200}}> 
+            <label class="specialcontainer" style={{display:'block',textAlign:'left', marginTop:200}}> 
             <input type="checkbox" name="checkbox-checked" /> 
             <span class="checkbox" style={{width:130, height:30, borderRadius:'16px', marginLeft:-10,color:'black'}}>Science Fiction</span>
             </label>
 
-            <label class="container" style={{display:'block',textAlign:'left', marginTop:250}}> 
+            <label class="specialcontainer" style={{display:'block',textAlign:'left', marginTop:250}}> 
             <input type="checkbox" name="checkbox-checked" /> 
             <span class="checkbox" style={{width:90, height:30, borderRadius:'16px',color:'black'}}>Western</span>
             </label>
@@ -368,7 +400,7 @@ return (
         
           </div>
 
-          <div class="col2" style={{marginTop:215, marginLeft:958, width:300}}>
+          <div class="col2" style={{marginTop:215, marginLeft:987, width:300}}>
          {/* <div class="col" style={{marginTop:20, width: '25%', height: '200px', padding: '10px', margin: '5px'}}>    */}
 	    <h5>  Language <br/><br/> </h5>
              <div class="hr"></div>
