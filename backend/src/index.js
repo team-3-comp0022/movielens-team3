@@ -4,7 +4,7 @@ const fs = require("fs");
 const fastcsv = require("fast-csv");
 const util = require('util');
 var mysql = require('mysql')
-var express = require('express')
+//var express = require('express')
 
 const filenames = queries.filenames
 const csv_queres = queries.csv_queres
@@ -36,11 +36,11 @@ firstQuery("Fair Game (1995)", function(result){
 
 
  //example usage
- var solution = [];
+/*var solution = [];
 searchQuery("Story", function(result){
     solution = result;//returns array of Ids
     console.log(solution)//use it
- });
+ });*/
 
 
 //connection.connect()
