@@ -175,7 +175,7 @@ GROUP BY MT.movieID;
 
 //rate movies by average popularity
 const case_two = `
-SELECT MT.title, AVG(R.rating) 
+SELECT MT.title, AVG(R.rating) as average_rating
 FROM films.movies_titles MT, films.ratings R 
 WHERE MT.movieID = R.movieID 
 GROUP BY MT.title 
@@ -209,4 +209,19 @@ WHERE hello.movieId = averages.movieId
 GROUP BY hello.title, difference ; 
 `;
 
-module.exports = {create_list, drop_all, filenames, csv_queres, case_one, case_two, case_three, case_four, create_movies_genre, create_movies_title, create_movies_genres_sep, search}
+const case_five = `
+SELECT AVG(P.openness) as Openness, AVG(P.agreeableness) As Agreeableness, AVG(P.emotional_stability) AS Emotional_stability, AVG(P.conscientiousness) AS Conscientiousness, AVG(P.extraversion) AS Extraversion 
+FROM films.personality_data P JOIN films.ratings_personality R on P.userid = R.userId 
+WHERE P.userId IN (SELECT DISTINCT R.userId FROM films.ratings_personality R, films.movies M WHERE M.title="%s" AND R.movie_id = M.movieId AND R.rating >= 4); `;
+
+const case_six = `
+SELECT AVG(P.openness) as Openness, AVG(P.agreeableness) As Agreeableness, AVG(P.emotional_stability) AS Emotional_stability, AVG(P.conscientiousness) AS Conscientiousness, AVG(P.extraversion) AS Extraversion FROM films.personality_data P 
+WHERE P.movie_1 in (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.title="%s")) 
+OR P.movie_2 IN (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.title="%s")) 
+OR P.movie_3 IN (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.title="%s")) 
+OR P.movie_4 IN (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.title="%s")) 
+OR P.movie_5 IN (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.title="%s")) 
+OR P.movie_6 IN (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.title="%s"));
+`;
+
+module.exports = {create_list, drop_all, filenames, csv_queres, case_one, case_two, case_three, case_four,case_five,case_six, create_movies_genre, create_movies_title, create_movies_genres_sep, search}
