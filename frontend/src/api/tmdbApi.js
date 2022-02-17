@@ -1,4 +1,5 @@
 import axiosClient from "./axiosClient";
+// const index = require('../backend/index_bend');
 
 export const category = {
     movie: 'movie',
