@@ -29,15 +29,15 @@ function initialise_data(){
     });
 }
 
-// initialise_data()
+initialise_data()
 
 
 //get query result data on frontend
-/*var stuff_i_want = [];
-firstQuery("Fair Game (1995)", function(result){
-    stuff_i_want = result;
-    console.log(stuff_i_want)
- });*/
+// var stuff_i_want = [];
+// firstQuery("Fair Game (1995)", function(result){
+//     stuff_i_want = result;
+//     console.log(stuff_i_want)
+//  });
 
 
  //example usage
@@ -171,8 +171,8 @@ function searchQuery(title, callback){
 
 function firstQuery(title, callback){
     
-    let caseOne = util.format(queries.case_one, title)
-    connection.query(caseOne, function (err, rows, fields) {
+    let caseOne = queries.case_one
+    connection.query(caseOne,[title], function (err, rows, fields) {
         if (err) throw err
     
         console.log('Success')
@@ -240,8 +240,8 @@ function fourthQuery(callback){
 
 function fifthQuery(title, callback){
     
-    let caseFive = util.format(queries.case_five, title)
-    connection.query(caseFive, function (err, rows, fields) {
+    let caseFive = queries.case_five
+    connection.query(caseFive,[title], function (err, rows, fields) {
         if (err) throw err
     
         console.log('Success')
@@ -251,8 +251,8 @@ function fifthQuery(title, callback){
 
 function sixthQuery(title, callback){
     
-    let caseSix = util.format(queries.case_six, title,title,title,title,title,title)
-    connection.query(caseSix, function (err, rows, fields) {
+    let caseSix = queries.case_six
+    connection.query(caseSix,[title,title,title,title,title,title], function (err, rows, fields) {
         if (err) throw err
     
         console.log('Success')

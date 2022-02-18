@@ -12,17 +12,18 @@ CREATE TABLE ratings (
     userId int,
     movieId int,
     rating int,
-    timestamp int
+    timestamp int,
+    PRIMARY KEY (userId, movieId)
     )
 `,`
 CREATE TABLE links (
-    movieId int,
+    movieId int PRIMARY KEY,
     imdbId int,
     tmdbId int
 )
 `,`
 CREATE TABLE movies (
-    movieId int,
+    movieId int PRIMARY KEY,
     title varchar(100),
     genres varchar(100)
 )
@@ -31,18 +32,19 @@ CREATE TABLE tags (
     userId int,
     movieId int,
     tag varchar(100),
-    timestamp int 
+    timestamp int,
+    PRIMARY KEY (userId, movieId) 
 )
 ` ,`
 CREATE TABLE ratings_personality (
-    userid varchar(40),
+    userid varchar(40) PRIMARY KEY,
     movie_id int,
     rating int,
     tstamp DATETIME
 )
 `,  `
 CREATE TABLE personality_data (
-    userid varchar(40),
+    userid varchar(40) PRIMARY KEY,
     openness double,
     agreeableness double, 
     emotional_stability double, 
@@ -138,19 +140,19 @@ const csv_queres = [`INSERT IGNORE INTO movies (movieId, title, genres) VALUES ?
 ]
 
 const create_movies_title=`
-CREATE TABLE movies_titles AS 
+CREATE TABLE movies_titles(PRIMARY KEY(movieId)) AS 
 (SELECT movieId, title FROM films.movies)` 
  
 const create_movies_genre=`
-CREATE TABLE movies_genres AS 
+CREATE TABLE movies_genres(PRIMARY KEY(movieId)) AS 
 (SELECT movieId, genres FROM films.movies)` 
 
 
 const create_movies_genres_sep=`
-CREATE TABLE movies_genres_sep AS 
+CREATE TABLE movies_genres_sep(PRIMARY KEY (movieId, genre)) AS 
 (select 
 films.movies_genres.movieId, 
-SUBSTRING_INDEX(SUBSTRING_INDEX(films.movies_genres.genres, '|', numbers.n), '|', -1) name 
+SUBSTRING_INDEX(SUBSTRING_INDEX(films.movies_genres.genres, '|', numbers.n), '|', -1) genre 
 from 
 (select 1 n union all 
 select 2 union all select 3 union all 
@@ -169,7 +171,7 @@ SELECT links.tmdbId FROM links where links.movieId IN (
 const case_one = `
 SELECT MT.movieID, AVG(R.rating) as average_rating 
 FROM films.movies_titles MT, films.ratings R 
-WHERE MT.title = "%s" and MT.movieID = R.movieId
+WHERE MT.title = ? and MT.movieID = R.movieId
 GROUP BY MT.movieID;
 `;
 
@@ -185,10 +187,10 @@ ORDER BY AVG(R.rating) DESC;
 
 // //polarity
 const case_three = `
-SELECT MG.name, variance(R.rating) as VR 
+SELECT MG.genre, variance(R.rating) as VR 
 FROM films.movies_genres_sep MG, films.ratings R 
 WHERE MG.movieId = R.movieId 
-GROUP BY MG.name 
+GROUP BY MG.genre 
 ORDER BY VR DESC
 `;
 
@@ -212,16 +214,18 @@ GROUP BY hello.title, difference ;
 const case_five = `
 SELECT AVG(P.openness) as Openness, AVG(P.agreeableness) As Agreeableness, AVG(P.emotional_stability) AS Emotional_stability, AVG(P.conscientiousness) AS Conscientiousness, AVG(P.extraversion) AS Extraversion 
 FROM films.personality_data P JOIN films.ratings_personality R on P.userid = R.userId 
-WHERE P.userId IN (SELECT DISTINCT R.userId FROM films.ratings_personality R, films.movies M WHERE M.title="%s" AND R.movie_id = M.movieId AND R.rating >= 4); `;
+WHERE P.userId IN (SELECT DISTINCT R.userId FROM films.ratings_personality R, films.movies M WHERE M.title=? AND R.movie_id = M.movieId AND R.rating >= 4); `;
 
 const case_six = `
 SELECT AVG(P.openness) as Openness, AVG(P.agreeableness) As Agreeableness, AVG(P.emotional_stability) AS Emotional_stability, AVG(P.conscientiousness) AS Conscientiousness, AVG(P.extraversion) AS Extraversion FROM films.personality_data P 
-WHERE P.movie_1 in (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.title="%s")) 
-OR P.movie_2 IN (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.title="%s")) 
-OR P.movie_3 IN (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.title="%s")) 
-OR P.movie_4 IN (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.title="%s")) 
-OR P.movie_5 IN (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.title="%s")) 
-OR P.movie_6 IN (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.title="%s"));
+WHERE P.movie_1 in (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.title=?)) 
+OR P.movie_2 IN (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.title=?)) 
+OR P.movie_3 IN (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.title=?)) 
+OR P.movie_4 IN (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.title=?)) 
+OR P.movie_5 IN (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.title=?)) 
+OR P.movie_6 IN (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.title=?));
 `;
+
+
 
 module.exports = {create_list, drop_all, filenames, csv_queres, case_one, case_two, case_three, case_four,case_five,case_six, create_movies_genre, create_movies_title, create_movies_genres_sep, search}
