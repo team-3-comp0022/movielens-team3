@@ -25,6 +25,16 @@ app.get("/findMovies", (req, res) => {
   res.send
 });
 
+app.get("/search", (req, res) => {
+  console.log(req.query)
+  console.log(req.query.query)
+  var query = "SELECT * FROM movies";
+  connection.query(query, (err, result) => {
+    console.log(result);
+    res.send(result)
+  });
+  res.send
+});
 
 app.get("/", (req, res) => {
   res.send("Hi");
