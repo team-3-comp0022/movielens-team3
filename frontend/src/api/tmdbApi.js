@@ -1,5 +1,5 @@
+import { Axios } from "axios";
 import axiosClient from "./axiosClient";
-//import queries from "../backend/index"
 
 export const category = {
     movie: 'movie',
@@ -33,9 +33,10 @@ const tmdbApi = {
     },
     search: (cate, params) => {
         const url = 'search/' + category[cate];
-        //console.log(queries.firstQuery("Hello"));
-        //console.log("Hi");
-        //axiosClient.get("/");
+
+        axiosClient.get("http://localhost:3001/findMovies").then((response) => {
+                console.log(response);
+        })
         return axiosClient.get(url, params);
     },
     detail: (cate, id, params) => {

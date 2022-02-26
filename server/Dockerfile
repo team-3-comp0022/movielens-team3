@@ -1,18 +1,15 @@
-FROM node:17
-WORKDIR /usr/src/app
+FROM  node:16
 
-# Install app dependencies
-COPY package*.json ./
+# All subsequent commands will now be run from inside this folder
+RUN mkdir -p /server
+WORKDIR /server
+# Copy all the code in the local directory into the container’s working directory
+COPY ./ ./
 
 RUN npm install
-RUN npm install fast-csv
-RUN npm install mysql
 
-# Bundle app source
-COPY . .
+CMD [ "npm", "start" ]
 
-EXPOSE 8090
-
-CMD [ "node", "index.js" ]
+EXPOSE 3001
 
 # Source: https://nodejs.org/en/docs/guides/nodejs-docker-webapp/
