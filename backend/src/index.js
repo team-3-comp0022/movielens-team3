@@ -16,31 +16,61 @@ var connection = mysql.createConnection({
     database: "films",
     port: '8086'
   })
-  /*
-deleteTables()
-makeTables()
-addData()
-const sleep = (waitTimeInMs) => new Promise(resolve => setTimeout(resolve, waitTimeInMs));
-sleep(4000).then(() => {
-    makeSecondTables()
-    makeSplitTable()
-});*/
+
+
+function initialise_data(){
+    deleteTables()
+    makeTables()
+    addData()
+    const sleep = (waitTimeInMs) => new Promise(resolve => setTimeout(resolve, waitTimeInMs));
+    sleep(4000).then(() => {
+        makeSecondTables()
+        makeSplitTable()
+    });
+}
+
+//initialise_data()
 
 
 //get query result data on frontend
-/*var stuff_i_want = [];
-firstQuery("Fair Game (1995)", function(result){
-    stuff_i_want = result;
-    console.log(stuff_i_want)
- });*/
+// var stuff_i_want = [];
+// firstQuery("Fair Game (1995)", function(result){
+//     stuff_i_want = result;
+//     console.log(stuff_i_want)
+//  });
 
 
  //example usage
-/*var solution = [];
-searchQuery("Story", function(result){
-    solution = result;//returns array of Ids
-    console.log(solution)//use it
- });*/
+//  var solution = [];
+// searchQuery("Story", function(result){
+//     solution = result;//returns array of Ids
+//     console.log(solution)//use it
+//  });
+
+// secondQuery(function(result){
+//     solution = result;//returns array of Ids
+//     console.log(solution)//use it
+//  });
+
+//  thirdQuery(function(result){
+//     solution = result;//returns array of Ids
+//     console.log(solution)//use it
+//  });
+
+// fourthQuery(function(result){
+//     solution = result;//returns array of Ids
+//     console.log(solution)//use it
+//  });
+
+// fifthQuery("Jumanji (1995)",function(result){
+//     solution = result;//returns array of Ids
+//     console.log(solution)//use it
+//  });
+
+// sixthQuery("Jumanji (1995)",function(result){
+//     solution = result;//returns array of Ids
+//     console.log(solution)//use it
+//  });
 
 
 //connection.connect()
@@ -141,8 +171,8 @@ function searchQuery(title, callback){
 
 function firstQuery(title, callback){
     
-    let caseOne = util.format(queries.case_one, title)
-    connection.query(caseOne, function (err, rows, fields) {
+    let caseOne = queries.case_one
+    connection.query(caseOne,[title], function (err, rows, fields) {
         if (err) throw err
     
         console.log('Success')
@@ -150,24 +180,95 @@ function firstQuery(title, callback){
         return callback(rows[0].average_rating);
     })
 }
-/*
-function secondQuery(title, callback){
+
+function secondQuery(callback){
     
-    let caseTwo = util.format(queries.case_two, title)
+    let caseTwo = queries.case_two
     connection.query(caseTwo, function (err, rows, fields) {
         if (err) throw err
     
         console.log('Success')
-        console.log(rows)
-        stuff_i_want = rows[0].tmdbId;  // Scope is larger than function
-        //console.log(stuff_i_want)
-        return callback(rows[0].tmdbId);
+        // console.log(rows)
+        // for (let i =0; i<rows.length;i++){
+        //     for (let j in rows[i]){
+        //         console.log(j +": "+rows[i][j]);
+        //     }
+        // }
+        // desired_data = rows[0];  // Scope is larger than function
+        // console.log(desired_data)
+        return callback(rows);
     })
-}*/
+}
+
+function thirdQuery(callback){
+    
+    let caseThree = queries.case_three
+    connection.query(caseThree, function (err, rows, fields) {
+        if (err) throw err
+    
+        console.log('Success')
+        // console.log(rows)
+        // for (let i =0; i<rows.length;i++){
+        //     for (let j in rows[i]){
+        //         console.log(j +": "+rows[i][j]);
+        //     }
+        // }
+        // desired_data = rows[0];  // Scope is larger than function
+        // console.log(desired_data)
+        return callback(rows);
+    })
+}
+
+function fourthQuery(callback){
+    
+    let caseFour = queries.case_four
+    connection.query(caseFour, function (err, rows, fields) {
+        if (err) throw err
+    
+        console.log('Success')
+        // console.log(rows)
+        // for (let i =0; i<rows.length;i++){
+        //     for (let j in rows[i]){
+        //         console.log(j +": "+rows[i][j]);
+        //     }
+        // }
+        // desired_data = rows[0];  // Scope is larger than function
+        // console.log(desired_data)
+        return callback(rows);
+    })
+}
+
+function fifthQuery(title, callback){
+    
+    let caseFive = queries.case_five
+    connection.query(caseFive,[title], function (err, rows, fields) {
+        if (err) throw err
+    
+        console.log('Success')
+        return callback(rows);
+    })
+}
+
+function sixthQuery(title, callback){
+    
+    let caseSix = queries.case_six
+    connection.query(caseSix,[title,title,title,title,title,title], function (err, rows, fields) {
+        if (err) throw err
+    
+        console.log('Success')
+        return callback(rows);
+    })
+}
+
 
 //connection.end();
 
 module.exports= {
     searchQuery,
     firstQuery,
+    secondQuery,
+    thirdQuery,
+    fourthQuery,
+    fifthQuery,
+    sixthQuery
 }

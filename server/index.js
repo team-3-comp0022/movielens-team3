@@ -4,7 +4,7 @@ const app = express();
 const mysql = require('mysql');
 var cors = require('cors')
 const { DEC8_BIN } = require('mysql/lib/protocol/constants/charsets');
-
+const qResults = require('./query_access.js')
 
 var connection = mysql.createConnection({
     host: "db",
@@ -28,11 +28,19 @@ app.get("/findMovies", (req, res) => {
 app.get("/search", (req, res) => {
   console.log(req.query)
   console.log(req.query.query)
+  let searchData = req.query.query
+  //new
+  qResults.searchQuery(searchData, function(result){
+     console.log(result)
+     res.send(result)
+  });
+  /*
   var query = "SELECT * FROM movies";
   connection.query(query, (err, result) => {
     console.log(result);
     res.send(result)
-  });
+  });*/
+  //new
   res.send
 });
 
