@@ -1,0 +1,98 @@
+1. 
+
+SELECT MT.movieID, AVG(R.rating) as average_rating 
+FROM films.movies_titles MT, films.ratings R 
+WHERE MT.title = "Fair Game (1995)" and MT.movieID = R.movieId; 
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+2. 
+
+SELECT MT.title, AVG(R.rating) 
+FROM films.movies_titles MT, films.ratings R 
+WHERE MT.movieID = R.movieID 
+GROUP BY MT.title 
+ORDER BY AVG(R.rating) DESC; 
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+3. 
+
+CREATE TABLE movies_genres_sep AS 
+(select 
+films.movies_genres.movieId, 
+SUBSTRING_INDEX(SUBSTRING_INDEX(films.movies_genres.genres, '|', numbers.n), '|', -1) name 
+from 
+(select 1 n union all 
+select 2 union all select 3 union all 
+select 4 union all select 5) numbers INNER JOIN films.movies_genres 
+on CHAR_LENGTH(films.movies_genres.genres) 
+-CHAR_LENGTH(REPLACE(films.movies_genres.genres, '|', ''))>=numbers.n-1 
+order by 
+films.movies_genres.movieId, n); 
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+4. 
+
+SELECT hello.title, AVG(hello.rating), averages.avg_rating, ABS(averages.avg_rating - hello.rating) as difference 
+
+FROM ( 
+
+SELECT R.userId, R.movieId, MT.title, SUBSTRING_INDEX(SUBSTRING_INDEX(MT.title, '(', -1), ')', 1) as year, FROM_UNIXTIME(R.timestamp) as rating_time_stamp, R.rating 
+
+FROM films.ratings R, films.movies_titles MT 
+
+WHERE R.movieId = MT.movieId  
+
+AND SUBSTRING_INDEX(SUBSTRING_INDEX(MT.title, '(', -1), ')', 1) = YEAR(FROM_UNIXTIME(R.timestamp)) 
+
+) AS hello, (SELECT MT.title, AVG(R.rating) as avg_rating, MT.movieId 
+
+FROM films.movies_titles MT, films.ratings R  
+
+WHERE MT.movieId = R.movieId 
+
+GROUP BY MT.title  
+
+ORDER BY AVG(R.rating) DESC) AS averages 
+
+WHERE hello.movieId = averages.movieId 
+
+GROUP BY hello.movieId 
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+5. 
+
+SELECT AVG(P.openness) as Openness, AVG(P.agreeableness) As Agreeableness, AVG(P.emotional_stability) AS Emotional_stability, AVG(P.conscientiousness) AS Conscientiousness, AVG(P.extraversion) AS Extraversion  
+
+FROM films.personality_data P 
+
+JOIN ratings_ten_users R on P.userId = R.userId  
+
+WHERE P.userId IN (SELECT DISTINCT R.userId FROM films.ratings_ten_users R WHERE R.movie_id = 2571 AND R.rating > 4) 
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+6. 
+SELECT AVG(P.openness) as Openness, AVG(P.agreeableness) As Agreeableness,   
+
+AVG(P.emotional_stability) AS Emotional_stability, AVG(P.conscientiousness) AS Conscientiousness, AVG(P.extraversion) AS Extraversion   
+
+FROM films.personality_data P, (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag  FROM films.tags T  WHERE T.movieId = 2)) AS TAG, films.tags T 
+
+WHERE P.movie_1 in (SELECT DISTINCT T.movieId FROM films.tags T )  
+
+OR P.movie_2 IN (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag  FROM films.tags T WHERE T.movieId = 2))  
+
+OR P.movie_3 IN (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag  FROM films.tags T  WHERE T.movieId = 2))  
+
+OR P.movie_4 IN (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag  FROM films.tags T  WHERE T.movieId = 2))  
+
+OR P.movie_5 IN (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag  FROM films.tags T WHERE T.movieId = 2))  
+
+OR P.movie_6 IN (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag  FROM films.tags T WHERE T.movieId = 2)); 
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
