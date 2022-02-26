@@ -37,6 +37,7 @@ const tmdbApi = {
 
         axiosClient.get("http://localhost:3001/search",params
         ).then((response) => {
+            //RESPONSE IS THE IDS
         })
         return axiosClient.get(url, params);
     },

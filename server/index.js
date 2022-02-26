@@ -29,24 +29,72 @@ app.get("/search", (req, res) => {
   console.log(req.query)
   console.log(req.query.query)
   let searchData = req.query.query
-  //new
   qResults.searchQuery(searchData, function(result){
      console.log(result)
      res.send(result)
   });
-  /*
-  var query = "SELECT * FROM movies";
-  connection.query(query, (err, result) => {
-    console.log(result);
-    res.send(result)
-  });*/
-  //new
+  res.send
+});
+
+app.get("/firstQuery", (req, res) => {
+  console.log(req.query)
+  console.log(req.query.query)
+  let firstData = req.query.query
+  qResults.firstQuery(firstData, function(result){
+     console.log(result)
+     res.send(result)
+  });
+  res.send
+});
+
+app.get("/secondQuery", (req, res) => {
+  qResults.secondQuery(function(result){
+     console.log(result)
+     res.send(result)
+  });
+  res.send
+});
+
+app.get("/thirdQuery", (req, res) => {
+  qResults.thirdQuery(function(result){
+     console.log(result)
+     res.send(result)
+  });
+  res.send
+});
+
+app.get("/fourthQuery", (req, res) => {
+  qResults.fourthQuery(function(result){
+     console.log(result)
+     res.send(result)
+  });
+  res.send
+});
+
+app.get("/fifthQuery", (req, res) => {
+  console.log(req.query)
+  console.log(req.query.query)
+  let fifthData = req.query.query
+  qResults.fifthQuery(fifthData,function(result){
+     console.log(result)
+     res.send(result)
+  });
+  res.send
+});
+
+app.get("/sixthQuery", (req, res) => {
+  console.log(req.query)
+  console.log(req.query.query)
+  let sixthData = req.query.query
+  qResults.sixthQuery(sixthData,function(result){
+     console.log(result)
+     res.send(result)
+  });
   res.send
 });
 
 app.get("/", (req, res) => {
   res.send("Hi");
-  var query = "INSERT INTO `links` (`movieId`, `imdbId`, `tmdbId`) VALUES ('0', '0', '0');";
 
   connection.ping(function (err) {
       if(err) {
