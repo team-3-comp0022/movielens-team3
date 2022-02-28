@@ -1,8 +1,19 @@
 // Source: https://www.youtube.com/watch?v=T8mqZZ0r-RA
 const express = require('express');
+const bodyParser = require("body-parser");
+const pathToFrontend = __dirname +'/views/';
 const app = express();
+const cors = require("cors");
+app.use(express.static(pathToFrontend));
+var corsOptions = {
+  origin: "http://localhost:3001"
+};
+app.use(cors(corsOptions));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
 const mysql = require('mysql');
-var cors = require('cors')
+//var cors = require('cors')
 const { DEC8_BIN } = require('mysql/lib/protocol/constants/charsets');
 const qResults = require('./query_access.js')
 
@@ -14,7 +25,7 @@ var connection = mysql.createConnection({
     port: '3306'
   });
 
-app.use(cors());
+ //app.use(cors());
 
 app.get("/findMovies", (req, res) => {
   var query = "SELECT * FROM movies";
@@ -93,8 +104,8 @@ app.get("/sixthQuery", (req, res) => {
   res.send
 });
 
-app.get("/", (req, res) => {
-  res.send("Hi");
+app.get("/", (req, res) => { // req = get info from the frontend
+  res.sendFile(pathToFrontend + "index.html"); // res = response we are sending to the frontend
 
   connection.ping(function (err) {
       if(err) {
@@ -110,8 +121,9 @@ app.get("/", (req, res) => {
   })
   console.log("Hey");*/
   res.send("hello world");
-})
-
+});
+//require("")(app);
+//const PORT = process.env.PORT || 3000;
 app.listen(3001, '0.0.0.0', () => {
     console.log("Running on 3001");
 });
