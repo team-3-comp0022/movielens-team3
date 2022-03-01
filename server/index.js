@@ -25,6 +25,15 @@ app.get("/findMovies", (req, res) => {
   res.send
 });
 
+app.get("/findMovieIds", (req, res) => {
+  var query = "SELECT imdbId FROM links INNER JOIN movies ON movies.movieId = links.movieId";
+  connection.query(query, (err, result) => {
+    console.log(result);
+    res.send(result)
+  });
+  res.send
+});
+
 app.get("/search", (req, res) => {
   console.log(req.query)
   console.log(req.query.query)
