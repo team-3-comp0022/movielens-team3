@@ -1,5 +1,6 @@
+import { Axios } from "axios";
 import axiosClient from "./axiosClient";
-//import queries from "../backend/index"
+// const index = require('../backend/index_bend');
 
 export const category = {
     movie: 'movie',
@@ -21,6 +22,10 @@ export const tvType = {
 const tmdbApi = {
     getMoviesList: (type, params) => {
         const url = 'movie/' + movieType[type];
+        axiosClient.get("http://localhost:3001/findMovieIds").then((response) => {
+            //RESPONSE IS THE IDS
+            console.log(response);
+        })
         return axiosClient.get(url, params);
     },
     getTvList: (type, params) => {
@@ -33,9 +38,11 @@ const tmdbApi = {
     },
     search: (cate, params) => {
         const url = 'search/' + category[cate];
-        //console.log(queries.firstQuery("Hello"));
-        //console.log("Hi");
-        //axiosClient.get("/");
+
+        axiosClient.get("http://localhost:3001/search",params
+        ).then((response) => {
+            //RESPONSE IS THE IDS
+        })
         return axiosClient.get(url, params);
     },
     detail: (cate, id, params) => {

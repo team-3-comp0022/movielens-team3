@@ -4,69 +4,72 @@ services:
 
   frontend:
     container_name: frontend
+    restart: unless-stopped
     build:
       context: ./frontend
       dockerfile: Dockerfile
     volumes:
       - './frontend:/usr/src/app'
+         # - ./app/src:/app/src
     ports:
-      - 3001:3000
+      - "3000:3000"
     environment:
       - CHOKIDAR_USEPOLLING=true
+    links:
+      - server
+    networks:
+      - dbNetwork
+    depends_on:
+      - server
 
   server:
     container_name: server
+    restart: unless-stopped
     build: 
       context: ./server
       dockerfile: Dockerfile
     volumes:
-      - './server:/usr/src/app'
-      - '/usr/src/app/node_modules'
+      - "./server:/server"
     ports:
-      - 8090:8090
+      - "3001:3001"
     environment:
       - CHOKIDAR_USEPOLLING=true
-    #networks:
-    #  - dbNetwork
-
-  #backend:
-  #  container_name: backend
-  #  build: 
-  #    context: ./backend
-  #    dockerfile: Dockerfile
-  #  volumes:
-  #    - './express:/usr/src/app'
-  #    - '/usr/src/app/node_modules'
-  #  ports:
-  #    - 8081:8080
-  #  environment:
-  #    - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      - db
+    networks:
+      - dbNetwork
+    links:
+      - db
 
   db:
     image: mysql
-    command: mysqld --default-authentication-plugin=mysql_native_password
+    command: mysqld --default-authentication-plugin=mysql_native_password --max_allowed_packet=8532505856 --wait_timeout=58800
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: example
-    # TODO: Enable networks
-    #networks:
-    #  - dbNetwork
     ports:
-      - 8086:3306
+      - 3306:3306
     volumes:
       - dbdata:/var/lib/mysql
+    networks:
+      - dbNetwork
 
   phpmyadmin:
-    image: phpmyadmin
+    image: phpmyadmin:5
     restart: always
     ports:
       - 8080:80
     environment:
       - PMA_HOST=db
+    depends_on:
+      - db
+    links:
+      - db
+    networks:
+      - dbNetwork
 
-#networks:
-#    dbNetwork:
-#      driver: bridge
+networks:
+    dbNetwork:
 
 volumes: 
   dbdata:
