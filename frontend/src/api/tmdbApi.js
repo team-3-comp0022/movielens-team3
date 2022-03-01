@@ -1,6 +1,5 @@
 import { Axios } from "axios";
 import axiosClient from "./axiosClient";
-// const index = require('../backend/index_bend');
 
 export const category = {
     movie: 'movie',
@@ -25,6 +24,8 @@ const tmdbApi = {
         axiosClient.get("http://localhost:3001/findMovieIds").then((response) => {
             //RESPONSE IS THE IDS
             console.log(response);
+            console.log(Object.getOwnPropertyNames(response));
+            console.log(typeof(response));
         })
         return axiosClient.get(url, params);
     },
