@@ -13,13 +13,16 @@ var connection = mysql.createConnection({
     host: "db",
     user: "root",
     password: "example",
-    database: "films",
+    //database: "films",
     port: '3306'
   });
 
 
 function initialise_data(){
-    deleteTables()
+    //deleteTables()
+    deleteDatabase()
+    makeDatabase()
+    useDatabase()
     makeTables()
     addData()
     const sleep = (waitTimeInMs) => new Promise(resolve => setTimeout(resolve, waitTimeInMs));
@@ -29,7 +32,7 @@ function initialise_data(){
     });
 }
 
-//initialise_data()
+initialise_data()
 
 
 //get query result data on frontend
@@ -82,6 +85,30 @@ function test(){
     })
 }
 
+/* create Databse */
+function makeDatabase(){
+    const create_db = queries.create_db
+
+    connection.query(create_db, function (err, rows, fields) {
+        if (err) throw err
+        
+        console.log('Success creating databse')
+    });
+
+}
+
+/* create Databse */
+function useDatabase(){
+    const use_db = queries.use_db
+
+    connection.query(use_db, function (err, rows, fields) {
+        if (err) throw err
+        
+        console.log('Success creating databse')
+    });
+
+}
+
 /* create tables */
 function makeTables(){
     const create_list = queries.create_list
@@ -99,6 +126,17 @@ function deleteTables(){
     const drop_all = queries.drop_all
 
     connection.query(drop_all, function (err, rows, fields) {
+        if (err) throw err
+    
+        console.log('Success')
+    })
+}
+
+/* delete database */
+function deleteDatabase(){
+    const drop_db = queries.drop_db
+
+    connection.query(drop_db, function (err, rows, fields) {
         if (err) throw err
     
         console.log('Success')

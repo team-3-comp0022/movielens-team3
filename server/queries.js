@@ -84,6 +84,15 @@ CREATE TABLE personality_data (
 
 const drop_all = `DROP TABLE IF EXISTS links, ratings, movies, tags, ratings_personality, personality_data, movies_titles, movies_genres, movies_genres_sep`
 
+const drop_db = `DROP DATABASE IF EXISTS films;`
+
+const create_db = `CREATE DATABASE films
+DEFAULT CHARACTER SET utf8
+DEFAULT COLLATE utf8_general_ci;`
+
+const use_db = `
+USE films;`
+
 
 const filenames = ["./ml-latest-small/movies.csv","./ml-latest-small/links.csv", "./ml-latest-small/ratings.csv","./ml-latest-small/tags.csv", "./personality-isf2018/personality-data.csv","./personality-isf2018/ratings.csv"]
 const csv_queres = [`INSERT IGNORE INTO movies (movieId, title, genres) VALUES ?`, 
@@ -228,4 +237,4 @@ OR P.movie_6 IN (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM fi
 
 
 
-module.exports = {create_list, drop_all, filenames, csv_queres, case_one, case_two, case_three, case_four,case_five,case_six, create_movies_genre, create_movies_title, create_movies_genres_sep, search}
+module.exports = {create_list, drop_all, filenames, csv_queres, case_one, case_two, case_three, case_four,case_five,case_six, create_movies_genre, create_movies_title, create_movies_genres_sep, search, drop_db, create_db, use_db}
