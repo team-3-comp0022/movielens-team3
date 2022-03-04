@@ -84,6 +84,14 @@ CREATE TABLE personality_data (
 
 const drop_all = `DROP TABLE IF EXISTS links, ratings, movies, tags, ratings_personality, personality_data, movies_titles, movies_genres, movies_genres_sep`
 
+const drop_db = `DROP Database films;`
+
+const makeDatabase = `CREATE DATABASE films
+DEFAULT CHARACTER SET utf8
+DEFAULT COLLATE utf8_general_ci;
+
+USE films;`
+
 
 const filenames = ["./ml-latest-small/movies.csv","./ml-latest-small/links.csv", "./ml-latest-small/ratings.csv","./ml-latest-small/tags.csv", "./personality-isf2018/personality-data.csv","./personality-isf2018/ratings.csv"]
 const csv_queres = [`INSERT IGNORE INTO movies (movieId, title, genres) VALUES ?`, 
@@ -167,21 +175,35 @@ SELECT links.tmdbId FROM links where links.movieId IN (
   SELECT movies_titles.movieId FROM movies_titles WHERE movies_titles.title LIKE "%@%")
 `
 
-// //substitute the Fair Game for %s
+const create_year_table = `CREATE TABLE movie_years(PRIMARY KEY(movieId)) AS 
+(SELECT *, REPLACE(RIGHT(title, LOCATE('(',REVERSE(title))-1),')','') AS year FROM films.movies_titles)`;
+
+// //substitute the Fair Game for ?
+// return the TMDB ID instead
+//Tom and Huck (1995)
+// SELECT MT.movieID, AVG(R.rating) as average_rating 
+// FROM films.movies_titles MT, films.ratings R 
+// WHERE MT.title = 'Tom and Huck (1995)' and MT.movieID = R.movieId
+// GROUP BY MT.movieID;
+// SELECT lk.tmdbId, AVG(R.rating) as average_rating 
+// FROM films.movies_titles MT, films.ratings R, links lk
+// WHERE MT.title = "Tom and Huck (1995)" and MT.movieID = R.movieId and MT.movieID = lk.movieId
+// GROUP BY MT.movieID;
 const case_one = `
-SELECT MT.movieID, AVG(R.rating) as average_rating 
-FROM films.movies_titles MT, films.ratings R 
-WHERE MT.title = ? and MT.movieID = R.movieId
+SELECT lk.tmdbId, MT.movieID, AVG(R.rating) as average_rating 
+FROM films.movies_titles MT, films.ratings R, links lk 
+WHERE MT.title = ? and MT.movieID = R.movieId and MT.movieID = lk.movieId
 GROUP BY MT.movieID;
 `;
 
 //rate movies by average popularity
+//return TMDB ID instead of title
 const case_two = `
-SELECT MT.title, AVG(R.rating) as average_rating
-FROM films.movies_titles MT, films.ratings R 
-WHERE MT.movieID = R.movieID 
-GROUP BY MT.title 
-ORDER BY AVG(R.rating) DESC; 
+SELECT lk.movieId, AVG(R.rating) as average_rating
+FROM films.movies_titles MT, films.ratings R, films.links lk
+WHERE MT.movieID = R.movieID AND MT.movieID = lk.movieId
+GROUP BY lk.movieId
+ORDER BY AVG(R.rating) DESC;
 `;
 
 
@@ -195,21 +217,40 @@ ORDER BY VR DESC
 `;
 
 //predict how a film
+//return TMDB ID instead of title
+// SELECT hello.title, AVG(hello.rating), ABS(averages.avg_rating - hello.rating) as difference 
+// FROM ( 
+// SELECT R.userId, R.movieId, MT.title, REPLACE(RIGHT(title, LOCATE('(',REVERSE(title))-1),')','') AS year , FROM_UNIXTIME(R.timestamp) as rating_time_stamp, R.rating 
+// FROM films.ratings R, films.movies_titles MT 
+// WHERE R.movieId = MT.movieId  
+// AND REPLACE(RIGHT(title, LOCATE('(',REVERSE(title))-1),')','') = YEAR(FROM_UNIXTIME(R.timestamp)) 
+// ) AS hello, (SELECT MT.movieId, AVG(R.rating) as avg_rating 
+// FROM films.movies_titles MT, films.ratings R  
+// WHERE MT.movieId = R.movieId 
+// GROUP BY MT.movieId  
+// ORDER BY avg_rating DESC) AS averages 
+// WHERE hello.movieId = averages.movieId 
+// GROUP BY hello.title, difference;
 const case_four = `
-SELECT hello.title, AVG(hello.rating), ABS(averages.avg_rating - hello.rating) as difference 
+SELECT lk.tmdbId, AVG(hello.rating), ABS(averages.avg_rating - hello.rating) as difference 
 FROM ( 
-SELECT R.userId, R.movieId, MT.title, SUBSTRING_INDEX(SUBSTRING_INDEX(MT.title, '(', -1), ')', 1) as year, FROM_UNIXTIME(R.timestamp) as rating_time_stamp, R.rating 
+SELECT R.userId, R.movieId, MT.title, REPLACE(RIGHT(title, LOCATE('(',REVERSE(title))-1),')','') AS year , FROM_UNIXTIME(R.timestamp) as rating_time_stamp, R.rating 
 FROM films.ratings R, films.movies_titles MT 
 WHERE R.movieId = MT.movieId  
-AND SUBSTRING_INDEX(SUBSTRING_INDEX(MT.title, '(', -1), ')', 1) = YEAR(FROM_UNIXTIME(R.timestamp)) 
+AND REPLACE(RIGHT(title, LOCATE('(',REVERSE(title))-1),')','') = YEAR(FROM_UNIXTIME(R.timestamp)) 
 ) AS hello, (SELECT MT.movieId, AVG(R.rating) as avg_rating 
 FROM films.movies_titles MT, films.ratings R  
 WHERE MT.movieId = R.movieId 
 GROUP BY MT.movieId  
-ORDER BY AVG(R.rating) DESC) AS averages 
-WHERE hello.movieId = averages.movieId 
-GROUP BY hello.title, difference ; 
+ORDER BY avg_rating DESC) AS averages, films.links lk
+WHERE hello.movieId = averages.movieId and averages.movieId = lk.tmdbId
+GROUP BY lk.tmdbId, difference;
 `;
+
+//Friend Is a Treasure, A (Chi Trova Un Amico, Trova un Tesoro) (Who Finds a Friend Finds a Treasure) (1981)
+//)1891( )erusaerT a sdniF dneirF a sdniF ohW( )oros...
+
+//REPLACE(RIGHT(title, LOCATE('(',REVERSE(title))-1),')','') 
 
 const case_five = `
 SELECT AVG(P.openness) as Openness, AVG(P.agreeableness) As Agreeableness, AVG(P.emotional_stability) AS Emotional_stability, AVG(P.conscientiousness) AS Conscientiousness, AVG(P.extraversion) AS Extraversion 
@@ -228,4 +269,4 @@ OR P.movie_6 IN (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM fi
 
 
 
-module.exports = {create_list, drop_all, filenames, csv_queres, case_one, case_two, case_three, case_four,case_five,case_six, create_movies_genre, create_movies_title, create_movies_genres_sep, search}
+module.exports = {create_list, drop_all, filenames, csv_queres, case_one, case_two, case_three, case_four,case_five,case_six, create_movies_genre, create_movies_title, create_movies_genres_sep, search, drop_db, makeDatabase, create_year_table}

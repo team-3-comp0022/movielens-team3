@@ -20,6 +20,7 @@ var connection = mysql.createConnection({
 
 function initialise_data(){
     deleteTables()
+    //makeDatabase()
     makeTables()
     addData()
     const sleep = (waitTimeInMs) => new Promise(resolve => setTimeout(resolve, waitTimeInMs));
@@ -34,10 +35,10 @@ function initialise_data(){
 
 //get query result data on frontend
 // var stuff_i_want = [];
-// firstQuery("Fair Game (1995)", function(result){
-//     stuff_i_want = result;
-//     console.log(stuff_i_want)
-//  });
+firstQuery("Tom and Huck (1995)", function(result){
+    stuff_i_want = result;
+    console.log(stuff_i_want)
+ });
 
 
  //example usage
@@ -81,6 +82,17 @@ function test(){
     console.log('The solution is: ', rows[0].solution)
     })
 }
+
+function makeDatabase(){
+    const create_db = queries.create_db
+    
+    connection.query(create_db, function (err, rows, fields) {
+        if (err) throw err
+        console.log('Success creating databse')
+    });
+    
+}
+
 
 /* create tables */
 function makeTables(){
