@@ -163,7 +163,7 @@ order by
 films.movies_genres.movieId, n); 
 `
 const search =`
-SELECT links.tmdbId FROM links where links.movieId IN (
+SELECT links.imdbId FROM links where links.movieId IN (
   SELECT movies_titles.movieId FROM movies_titles WHERE movies_titles.title LIKE "%@%")
 `
 

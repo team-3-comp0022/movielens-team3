@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory, useParams } from 'react-router';
 import useCollapse from 'react-collapsed';
+import axios from "axios";
 
 import './movie-grid.scss';
 
@@ -10,7 +11,7 @@ import Input from '../input/Input'
 
 import tmdbApi, { category, movieType, tvType } from '../../api/tmdbApi';
 
-const MovieGrid = props => {
+const MovieGrid = (props) => {
 
     const [items, setItems] = useState([]);
 
@@ -22,11 +23,35 @@ const MovieGrid = props => {
     useEffect(() => {
         const getList = async () => {
             let response = null;
+            var result = [];
+            var final = [];
+            var finaloffinal = [];
             if (keyword === undefined) {
                 const params = {};
                 switch(props.category) {
                     case category.movie:
-                        response = await tmdbApi.getMoviesList(movieType.upcoming, {params});
+                        final = await axios.get('http://localhost:3001/findMovieIds');
+                        // the whole array with our IDs is response.data
+                              console.log("try it");
+                                console.log(final.data);
+                                
+                                for (var i = 0; i < 10; i++){
+                                    console.log(final.data[i].imdbId);
+                                    result.push(final.data[i]);
+                                }
+                        
+                        final = await tmdbApi.getMoviesFromOurDatabase(result, {params});
+                        for (var i = 0; i < 10; i++) {
+                            final[i].then(value => { console.log(value.movie_results[0]);
+                                //if(value.movie_results[0] ==0) break;
+                                finaloffinal.push(value.movie_results[0]);  });
+                           }
+                           final = [];
+                           final = {page:1, result: finaloffinal, total_pages: 1, total_results: 10} 
+                           response = final;
+                          console.log(response);
+
+                       // response = await tmdbApi.getMoviesList(movieType.popular, {params});
                         break;
                     default:
                         response = await tmdbApi.getTvList(tvType.popular, {params});
@@ -37,7 +62,7 @@ const MovieGrid = props => {
                 }
                 response = await tmdbApi.search(props.category, {params});
             }
-            setItems(response.results);
+            setItems(response.result)
             setTotalPage(response.total_pages);
         }
         getList();

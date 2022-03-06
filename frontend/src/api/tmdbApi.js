@@ -1,4 +1,3 @@
-import { Axios } from "axios";
 import axiosClient from "./axiosClient";
 
 export const category = {
@@ -9,7 +8,8 @@ export const category = {
 export const movieType = {
     upcoming: 'upcoming',
     popular: 'popular',
-    top_rated: 'top_rated'
+    top_rated: 'top_rated',
+    latest: 'latest'
 }
 
 export const tvType = {
@@ -20,15 +20,37 @@ export const tvType = {
 
 const tmdbApi = {
     getMoviesList: (type, params) => {
+        
         const url = 'movie/' + movieType[type];
-        axiosClient.get("http://localhost:3001/findMovieIds").then((response) => {
-            //RESPONSE IS THE IDS
-            console.log(response);
-            console.log(Object.getOwnPropertyNames(response));
-            console.log(typeof(response));
-        })
         return axiosClient.get(url, params);
+       
     },
+    getMoviesFromOurDatabase: (id,params) => {
+        //let res = await axios.get('http://localhost:3001/findMovieIds');
+        // let data = res.data;
+        // console.log("fml");
+        // // for (var i = 0; i < 10; i++)
+        //      console.log(data[i].imdbId);
+        // for (var i = 0; i < 10; i++){
+        //      tailoredUrl = 'find/' + data[i].imdbId+ '?api_key=1a438c34cc51e3bef8fc7e078fa986fc&language=en-US&external_source=imdb_id';
+        //      console.log(tailoredUrl);
+        //      all_urls.push(tailoredUrl);
+        //     }
+        //     console.log(all_urls);
+        // }
+        //makeGetRequest();
+        var my_list = [];
+        for (var i = 0; i < 10; i++){
+           var my_id = id[i].imdbId; 
+           const url = 'find/' + 'tt0'+ my_id;
+           console.log(url);
+           const tailoredUrl = "https://api.themoviedb.org/3/"+ url +'?api_key=1a438c34cc51e3bef8fc7e078fa986fc&external_source=imdb_id';
+           console.log(tailoredUrl);
+           my_list.push(axiosClient.get(tailoredUrl,params));
+        }
+        return my_list;
+    },
+
     getTvList: (type, params) => {
         const url = 'tv/' + tvType[type];
         return axiosClient.get(url, params);
@@ -40,8 +62,7 @@ const tmdbApi = {
     search: (cate, params) => {
         const url = 'search/' + category[cate];
 
-        axiosClient.get("http://localhost:3001/search",params
-        ).then((response) => {
+        axiosClient.get("http://localhost:3001/search",params).then((response) => {
             //RESPONSE IS THE IDS
         })
         return axiosClient.get(url, params);
