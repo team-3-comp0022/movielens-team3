@@ -18,14 +18,17 @@ export const tvType = {
     on_the_air: 'on_the_air'
 }
 
+export async function getMoviesFromDB(list_of_ids,params, callback) {
+   return callback(tmdbApi.getMoviesFromOurDatabase(list_of_ids,params));
+}
+
 const tmdbApi = {
     getMoviesList: (type, params) => {
-        
         const url = 'movie/' + movieType[type];
         return axiosClient.get(url, params);
        
     },
-    getMoviesFromOurDatabase: (id,params) => {
+    getMoviesFromOurDatabase: (list_of_ids,params) => {
         //let res = await axios.get('http://localhost:3001/findMovieIds');
         // let data = res.data;
         // console.log("fml");
@@ -40,12 +43,12 @@ const tmdbApi = {
         // }
         //makeGetRequest();
         var my_list = [];
-        for (var i = 0; i < 10; i++){
-           var my_id = id[i].imdbId; 
+        for (var i = 0; i < list_of_ids.length; i++){ // render 20 movies each time
+           var my_id = list_of_ids[i].imdbId; 
            const url = 'find/' + 'tt0'+ my_id;
-           console.log(url);
+           //console.log(url);
            const tailoredUrl = "https://api.themoviedb.org/3/"+ url +'?api_key=1a438c34cc51e3bef8fc7e078fa986fc&external_source=imdb_id';
-           console.log(tailoredUrl);
+           //console.log(tailoredUrl);
            my_list.push(axiosClient.get(tailoredUrl,params));
         }
         return my_list;
