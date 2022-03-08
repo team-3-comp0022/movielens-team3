@@ -9,9 +9,7 @@ import MovieCard from '../movie-card/MovieCard';
 import Button, { OutlineButton } from '../button/Button';
 import Input from '../input/Input'
 
-import tmdbApi, { category, movieType, tvType } from '../../api/tmdbApi';
-
-import getMoviesFromDB from '../../api/tmdbApi';
+import tmdbApi, { category, movieType } from '../../api/tmdbApi';
 
 const MovieGrid = (props) => {
 
@@ -51,8 +49,7 @@ const MovieGrid = (props) => {
                         response = {page:2, results: result, total_pages: 4, total_results: 70};                       
                         //response = await tmdbApi.getMoviesList(movieType.popular, {params});   
                         break;
-                    default:
-                        response = await tmdbApi.getTvList(tvType.popular, {params});
+                    
                 }
             } else {
                 const params = {
@@ -103,8 +100,7 @@ const MovieGrid = (props) => {
                     //response = await tmdbApi.getMoviesList(movieType.popular, {params});
                     //console.log("myitems", items); 
                     break;
-                default:
-                    response = await tmdbApi.getTvList(tvType.popular, {params});
+                
             }
         } else {
             const params = {
