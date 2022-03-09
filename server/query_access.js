@@ -198,6 +198,7 @@ function firstQuery(title, callback){
         return callback(rows[0].average_rating);
     })
 }
+
 /*
 function secondQuery(callback){
     
