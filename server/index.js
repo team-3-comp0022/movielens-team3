@@ -17,6 +17,7 @@ var connection = mysql.createConnection({
 app.use(cors());
 
 app.get("/findMovies", (req, res) => {
+  console.log("Yes");
   var query = "SELECT * FROM movies";
   connection.query(query, (err, result) => {
     console.log(result);
@@ -28,22 +29,19 @@ app.get("/findMovies", (req, res) => {
 app.get("/findMovieIds", (req, res) => {
   var query = "SELECT imdbId FROM links INNER JOIN movies ON movies.movieId = links.movieId";
   connection.query(query, (err, result) => {
-    console.log(result);
     res.send(result)
   });
   res.send
 });
 
-app.get("/search", (req, res) => {
-  console.log(req.query)
-  console.log(req.query.query)
-  let searchData = req.query.query
-  qResults.searchQuery(searchData, function(result){
-     console.log(result)
-     res.send(result)
-  });
-  res.send
-});
+ app.get("/search", (req, res) => {
+   let searchData = req.query.query;
+   qResults.searchQuery(searchData, function(result){
+      console.log("mysearch", result);
+      res.send(result);
+   });
+   res.send
+ });
 
 app.get("/getGenre", (req, res) => {
   qResults.getGenre(function(result){
@@ -76,12 +74,13 @@ app.get("/firstQuery", (req, res) => {
 });
 
 app.get("/secondQuery", (req, res) => {
-  qResults.secondQuery(function(result){
+  qResults.secondQuery(req.query.query, function(result){
      console.log(result)
      res.send(result)
   });
   res.send
 });
+
 
 app.get("/thirdQuery", (req, res) => {
   qResults.thirdQuery(function(result){

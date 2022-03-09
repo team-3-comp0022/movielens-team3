@@ -17,8 +17,8 @@ export const tvType = {
     on_the_air: 'on_the_air'
 }
 
-export async function getMoviesFromDB(list_of_ids,params, callback) {
-   return callback(tmdbApi.getMoviesFromOurDatabase(list_of_ids,params));
+function searchInDB(list_of_ids,params, callback) {
+   return callback(tmdbApi.search(list_of_ids,params));
 }
 
 const tmdbApi = {
@@ -28,23 +28,10 @@ const tmdbApi = {
        
     },
     getMoviesFromOurDatabase: (list_of_ids,params) => {
-        //let res = await axios.get('http://localhost:3001/findMovieIds');
-        // let data = res.data;
-        // console.log("fml");
-        // // for (var i = 0; i < 10; i++)
-        //      console.log(data[i].imdbId);
-        // for (var i = 0; i < 10; i++){
-        //      tailoredUrl = 'find/' + data[i].imdbId+ '?api_key=1a438c34cc51e3bef8fc7e078fa986fc&language=en-US&external_source=imdb_id';
-        //      console.log(tailoredUrl);
-        //      all_urls.push(tailoredUrl);
-        //     }
-        //     console.log(all_urls);
-        // }
-        //makeGetRequest();
         var my_list = [];
         for (var i = 0; i < list_of_ids.length; i++){ // render 20 movies each time
            var my_id = list_of_ids[i].imdbId; 
-           const url = 'find/' + 'tt0'+ my_id;
+           const url = 'find/' + 'tt'+ my_id;
            //console.log(url);
            const tailoredUrl = "https://api.themoviedb.org/3/"+ url +'?api_key=1a438c34cc51e3bef8fc7e078fa986fc&external_source=imdb_id';
            //console.log(tailoredUrl);
@@ -57,24 +44,25 @@ const tmdbApi = {
         const url = category[cate] + '/' + id + '/videos';
         return axiosClient.get(url, {params: {}});
     },
-    search: (cate, params) => {
-        const url = 'search/' + category[cate];
-
-        axiosClient.get("http://localhost:3001/search",params).then((response) => {
-            //RESPONSE IS THE IDS
+    search: (params) => {
+        console.log("intra in search");
+        console.log(params);
+        axiosClient.get("http://localhost:3001/search", params).then((response) => { 
+            console.log("lallala", response);
+            return response;
         })
-        return axiosClient.get(url, params);
+
     },
     //TODO: Change this method
-    getMovieInfo: (cate, id, params) => {
-        const url = 'search/' + category[cate];
-
-        axiosClient.get("http://localhost:3001/getMovieInfo", id, params).then((response) => {
+    getMovieInfo: (id, params) => {
+        var res = [];
+        axiosClient.get("http://localhost:3001/secondQuery?query="+id, params).then((response) => {
             //RESPONSE IS THE IDS
+            console.log("Hey")
+            console.log(response);
+            res = response;
         });
-        //return axiosClient.get(url, params);
-        const details = {genre:"Action", rating:"5"};
-        return details;
+        return res;
     },
     detail: (cate, id, params) => {
         const url = category[cate] + '/' + id;
@@ -88,6 +76,21 @@ const tmdbApi = {
         const url = category[cate] + '/' + id + '/similar';
         return axiosClient.get(url, {params: {}});
     },
+}
+
+function search(params){
+    const url = 'search/movie/' ;
+    var result; 
+
+    // axiosClient.get("http://localhost:3001/search", params).then((response) => {
+    //     //RESPONSE IS THE IDS
+    //     console.log("smth", response);
+    //     //result = response;
+    //     return response;
+    // })
+   
+   return axiosClient.get(url, params);
+
 }
 
 export default tmdbApi;

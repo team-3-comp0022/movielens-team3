@@ -55,7 +55,7 @@ const Detail = () => {
             const response = await tmdbApi.detail(category, id, {params:{}});
             setItem(response);
 
-            const responseFromOurDb = await tmdbApi.getMovieInfo(category, id, {params:{}});
+            const responseFromOurDb = await tmdbApi.getMovieInfo(id, {params:id});
             setItems(responseFromOurDb);
             window.scrollTo(0,0);
         }

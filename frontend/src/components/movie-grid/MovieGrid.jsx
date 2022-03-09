@@ -22,45 +22,73 @@ const MovieGrid = (props) => {
     useEffect(() => {
         const getList = async () => {
             let response = null;
+            let responseSearch = null;
             var result = [];
             var getIndexesFromOurDatabase = [];
             if (keyword === undefined) {
                 const params = {};
                 switch(props.category) {
                     case category.movie:
-                        getIndexesFromOurDatabase = await axios.get('http://localhost:3001/findMovieIds');
-                        // the whole array with our IDs is response.data
-                        // Permanently display first 20 movies and load more if necessary 
-                                // page 1
+                        getIndexesFromOurDatabase = await axios.get('http://localhost:3001/findMovieIds')
+                        console.log("before ids", getIndexesFromOurDatabase);
+                        //console.log("do it", getIndexesFromOurDatabase.data.length)
+                        // Permanently display first 20 movies and load more if necessary - load page 1
                         for (var i = 0; i < 20; i++) // obtain all the movies we want to load max on the page
-                            result.push(getIndexesFromOurDatabase.data[i]);
+                            result.push(getIndexesFromOurDatabase.data[i]); // result will have the imdbIds to be appended to the url sent to the api
                         
-                        console.log("e in get freaking list");
-                        // console.log(result.slice(0, 20));
-                        getIndexesFromOurDatabase = tmdbApi.getMoviesFromOurDatabase(result, {params}); // result will have the imdbIds to be appended to the url sent to the api
-                        // getIndexesFromOurDatabase will contained the urls in a list that can be accessed directly to retrieve the movies
+                        console.log("e in get freaking list", result);
+                        getIndexesFromOurDatabase = tmdbApi.getMoviesFromOurDatabase(result, {params}); // getIndexesFromOurDatabase will contained the urls in a list that can be accessed directly to retrieve the movies
                         result = []
-                        for (var i = 0; i < 20; i++) { // display first 20 for page 1 
+                        for (var i = 0; i < 20; i++)  // display first 20 for page 1 
                             getIndexesFromOurDatabase[i].then(value => { 
-                               
                                 result.push(value.movie_results[0]); // will append the objects or jsons with all the info for each movie
                              });
-                        }                      
-                        response = {page:2, results: result, total_pages: 4, total_results: 70};                       
+                                             
+                        response = {page:2, results: result, total_pages: 4, total_results: 70}; 
+                        console.log("response first", response);                      
                         //response = await tmdbApi.getMoviesList(movieType.popular, {params});   
+                        setItems(response.results); // items will firstly contain the first 20 movies to be rendered
+                        setTotalResults(response.total_results);
+                        setTotalPage(response.total_pages);
+                        
                         break;
-                    
+                       
                 }
+                
             } else {
                 const params = {
                     query: keyword
                 }
-                response = await tmdbApi.search(props.category, {params});
+                var getIndexesFromOurDatabase = [];
+                var getIndexes = [];
+                getIndexesFromOurDatabase = axios.get('http://localhost:3001/search?query=' + params.query);
+                console.log("my ids", getIndexesFromOurDatabase);
+
+                result = [];
+                getIndexesFromOurDatabase.then(value => {  
+                    console.log("idk", value.data.length);
+                    for(var i=0; i< value.data.length; i++)
+                        //result.push(value.data[0].imdbId); 
+                        result.splice(i, 0, value.data[i]);
+                    console.log("params", result);
+                    const params2 = {};
+                    getIndexes = tmdbApi.getMoviesFromOurDatabase(result, {params2});
+                    console.log("new", getIndexes);
+
+                    var result2 = []
+               
+                    for (var i = 0; i < value.data.length; i++)  // display first 20 for page 1 
+                         getIndexes[i].then(value => { 
+                            result2.push(value.movie_results[0]); // will append the objects or jsons with all the info for each movie
+                        });
+                                        
+                    responseSearch = {page:1, results: result2, total_pages: 4, total_results: value.data.length};                   
+                    console.log("responseSearch", responseSearch);    
+                    setItems(responseSearch.results); // items will firstly contain the first 20 movies to be rendered
+                    setTotalResults(responseSearch.total_results);
+                    setTotalPage(responseSearch.total_pages);
+                });
             }
-            setItems(response.results); // items will firstly contain the first 20 movies to be rendered
-            // items is updated dynamically -> its size += 20 per each page
-            setTotalResults(response.total_results);
-            setTotalPage(response.total_pages);
         }
         getList();
        
@@ -107,7 +135,7 @@ const MovieGrid = (props) => {
                 page: page + 1,
                 query: keyword
             }
-            response = await tmdbApi.search(props.category, {params});
+            response = await tmdbApi.search({params});
         }
         setPage(page+1);
         //setItems([...items, ...response.results]);
@@ -148,7 +176,7 @@ const MovieSearch = props => {
     const goToSearch = useCallback(
         () => {
             if (keyword.trim().length > 0) {
-                history.push(`/${category[props.category]}/search/${keyword}`);
+                history.push(`/movie/search/${keyword}`);
             }
         },
         [keyword, props.category, history]
@@ -222,38 +250,6 @@ return (
         <div class="col2" style={{marginTop:38, marginLeft:-10,}}>
 	    <h5>   Runtime <br/><br/> </h5>
         <div class="hr"></div>
-
-        {/* <div class="slider-wrapper">
-      <div id="slider-range"></div>
-
-      <div class="range-wrapper">
-        <div class="range"></div>
-        <div class="range-alert">+</div>
-
-        <div class="gear-wrapper">
-          <div class="gear-large gear-one">
-            <div class="gear-tooth"></div>
-            <div class="gear-tooth"></div>
-            <div class="gear-tooth"></div>
-            <div class="gear-tooth"></div>
-          </div>
-          <div class="gear-large gear-two">
-            <div class="gear-tooth"></div>
-            <div class="gear-tooth"></div>
-            <div class="gear-tooth"></div>
-            <div class="gear-tooth"></div>
-          </div>
-        </div>
-
-      </div>
-
-      <div class="marker marker-0"><sup>$</sup>10,000</div>
-      <div class="marker marker-25"><sup>$</sup>35,000</div>
-      <div class="marker marker-50"><sup>$</sup>60,000</div>
-      <div class="marker marker-75"><sup>$</sup>85,000</div>
-      <div class="marker marker-100"><sup>$</sup>110,000+</div>
-    </div> */}
-
 
              </div>
 	   </div>
