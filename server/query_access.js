@@ -31,6 +31,16 @@ function initialise_data(){
 
 // initialise_data()
 
+//firstQueryExample
+var stuff_i_want = [];
+firstQuery("Action","rating",function(result){
+    stuff_i_want = result;
+    console.log("here")
+    console.log(stuff_i_want)
+ });
+
+
+
 //test genre
 //var stuff_i_want = [];
 //getFilmInGenre("Action",function(result){
@@ -185,7 +195,7 @@ function searchQuery(keyword, callback){
         return callback(rows);
     })
 }
-
+/*
 function firstQuery(title, callback){
     
     let caseOne = queries.case_one
@@ -195,6 +205,22 @@ function firstQuery(title, callback){
         console.log('Success')
         console.log(rows)
         return callback(rows[0].average_rating);
+    })
+}
+*/
+
+//category is film category, type is filter type, order is ASC/DESC(CHANGE?)
+function firstQuery(category, type, callback){
+    let caseOne=null
+    if(type=="rating"){
+        caseOne = queries.case_one_rating
+    }
+    connection.query(caseOne,[category], function (err, rows, fields) {
+        if (err) throw err
+    
+        console.log('Success')
+        console.log(rows)
+        return callback(rows);
     })
 }
 

@@ -175,7 +175,35 @@ WHERE MT.title = ? and MT.movieID = R.movieId
 GROUP BY MT.movieID;
 `;
 
+//combine for use-case 1
+const case_one_base=`
+SELECT lk.imdbId 
+FROM movies_titles MT, links lk 
+WHERE MT.movieId = lk.movieId
+`
+
+const alpha=`
+ORDER BY MT.title
+`
+const reverse=`
+DESC; 
+`
+
+const case_one_rating=`
+SELECT lk.imdbId   
+FROM movies_titles MT, links lk   
+WHERE MT.movieId = lk.movieId  
+and MT.movieId IN(  
+SELECT MT.movieID  
+FROM films.movies_titles MT, films.ratings R, films.tags T 
+WHERE MT.movieID = R.movieId and T.tag = ? 
+GROUP BY MT.movieID  
+ORDER BY AVG(R.rating)
+); 
+`
+
 //rate movies by average popularity
+/*
 const case_two = `
 SELECT MT.title, AVG(R.rating) as average_rating
 FROM films.movies_titles MT, films.ratings R 
@@ -183,6 +211,7 @@ WHERE MT.movieID = R.movieID
 GROUP BY MT.title 
 ORDER BY AVG(R.rating) DESC; 
 `;
+*/
 
 const case_two_part_one = `
 SELECT AVG(R.rating) as average_rating, SUM(R.rating) as aggregate_Rating, variance(R.rating) as variance_Rating
@@ -246,4 +275,4 @@ SELECT links.imdbId FROM links where links.movieId IN (SELECT movieID FROM films
 `
 
 
-module.exports = {create_list, drop_all, filenames, csv_queres, case_one, case_two, case_three, case_four,case_five,case_six, create_movies_genre, create_movies_title, create_movies_genres_sep, search, case_two_part_one, case_two_part_two, getGenres, getFilmsinGenre}
+module.exports = {create_list, drop_all, filenames, csv_queres, case_one, case_three, case_four,case_five,case_six, create_movies_genre, create_movies_title, create_movies_genres_sep, search, case_two_part_one, case_two_part_two, getGenres, getFilmsinGenre, case_one_rating}
