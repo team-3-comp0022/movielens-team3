@@ -18,7 +18,7 @@ CREATE TABLE ratings (
 `,`
 CREATE TABLE links (
     movieId int PRIMARY KEY,
-    imdbId int,
+    imdbId varchar(8),
     tmdbId int
 )
 `,`

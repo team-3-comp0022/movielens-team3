@@ -39,9 +39,11 @@ function initialise_data(){
 //    console.log(stuff_i_want)
 // });
 
+
 //get new second query
-//var stuff_i_want = [];
-//secondQuery(114709, function(result){
+
+// var stuff_i_want = [];
+// secondQuery(114709, function(result){
 //    stuff_i_want = result;
 //    console.log("here")
 //    console.log(stuff_i_want)
