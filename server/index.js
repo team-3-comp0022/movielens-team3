@@ -28,19 +28,30 @@ app.get("/findMovies", (req, res) => {
 app.get("/findMovieIds", (req, res) => {
   var query = "SELECT imdbId FROM links INNER JOIN movies ON movies.movieId = links.movieId";
   connection.query(query, (err, result) => {
-    console.log(result);
+    console.log("smth", result);
     res.send(result)
   });
   res.send
 });
 
+// app.get("/search", (req, res) => {
+//   console.log("hello");
+//   console.log("attempt1", req);
+//   console.log("attempt2", req.query.query);
+  
+//   let searchData = req.query.query;
+//   qResults.searchQuery("toy", function(result){
+//      console.log("mysearch", result);
+//      res.send(result);
+//   });
+//   res.send
+// });
+
 app.get("/search", (req, res) => {
-  console.log(req.query)
-  console.log(req.query.query)
-  let searchData = req.query.query
-  qResults.searchQuery(searchData, function(result){
-     console.log(result)
-     res.send(result)
+ var query ="SELECT links.imdbId FROM links where links.movieId IN (SELECT movies_titles.movieId FROM movies_titles WHERE movies_titles.title LIKE '%toy%')"
+  connection.query(query, (err, result) => {
+    console.log("objj", result);
+    res.send(result)
   });
   res.send
 });

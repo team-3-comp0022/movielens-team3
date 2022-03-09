@@ -29,7 +29,7 @@ function initialise_data(){
     });
 }
 
-//initialise_data()
+initialise_data()
 
 //test genre
 //var stuff_i_want = [];
@@ -176,7 +176,7 @@ function makeSplitTable(){
     })
 }
 
-function searchQuery(title, callback){
+function searchQuery(keyword, callback){
     
     let search = queries.search.replace('@', title)
     console.log(search)
