@@ -148,15 +148,19 @@ const Detail = () => {
                                  
                                  </div>
 
+                                    <div className='ratings'>
+                                        {
+                                            dbItems && dbItems[1].map((r, i) => (
+                                                <p >No. of users with rating {r.rating}: {r.noOfRatings}</p>
+                                            ))
+                                        }
+                                        {/* {item.directors.map(director => ( <p key={director.credit_id}>{director.name}</p> ))} */}
+                                 </div>
+
                                  <div className="detailedRatings">
-                                    <h5>No. of users with rating 1: {dbItems[1][4].rating || 0}</h5>
-                                    <h5>No. of users with rating 2: {dbItems[1][3].rating || 0}</h5>
-                                    <h5>No. of users with rating 3: {dbItems[1][2].rating || 0}</h5>
-                                    <h5>No. of users with rating 4: {dbItems[1][1].rating || 0}</h5>
-                                    <h5>No. of users with rating 5: {dbItems[1][0].rating || 0}</h5>
-                                    <h5>Aggregate rating: {dbItems[0][0].aggregate_Rating || 0}</h5>              
-                                    <h5>Total no. of users: {dbItems[1][4].rating + dbItems[1][3].rating + dbItems[1][2].rating + dbItems[1][1].rating + dbItems[1][0].rating || 0}</h5>              
-                                    <h5>Variance of the ratings: {dbItems[0][0].variance_Rating || 0}</h5>
+                                    <h5>Aggregate rating: {(dbItems[0][0] && dbItems[0][0].aggregate_Rating) || 0}</h5>              
+                                    <h5>Total no. of users: </h5>              
+                                    <h5>Variance of the ratings: {(dbItems[0][0] && dbItems[0][0].variance_Rating) || 0}</h5>
                                     <br />
                                     <h5>Predicted rating: </h5>
                                     <br />
