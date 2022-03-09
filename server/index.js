@@ -17,6 +17,7 @@ var connection = mysql.createConnection({
 app.use(cors());
 
 app.get("/findMovies", (req, res) => {
+  console.log("Yes");
   var query = "SELECT * FROM movies";
   connection.query(query, (err, result) => {
     console.log(result);
@@ -93,6 +94,7 @@ app.get("/secondQuery", (req, res) => {
   });
   res.send
 });
+
 
 app.get("/thirdQuery", (req, res) => {
   qResults.thirdQuery(function(result){
