@@ -49,7 +49,9 @@ app.get("/findMovieIds", (req, res) => {
 // });
 
 app.get("/search", (req, res) => {
- var query ="SELECT links.imdbId FROM links where links.movieId IN (SELECT movies_titles.movieId FROM movies_titles WHERE movies_titles.title LIKE '%toy%')"
+  console.log("Hello");
+  console.log(req.query.query);
+ var query ="SELECT links.imdbId FROM links where links.movieId IN (SELECT movies_titles.movieId FROM movies_titles WHERE movies_titles.title LIKE '%" + req.query.query + "%')"
   connection.query(query, (err, result) => {
     console.log("objj", result);
     res.send(result)

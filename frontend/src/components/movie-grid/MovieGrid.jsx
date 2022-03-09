@@ -61,7 +61,7 @@ const MovieGrid = (props) => {
                 }
                 var getIndexesFromOurDatabase = [];
                 var getIndexes = [];
-                getIndexesFromOurDatabase =  axios.get('http://localhost:3001/search');
+                getIndexesFromOurDatabase = axios.get('http://localhost:3001/search?query=' + params.query);
                 console.log("my ids", getIndexesFromOurDatabase);
 
                 result = [];
