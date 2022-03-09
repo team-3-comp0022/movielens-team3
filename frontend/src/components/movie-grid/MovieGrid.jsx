@@ -9,52 +9,47 @@ import MovieCard from '../movie-card/MovieCard';
 import Button, { OutlineButton } from '../button/Button';
 import Input from '../input/Input'
 
-import tmdbApi, { category, movieType, tvType } from '../../api/tmdbApi';
+import tmdbApi, { category, movieType } from '../../api/tmdbApi';
 
 const MovieGrid = (props) => {
 
-    const [items, setItems] = useState([]);
-
+    var [items, setItems] = useState([]);
     const [page, setPage] = useState(1);
     const [totalPage, setTotalPage] = useState(0);
-
+    const [totalResults, setTotalResults] = useState(0);
     const { keyword, collapse } = useParams();
 
     useEffect(() => {
         const getList = async () => {
             let response = null;
             var result = [];
-            var final = [];
-            var finaloffinal = [];
+            var getIndexesFromOurDatabase = [];
             if (keyword === undefined) {
                 const params = {};
                 switch(props.category) {
                     case category.movie:
-                        final = await axios.get('http://localhost:3001/findMovieIds');
+                        getIndexesFromOurDatabase = await axios.get('http://localhost:3001/findMovieIds');
                         // the whole array with our IDs is response.data
-                              console.log("try it");
-                                console.log(final.data);
-                                
-                                for (var i = 0; i < 10; i++){
-                                    console.log(final.data[i].imdbId);
-                                    result.push(final.data[i]);
-                                }
+                        // Permanently display first 20 movies and load more if necessary 
+                                // page 1
+                        for (var i = 0; i < 20; i++) // obtain all the movies we want to load max on the page
+                            result.push(getIndexesFromOurDatabase.data[i]);
                         
-                        final = await tmdbApi.getMoviesFromOurDatabase(result, {params});
-                        for (var i = 0; i < 10; i++) {
-                            final[i].then(value => { console.log(value.movie_results[0]);
-                                //if(value.movie_results[0] ==0) break;
-                                finaloffinal.push(value.movie_results[0]);  });
-                           }
-                           final = [];
-                           final = {page:1, result: finaloffinal, total_pages: 1, total_results: 10} 
-                           response = final;
-                          console.log(response);
-
-                       // response = await tmdbApi.getMoviesList(movieType.popular, {params});
+                        console.log("e in get freaking list");
+                        // console.log(result.slice(0, 20));
+                        getIndexesFromOurDatabase = tmdbApi.getMoviesFromOurDatabase(result, {params}); // result will have the imdbIds to be appended to the url sent to the api
+                        // getIndexesFromOurDatabase will contained the urls in a list that can be accessed directly to retrieve the movies
+                        result = []
+                        for (var i = 0; i < 20; i++) { // display first 20 for page 1 
+                            getIndexesFromOurDatabase[i].then(value => { 
+                               
+                                result.push(value.movie_results[0]); // will append the objects or jsons with all the info for each movie
+                             });
+                        }                      
+                        response = {page:2, results: result, total_pages: 4, total_results: 70};                       
+                        //response = await tmdbApi.getMoviesList(movieType.popular, {params});   
                         break;
-                    default:
-                        response = await tmdbApi.getTvList(tvType.popular, {params});
+                    
                 }
             } else {
                 const params = {
@@ -62,24 +57,50 @@ const MovieGrid = (props) => {
                 }
                 response = await tmdbApi.search(props.category, {params});
             }
-            setItems(response.result)
+            setItems(response.results); // items will firstly contain the first 20 movies to be rendered
+            // items is updated dynamically -> its size += 20 per each page
+            setTotalResults(response.total_results);
             setTotalPage(response.total_pages);
         }
         getList();
+       
     }, [props.category, keyword]);
 
     const loadMore = async () => {
         let response = null;
+        var result = undefined || [];
+        var getIndexesFromOurDatabase = [];
         if (keyword === undefined) {
             const params = {
                 page: page + 1
             };
             switch(props.category) {
                 case category.movie:
-                    response = await tmdbApi.getMoviesList(movieType.upcoming, {params});
+                    getIndexesFromOurDatabase = await axios.get('http://localhost:3001/findMovieIds');
+
+                    //console.log("i am in loading"); console.log("mypage", page); 
+                    var limit; 
+                    var noOfMovies = 20;
+                    if(20*(page+1) >= totalResults) {limit =  totalResults; noOfMovies = totalResults - 20*(page);}
+                    else limit = 20*(page+1);
+                    for (var i=20*page; i < limit; i++) // obtain all the movies we want to load max on the page
+                        result.push(getIndexesFromOurDatabase.data[i]); // result will have the imdbIds to be appended to the url sent to the api
+                        
+                    getIndexesFromOurDatabase = tmdbApi.getMoviesFromOurDatabase(result, {params});
+                    var sp = [];
+                    //console.log("prior global", sp);
+                    for (var i = 0; i < noOfMovies; i++) {  
+                        getIndexesFromOurDatabase[i].then(value => {  // getIndexesFromOurDatabase will contained the urls in a list that can be accessed directly to retrieve the movies
+                            sp.splice(i, 0, value.movie_results[0]);
+                            setItems([...items, ...sp]);
+                        }); 
+                    }
+                    
+                    response = {page:page, results: sp, total_pages: 3, total_results: 50};
+                    //response = await tmdbApi.getMoviesList(movieType.popular, {params});
+                    //console.log("myitems", items); 
                     break;
-                default:
-                    response = await tmdbApi.getTvList(tvType.popular, {params});
+                
             }
         } else {
             const params = {
@@ -88,8 +109,8 @@ const MovieGrid = (props) => {
             }
             response = await tmdbApi.search(props.category, {params});
         }
-        setItems([...items, ...response.results]);
-        setPage(page + 1);
+        setPage(page+1);
+        //setItems([...items, ...response.results]);
     }
 
     return (
@@ -109,7 +130,8 @@ const MovieGrid = (props) => {
             {
                 page < totalPage ? (
                     <div className="movie-grid__loadmore">
-                        <OutlineButton className="small" onClick={loadMore}>Load more</OutlineButton>
+                        <OutlineButton className="small" onClick={loadMore}>Load page {page+1} of movies</OutlineButton>
+                    
                     </div>
                 ) : null
             }

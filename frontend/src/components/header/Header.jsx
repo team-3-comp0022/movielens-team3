@@ -15,10 +15,6 @@ const headerNav = [
         display: 'Movies',
         path: '/movie'
     },
-    {
-        display: 'Series',
-        path: '/tv'
-    }
 ];
 
 const Header = () => {
