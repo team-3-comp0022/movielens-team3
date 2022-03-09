@@ -31,6 +31,13 @@ function initialise_data(){
 
 //initialise_data()
 
+//test genre
+//var stuff_i_want = [];
+//getFilmInGenre("Action",function(result){
+//    stuff_i_want = result;
+//    console.log("here")
+//    console.log(stuff_i_want)
+// });
 
 //get new second query
 //var stuff_i_want = [];
@@ -49,11 +56,11 @@ function initialise_data(){
 
 
  //example usage
-//  var solution = [];
-// searchQuery("Story", function(result){
-//     solution = result;//returns array of Ids
-//     console.log(solution)//use it
-//  });
+ // var solution = [];
+ //searchQuery("Story", function(result){
+ //    solution = result;//returns array of Ids
+ //    console.log(solution)//use it
+ // });
 
 // secondQuery(function(result){
 //     solution = result;//returns array of Ids
@@ -170,10 +177,11 @@ function makeSplitTable(){
 function searchQuery(title, callback){
     
     let search = queries.search.replace('@', title)
+    console.log(search)
     connection.query(search, function (err, rows, fields) {
         if (err) throw err
-        let res = rows.map(function(X) {return X.tmdbId;})
-        return callback(res);
+        //let res = rows.map(function(X) {return X.tmdbId;})
+        return callback(rows);
     })
 }
 
@@ -305,7 +313,28 @@ function sixthQuery(title, callback){
     })
 }
 
+function getGenre(callback){
+    
+    let getGen = queries.getGenres
+    connection.query(getGen, function (err, rows, fields) {
+        if (err) throw err
+    
+        console.log('Success')
+        return callback(rows);
+    })
+}
 
+function getFilmInGenre(title, callback){
+    
+    let getGenresFilms = queries.getFilmsinGenre
+    console.log(getGenresFilms)
+    connection.query(getGenresFilms,[title], function (err, rows, fields) {
+        if (err) throw err
+    
+        console.log('Success')
+        return callback(rows);
+    })
+}
 //connection.end();
 
 module.exports= {
@@ -315,5 +344,7 @@ module.exports= {
     thirdQuery,
     fourthQuery,
     fifthQuery,
-    sixthQuery
+    sixthQuery,
+    getGenre,
+    getFilmInGenre
 }

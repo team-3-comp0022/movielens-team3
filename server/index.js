@@ -45,6 +45,25 @@ app.get("/search", (req, res) => {
   res.send
 });
 
+app.get("/getGenre", (req, res) => {
+  qResults.getGenre(function(result){
+    console.log(result)
+    res.send(result)
+ });
+ res.send
+});
+
+app.get("/getFilmInGenre", (req, res) => {
+  console.log(req.query)
+  console.log(req.query.query)
+  let genre = req.query.query
+  qResults.getFilmInGenre(genre, function(result){
+     console.log(result)
+     res.send(result)
+  });
+  res.send
+});
+
 app.get("/firstQuery", (req, res) => {
   console.log(req.query)
   console.log(req.query.query)
