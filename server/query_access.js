@@ -178,11 +178,10 @@ function makeSplitTable(){
 
 function searchQuery(keyword, callback){
     
-    let search = queries.search.replace('@', title)
+    let search = queries.search.replace('@', keyword)
     console.log(search)
     connection.query(search, function (err, rows, fields) {
         if (err) throw err
-        //let res = rows.map(function(X) {return X.tmdbId;})
         return callback(rows);
     })
 }
