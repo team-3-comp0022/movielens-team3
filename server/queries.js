@@ -184,6 +184,18 @@ GROUP BY MT.title
 ORDER BY AVG(R.rating) DESC; 
 `;
 
+const case_two_part_one = `
+SELECT AVG(R.rating) as average_rating, SUM(R.rating) as aggregate_Rating, variance(R.rating) as variance_Rating
+FROM films.movies_titles MT, films.ratings R, links lk 
+WHERE MT.movieID = R.movieID and MT.movieID = lk.movieId and lk.imdbId = ?;
+`;
+
+const case_two_part_two = `
+SELECT R.rating, count(R.rating) 
+FROM films.movies_titles MT, films.ratings R, links lk 
+WHERE MT.movieID = R.movieID and MT.movieID = lk.movieId and lk.imdbId = ?
+GROUP BY R.rating; 
+`;
 
 // //polarity
 const case_three = `
@@ -228,4 +240,4 @@ OR P.movie_6 IN (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM fi
 
 
 
-module.exports = {create_list, drop_all, filenames, csv_queres, case_one, case_two, case_three, case_four,case_five,case_six, create_movies_genre, create_movies_title, create_movies_genres_sep, search}
+module.exports = {create_list, drop_all, filenames, csv_queres, case_one, case_two, case_three, case_four,case_five,case_six, create_movies_genre, create_movies_title, create_movies_genres_sep, search, case_two_part_one, case_two_part_two}

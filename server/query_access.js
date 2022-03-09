@@ -32,6 +32,14 @@ function initialise_data(){
 //initialise_data()
 
 
+//get new second query
+//var stuff_i_want = [];
+//secondQuery(114709, function(result){
+//    stuff_i_want = result;
+//    console.log("here")
+//    console.log(stuff_i_want)
+// });
+
 //get query result data on frontend
 // var stuff_i_want = [];
 // firstQuery("Fair Game (1995)", function(result){
@@ -180,7 +188,7 @@ function firstQuery(title, callback){
         return callback(rows[0].average_rating);
     })
 }
-
+/*
 function secondQuery(callback){
     
     let caseTwo = queries.case_two
@@ -198,6 +206,43 @@ function secondQuery(callback){
         // console.log(desired_data)
         return callback(rows);
     })
+}
+*/
+
+function secondQueryOne(val, callback){
+    
+    let caseTwoPartOne = queries.case_two_part_one
+    connection.query(caseTwoPartOne, [val], function (err, rows, fields) {
+        if (err) throw err
+    
+        console.log('Success')
+        return callback(rows);
+    })
+}
+
+function secondQueryTwo(val, callback){
+    
+    let caseTwoPartTwo = queries.case_two_part_two
+    connection.query(caseTwoPartTwo, [val], function (err, rows, fields) {
+        if (err) throw err
+    
+        console.log('Success')
+        return callback(rows);
+    })
+}
+
+function secondQuery(val, callback){
+    first=[]
+    second=[]
+    secondQueryOne(val, function(result){
+        first = result;
+        console.log(first)
+        secondQueryTwo(val, function(result){
+            second = result;
+            console.log(first, second)
+            return callback([first, second])
+         });
+     });
 }
 
 function thirdQuery(callback){
