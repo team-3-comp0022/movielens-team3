@@ -67,6 +67,17 @@ const tmdbApi = {
         })
         return axiosClient.get(url, params);
     },
+    //TODO: Change this method
+    getMovieInfo: (cate, id, params) => {
+        const url = 'search/' + category[cate];
+
+        axiosClient.get("http://localhost:3001/getMovieInfo", id, params).then((response) => {
+            //RESPONSE IS THE IDS
+        });
+        //return axiosClient.get(url, params);
+        const details = {genre:"Action", rating:"5"};
+        return details;
+    },
     detail: (cate, id, params) => {
         const url = category[cate] + '/' + id;
         return axiosClient.get(url, params);
