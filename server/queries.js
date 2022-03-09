@@ -199,11 +199,11 @@ GROUP BY R.rating;
 
 // //polarity
 const case_three = `
-SELECT MG.genre, variance(R.rating) as VR 
+SELECT MG.genre, variance(R.rating) as VR, count(R.movieId) as number_of_reviewers, AVG(R.rating) 
 FROM films.movies_genres_sep MG, films.ratings R 
 WHERE MG.movieId = R.movieId 
 GROUP BY MG.genre 
-ORDER BY VR DESC
+ORDER BY VR DESC; 
 `;
 
 //predict how a film
