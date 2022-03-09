@@ -220,7 +220,8 @@ WHERE MT.movieId = R.movieId
 GROUP BY MT.movieId  
 ORDER BY AVG(R.rating) DESC) AS averages 
 WHERE hello.movieId = averages.movieId 
-GROUP BY hello.title, difference ; 
+GROUP BY hello.title, difference 
+ORDER BY r.rating; 
 `;
 
 const case_five = `

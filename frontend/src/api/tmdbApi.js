@@ -61,6 +61,7 @@ const tmdbApi = {
             console.log("Hey")
             console.log(response);
             res = response;
+            return response;
         });
         return res;
     },
