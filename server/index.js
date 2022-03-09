@@ -87,7 +87,7 @@ app.get("/firstQuery", (req, res) => {
 });
 
 app.get("/secondQuery", (req, res) => {
-  qResults.secondQuery(function(result){
+  qResults.secondQuery(req.query.query, function(result){
      console.log(result)
      res.send(result)
   });

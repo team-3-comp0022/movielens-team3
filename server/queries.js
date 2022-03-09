@@ -187,13 +187,13 @@ ORDER BY AVG(R.rating) DESC;
 const case_two_part_one = `
 SELECT AVG(R.rating) as average_rating, SUM(R.rating) as aggregate_Rating, variance(R.rating) as variance_Rating
 FROM films.movies_titles MT, films.ratings R, links lk 
-WHERE MT.movieID = R.movieID and MT.movieID = lk.movieId and lk.imdbId = ?;
+WHERE MT.movieID = R.movieID and MT.movieID = lk.movieId and lk.tmdbId = ?;
 `;
 
 const case_two_part_two = `
 SELECT R.rating, count(R.rating) 
 FROM films.movies_titles MT, films.ratings R, links lk 
-WHERE MT.movieID = R.movieID and MT.movieID = lk.movieId and lk.imdbId = ?
+WHERE MT.movieID = R.movieID and MT.movieID = lk.movieId and lk.tmdbId = ?
 GROUP BY R.rating; 
 `;
 
