@@ -194,7 +194,8 @@ const case_two_part_two = `
 SELECT R.rating, count(R.rating) as noOfRatings
 FROM films.movies_titles MT, films.ratings R, links lk 
 WHERE MT.movieID = R.movieID and MT.movieID = lk.movieId and lk.tmdbId = ?
-GROUP BY R.rating; 
+GROUP BY R.rating
+ORDER BY R.rating; 
 `;
 
 // //polarity
