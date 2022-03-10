@@ -258,20 +258,81 @@ WHERE hello.movieId = averages.movieId
 GROUP BY hello.title, difference ; 
 `;
 
-const case_five = `
-SELECT AVG(P.openness) as Openness, AVG(P.agreeableness) As Agreeableness, AVG(P.emotional_stability) AS Emotional_stability, AVG(P.conscientiousness) AS Conscientiousness, AVG(P.extraversion) AS Extraversion 
-FROM films.personality_data P JOIN films.ratings_personality R on P.userid = R.userId 
-WHERE P.userId IN (SELECT DISTINCT R.userId FROM films.ratings_personality R, films.movies M WHERE M.title=? AND R.movie_id = M.movieId AND R.rating >= 4); `;
+// const case_five = `
+// SELECT AVG(P.openness) as Openness, AVG(P.agreeableness) As Agreeableness, AVG(P.emotional_stability) AS Emotional_stability, AVG(P.conscientiousness) AS Conscientiousness, AVG(P.extraversion) AS Extraversion 
+// FROM films.personality_data P JOIN films.ratings_personality R on P.userid = R.userId 
+// WHERE P.userId IN (SELECT DISTINCT R.userId FROM films.ratings_personality R, films.movies M WHERE M.title=? AND R.movie_id = M.movieId AND R.rating >= 4); `;
+const case_five = `SELECT top_70.openness as predicted_openness, top_30.openness as actual_openness, (top_70.openness - top_30.openness) as difference_openness, top_70.agreeableness as predicted_agreeableness, top_30.agreeableness as actual_agreeableness, (top_70.agreeableness - top_30.agreeableness) as difference_agreeableness, top_70.emotional_stability as predicted_emotional_stability, top_30.emotional_stability as actual_emotional_stability, (top_70.emotional_stability - top_30.emotional_stability) as difference_emotional_stability, top_70.conscientiousness as predicted_conscientiousness, top_30.conscientiousness as actual_conscientiousness, (top_70.conscientiousness - top_30.conscientiousness) as difference_conscientiousness, top_70.extraversion as predicted_extraversion, top_30.extraversion as actual_extraversion, (top_70.extraversion - top_30.extraversion) as difference_extraversion 
 
-const case_six = `
-SELECT AVG(P.openness) as Openness, AVG(P.agreeableness) As Agreeableness, AVG(P.emotional_stability) AS Emotional_stability, AVG(P.conscientiousness) AS Conscientiousness, AVG(P.extraversion) AS Extraversion FROM films.personality_data P 
-WHERE P.movie_1 in (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.title=?)) 
-OR P.movie_2 IN (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.title=?)) 
-OR P.movie_3 IN (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.title=?)) 
-OR P.movie_4 IN (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.title=?)) 
-OR P.movie_5 IN (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.title=?)) 
-OR P.movie_6 IN (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.title=?));
-`;
+FROM (SELECT AVG(P.openness) as openness, AVG(P.agreeableness) As agreeableness, AVG(P.emotional_stability) AS emotional_stability, AVG(P.conscientiousness) AS conscientiousness, AVG(P.extraversion) AS extraversion  
+
+FROM films.personality_data P JOIN films.ratings_personality R on P.userid = R.userId  
+
+WHERE P.userId IN (SELECT X.userid    
+
+FROM (SELECT R.userId as userid, @counter := @counter +1 AS counter    
+
+    FROM (select @counter:=0) AS var, (SELECT DISTINCT R.userId FROM films.ratings_personality R, films.movies M WHERE M.movieId=? AND R.movie_id = M.movieId AND R.rating >= 4) R  
+
+    ORDER BY R.userid DESC) AS X    
+
+where (70/100 * @counter) >= counter)) top_70, (SELECT AVG(P.openness) as openness, AVG(P.agreeableness) As agreeableness, AVG(P.emotional_stability) AS emotional_stability, AVG(P.conscientiousness) AS conscientiousness, AVG(P.extraversion) AS extraversion  
+
+FROM films.personality_data P JOIN films.ratings_personality R on P.userid = R.userId  
+
+WHERE P.userId IN (SELECT X.userid    
+
+FROM (SELECT R.userId as userid, @counter := @counter +1 AS counter    
+
+    FROM (select @counter:=0) AS var, (SELECT DISTINCT R.userId FROM films.ratings_personality R, films.movies M WHERE M.movieId=? AND R.movie_id = M.movieId AND R.rating >= 4) R  
+
+    ORDER BY R.userid DESC) AS X    
+
+where (70/100 * @counter) <= counter)) top_30;`;
+
+// const case_six = `
+// SELECT AVG(P.openness) as Openness, AVG(P.agreeableness) As Agreeableness, AVG(P.emotional_stability) AS Emotional_stability, AVG(P.conscientiousness) AS Conscientiousness, AVG(P.extraversion) AS Extraversion FROM films.personality_data P 
+// WHERE P.movie_1 in (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.title=?)) 
+// OR P.movie_2 IN (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.title=?)) 
+// OR P.movie_3 IN (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.title=?)) 
+// OR P.movie_4 IN (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.title=?)) 
+// OR P.movie_5 IN (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.title=?)) 
+// OR P.movie_6 IN (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.title=?));
+// `;
+
+const case_six = `SELECT ABS(people_tag.openness - people_like.openness) AS diff_openness, ABS(people_tag.agreeableness - people_like. agreeableness) AS diff_agreeableness, ABS(people_tag.emotional_stability - people_like.emotional_stability) AS diff_emotional_stability, ABS(people_tag.conscientiousness - people_like.conscientiousness) AS diff_conscientiousness, ABS(people_tag.extraversion - people_like.extraversion) AS diff_extraversion 
+
+FROM (SELECT AVG(P.openness) as openness, AVG(P.agreeableness) As agreeableness, AVG(P.emotional_stability) AS emotional_stability, AVG(P.conscientiousness) AS conscientiousness, AVG(P.extraversion) AS extraversion 
+
+FROM films.personality_data P  
+
+WHERE P.movie_1 in (SELECT T.movieId FROM tags T WHERE T.movieId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.movieId = ?))  
+
+OR P.movie_2 IN (SELECT T.movieId FROM tags T WHERE T.movieId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.movieId = ?))  
+
+OR P.movie_3 IN (SELECT T.movieId FROM tags T WHERE T.movieId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.movieId = ?))  
+
+OR P.movie_4 IN (SELECT T.movieId FROM tags T WHERE T.movieId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.movieId = ?))  
+
+OR P.movie_5 IN (SELECT T.movieId FROM tags T WHERE T.movieId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.movieId = ?))  
+
+OR P.movie_6 IN (SELECT T.movieId FROM tags T WHERE T.movieId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.movieId = ?)) 
+
+OR P.movie_7 IN (SELECT T.movieId FROM tags T WHERE T.movieId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.movieId = ?)) 
+
+OR P.movie_8 IN (SELECT T.movieId FROM tags T WHERE T.movieId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.movieId = ?)) 
+
+OR P.movie_9 IN (SELECT T.movieId FROM tags T WHERE T.movieId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.movieId = ?)) 
+
+OR P.movie_10 IN (SELECT T.movieId FROM tags T WHERE T.movieId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.movieId = ?)) 
+
+OR P.movie_11 IN (SELECT T.movieId FROM tags T WHERE T.movieId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.movieId = ?)) 
+
+OR P.movie_12 IN (SELECT T.movieId FROM tags T WHERE T.movieId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.movieId = ?))) people_tag, (SELECT AVG(P.openness) as openness, AVG(P.agreeableness) As agreeableness, AVG(P.emotional_stability) AS emotional_stability, AVG(P.conscientiousness) AS conscientiousness, AVG(P.extraversion) AS extraversion 
+
+FROM films.personality_data P,  (SELECT RP.userid as userId FROM films.ratings_personality RP  WHERE RP.movie_id = ? and RP.rating >=4) user_like 
+
+WHERE user_like.userId = P.userid) people_like; `;
 
 const getGenres = `
 SELECT DISTINCT(genre) FROM films.movies_genres_sep
