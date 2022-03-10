@@ -41,7 +41,7 @@ CREATE TABLE ratings_personality (
     movie_id int,
     rating int,
     tstamp DATETIME,
-    PRIMARY KEY (userId, movie_id)
+    PRIMARY KEY (userId, movie_id, rating, tstamp)
 )
 `,  `
 CREATE TABLE personality_data (
@@ -172,35 +172,33 @@ const case_one_alpha = `
 SELECT lk.imdbId 
 FROM movies_titles MT, links lk, movies_genres G  
 WHERE MT.movieId = lk.movieId and MT.movieID = G.movieId and G.genres = ?
-ORDER BY MT.title;
+ORDER BY MT.title
 `;
 
 //combine for use-case 1
 const case_one_year=`
 SELECT lk.imdbId
-FROM movie_years MY, links lk  
-WHERE MY.movieId = lk.movieId and MY.year < ? MY.year > ? and MY.year!=""   
-ORDER BY year DESC; 
+FROM movie_years MY, links lk, movies_genres G   
+WHERE MY.movieId = lk.movieId and MY.year < ? MY.year > ? and MY.year!="" and MT.movieID = G.movieId and G.genres = ? 
+ORDER BY year
 `
-
+/*
 const case_one_tag=`
 SELECT lk.imdbId 
 FROM movies_titles MT, links lk 
 WHERE MT.movieId = lk.movieId
 `
-
+*/
 const case_one_rating=`
-SELECT lk.imdbId   
-FROM movies_titles MT, links lk   
-WHERE MT.movieId = lk.movieId  
-and MT.movieId IN(  
-SELECT MT.movieID  
-FROM films.movies_titles MT, films.ratings R, films.tags T 
-WHERE MT.movieID = R.movieId and T.tag = ? 
-GROUP BY MT.movieID  
-ORDER BY AVG(R.rating)
-); 
+SELECT lk.imdbId
+FROM movie_years MY, links lk, movies_genres G, films.ratings R   
+WHERE MY.movieId = lk.movieId and MY.movieID = G.movieId and G.genres = ? and MY.movieId = R.movieId
+GROUP BY MY.movieId
+ORDER BY AVG(R.rating) 
 `
+
+const desc=` DESC`
+
 const create_movies_years = ` 
 
 CREATE TABLE movie_years(PRIMARY KEY(movieId)) AS

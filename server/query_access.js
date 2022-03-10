@@ -23,7 +23,7 @@ function initialise_data(){
     makeTables()
     addData()
     const sleep = (waitTimeInMs) => new Promise(resolve => setTimeout(resolve, waitTimeInMs));
-    sleep(4000).then(() => {
+    sleep(40000).then(() => {
         makeSecondTables()
         makeSplitTable()
     });
@@ -32,7 +32,7 @@ function initialise_data(){
     });
 }
 
-initialise_data()
+//initialise_data()
 
 //firstQueryExample
 //var stuff_i_want = [];
