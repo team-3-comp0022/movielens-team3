@@ -24,7 +24,7 @@ CREATE TABLE links (
 `,`
 CREATE TABLE movies (
     movieId int PRIMARY KEY,
-    title varchar(100),
+    title varchar(200),
     genres varchar(100)
 )
 `, `
@@ -204,7 +204,7 @@ ORDER BY AVG(R.rating)
 const create_movies_years = ` 
 
 CREATE TABLE movie_years(PRIMARY KEY(movieId)) AS
-SELECT movieId, REPLACE(RIGHT(title, LOCATE('(',REVERSE(title))-1),')','') AS year FROM films.movies M; 
+SELECT movieId, title, REPLACE(RIGHT(title, LOCATE('(',REVERSE(title))-1),')','') AS year FROM films.movies M; 
 
 `; 
 
