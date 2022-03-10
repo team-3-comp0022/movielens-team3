@@ -32,7 +32,7 @@ function initialise_data(){
     });
 }
 
-//initialise_data()
+initialise_data()
 
 //firstQueryExample
 //var stuff_i_want = [];

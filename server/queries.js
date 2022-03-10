@@ -37,10 +37,11 @@ CREATE TABLE tags (
 )
 ` ,`
 CREATE TABLE ratings_personality (
-    userid varchar(40) PRIMARY KEY,
+    userid varchar(40),
     movie_id int,
     rating int,
-    tstamp DATETIME
+    tstamp DATETIME,
+    PRIMARY KEY (userId, movie_id)
 )
 `,  `
 CREATE TABLE personality_data (
@@ -167,26 +168,25 @@ SELECT links.imdbId FROM links where links.movieId IN (
   SELECT movies_titles.movieId FROM movies_titles WHERE movies_titles.title LIKE "%@%")
 `
 
-// //substitute the Fair Game for %s
-const case_one = `
-SELECT MT.movieID, AVG(R.rating) as average_rating 
-FROM films.movies_titles MT, films.ratings R 
-WHERE MT.title = ? and MT.movieID = R.movieId
-GROUP BY MT.movieID;
+const case_one_alpha = `
+SELECT lk.imdbId 
+FROM movies_titles MT, links lk, movies_genres G  
+WHERE MT.movieId = lk.movieId and MT.movieID = G.movieId and G.genres = ?
+ORDER BY MT.title;
 `;
 
 //combine for use-case 1
-const case_one_base=`
+const case_one_year=`
+SELECT lk.imdbId
+FROM movie_years MY, links lk  
+WHERE MY.movieId = lk.movieId and MY.year < ? MY.year > ? and MY.year!=""   
+ORDER BY year DESC; 
+`
+
+const case_one_tag=`
 SELECT lk.imdbId 
 FROM movies_titles MT, links lk 
 WHERE MT.movieId = lk.movieId
-`
-
-const alpha=`
-ORDER BY MT.title
-`
-const reverse=`
-DESC; 
 `
 
 const case_one_rating=`
@@ -281,4 +281,4 @@ SELECT links.imdbId FROM links where links.movieId IN (SELECT movieID FROM films
 `
 
 
-module.exports = {create_list, drop_all, filenames, csv_queres, case_one, case_three, case_four,case_five,case_six, create_movies_genre, create_movies_title, create_movies_genres_sep, search, case_two_part_one, case_two_part_two, getGenres, getFilmsinGenre, case_one_rating, create_movies_years}
+module.exports = {create_list, drop_all, filenames, csv_queres, case_three, case_four,case_five,case_six, create_movies_genre, create_movies_title, create_movies_genres_sep, search, case_two_part_one, case_two_part_two, getGenres, getFilmsinGenre, case_one_rating, create_movies_years}
