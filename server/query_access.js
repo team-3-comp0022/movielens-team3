@@ -27,17 +27,20 @@ function initialise_data(){
         makeSecondTables()
         makeSplitTable()
     });
+    sleep(4000).then(() => {
+        makeYearTable()
+    });
 }
 
-// initialise_data()
+initialise_data()
 
 //firstQueryExample
-var stuff_i_want = [];
-firstQuery("Action","rating",function(result){
-    stuff_i_want = result;
-    console.log("here")
-    console.log(stuff_i_want)
- });
+//var stuff_i_want = [];
+//firstQuery("Action","rating",function(result){
+//    stuff_i_want = result;
+//    console.log("here")
+//    console.log(stuff_i_want)
+// });
 
 
 
@@ -121,6 +124,18 @@ function makeTables(){
         });
     });
 }
+
+/* create tables */
+function makeYearTable(){
+    const create_movies_years = queries.create_movies_years
+
+    connection.query(create_movies_years, function (err, rows, fields) {
+        if (err) throw err
+        
+        console.log('Success creating tables')
+    });
+}
+
 /* delete tables */
 function deleteTables(){
     const drop_all = queries.drop_all

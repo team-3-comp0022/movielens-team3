@@ -82,7 +82,7 @@ CREATE TABLE personality_data (
 `];
 
 
-const drop_all = `DROP TABLE IF EXISTS links, ratings, movies, tags, ratings_personality, personality_data, movies_titles, movies_genres, movies_genres_sep`
+const drop_all = `DROP TABLE IF EXISTS links, ratings, movies, tags, ratings_personality, personality_data, movies_titles, movies_genres, movies_genres_sep, movie_years`
 
 
 const filenames = ["./ml-latest-small/movies.csv","./ml-latest-small/links.csv", "./ml-latest-small/ratings.csv","./ml-latest-small/tags.csv", "./personality-isf2018/personality-data.csv","./personality-isf2018/ratings.csv"]
@@ -201,6 +201,12 @@ GROUP BY MT.movieID
 ORDER BY AVG(R.rating)
 ); 
 `
+const create_movies_years = ` 
+
+CREATE TABLE movie_years(PRIMARY KEY(movieId)) AS
+SELECT movieId, REPLACE(RIGHT(title, LOCATE('(',REVERSE(title))-1),')','') AS year FROM films.movies M; 
+
+`; 
 
 //rate movies by average popularity
 /*
@@ -275,4 +281,4 @@ SELECT links.imdbId FROM links where links.movieId IN (SELECT movieID FROM films
 `
 
 
-module.exports = {create_list, drop_all, filenames, csv_queres, case_one, case_three, case_four,case_five,case_six, create_movies_genre, create_movies_title, create_movies_genres_sep, search, case_two_part_one, case_two_part_two, getGenres, getFilmsinGenre, case_one_rating}
+module.exports = {create_list, drop_all, filenames, csv_queres, case_one, case_three, case_four,case_five,case_six, create_movies_genre, create_movies_title, create_movies_genres_sep, search, case_two_part_one, case_two_part_two, getGenres, getFilmsinGenre, case_one_rating, create_movies_years}
