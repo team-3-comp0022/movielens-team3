@@ -167,21 +167,23 @@ const search =`
 SELECT links.imdbId FROM links where links.movieId IN (
   SELECT movies_titles.movieId FROM movies_titles WHERE movies_titles.title LIKE "%@%")
 `
-
+/*
 const case_one_alpha = `
 SELECT lk.imdbId 
-FROM movies_titles MT, links lk, movies_genres G  
-WHERE MT.movieId = lk.movieId and MT.movieID = G.movieId and G.genres = ?
-ORDER BY MT.title
+FROM movies_years MY, links lk, movies_genres G  
+WHERE MY.movieId = lk.movieId and MY.movieID = G.movieId and G.genres = ?
+ORDER BY MY.title
 `;
 
 //combine for use-case 1
 const case_one_year=`
 SELECT lk.imdbId
-FROM movie_years MY, links lk, movies_genres G   
-WHERE MY.movieId = lk.movieId and MY.year < ? MY.year > ? and MY.year!="" and MT.movieID = G.movieId and G.genres = ? 
+FROM movie_years MY, links lk, movies_genres_sep G   
+WHERE MY.movieId = lk.movieId and MY.movieID = G.movieId and G.genre = ? and MY.year < ? and MY.year > ? and MY.year!="" 
 ORDER BY year
 `
+*/
+
 /*
 const case_one_tag=`
 SELECT lk.imdbId 
@@ -189,6 +191,8 @@ FROM movies_titles MT, links lk
 WHERE MT.movieId = lk.movieId
 `
 */
+
+/*
 const case_one_rating=`
 SELECT lk.imdbId
 FROM movie_years MY, links lk, movies_genres G, films.ratings R   
@@ -196,7 +200,31 @@ WHERE MY.movieId = lk.movieId and MY.movieID = G.movieId and G.genres = ? and MY
 GROUP BY MY.movieId
 ORDER BY AVG(R.rating) 
 `
+*/
+//dynamic
 
+const baseOne=`
+SELECT lk.imdbId 
+FROM movie_years MY, links lk, movies_genres_sep G `
+
+const baseROne=`, films.ratings R `
+
+const baseTwo=`WHERE MY.movieId = lk.movieId and MY.movieID = G.movieId and G.genre = ?
+`
+//baseOne + extra + order + (?desc)
+//alpha, year. rating
+const baseAlpha=`
+ORDER BY MY.title
+`
+const baseYear=`
+and MY.year > ? and MY.year < ? and MY.year!="" 
+ORDER BY year
+`
+const baseRating=`
+and MY.movieId = R.movieId
+GROUP BY MY.movieId
+ORDER BY AVG(R.rating) 
+`
 const desc=` DESC`
 
 const create_movies_years = ` 
@@ -279,4 +307,28 @@ SELECT links.imdbId FROM links where links.movieId IN (SELECT movieID FROM films
 `
 
 
-module.exports = {create_list, drop_all, filenames, csv_queres, case_three, case_four,case_five,case_six, create_movies_genre, create_movies_title, create_movies_genres_sep, search, case_two_part_one, case_two_part_two, getGenres, getFilmsinGenre, case_one_rating, create_movies_years}
+module.exports = {
+    create_list, 
+    drop_all, 
+    filenames, 
+    csv_queres, 
+    case_three, 
+    case_four,
+    case_five,
+    case_six, 
+    create_movies_genre, 
+    create_movies_title, 
+    create_movies_genres_sep, 
+    search, 
+    case_two_part_one, 
+    case_two_part_two, 
+    getGenres, getFilmsinGenre, 
+    create_movies_years, 
+    baseAlpha, 
+    baseRating, 
+    baseYear, 
+    baseOne,
+    baseTwo,
+    baseROne,
+    desc
+}

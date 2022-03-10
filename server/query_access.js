@@ -35,14 +35,29 @@ function initialise_data(){
 //initialise_data()
 
 //firstQueryExample
-//var stuff_i_want = [];
-//firstQuery("Action","rating",function(result){
-//    stuff_i_want = result;
-//    console.log("here")
-//    console.log(stuff_i_want)
-// });
+//category is film category, type is filter type, order is ASC/DESC(CHANGE?)
+//rating
+//year
+//alphabetical
 
+/*
+var stuff_i_want = [];
+firstQuery("Action","alphabetical","desc",function(result){
+    stuff_i_want = result;
+    console.log("here")
+    console.log(stuff_i_want)
+ });
+*/
 
+//first query with year takes values (greater than first, less than second)
+/*
+var stuff_i_want = [];
+firstQuery(["Action",20,4000],"year","desc",function(result){
+    stuff_i_want = result;
+    console.log("here")
+    console.log(stuff_i_want)
+ });
+*/
 
 //test genre
 //var stuff_i_want = [];
@@ -225,12 +240,29 @@ function firstQuery(title, callback){
 */
 
 //category is film category, type is filter type, order is ASC/DESC(CHANGE?)
-function firstQuery(category, type, callback){
-    let caseOne=null
-    if(type=="rating"){
-        caseOne = queries.case_one_rating
+function firstQuery(category, type, order,callback){//CATEGORY ALSO HAS FILM DATA 
+    let caseOne=queries.baseOne
+    if (type=="rating"){
+        caseOne += queries.baseROne
     }
-    connection.query(caseOne,[category], function (err, rows, fields) {
+    caseOne+= queries.baseTwo
+    if(type=="rating"){
+        caseOne += queries.baseRating
+    }
+    else if (type=="year"){
+        
+        caseOne += queries.baseYear
+    }
+    else if (type=="alphabetical"){
+        caseOne +=queries.baseAlpha
+    }
+    if(order == "desc"){
+        caseOne += queries.desc
+    }
+
+    console.log(caseOne)
+
+    connection.query(caseOne,category, function (err, rows, fields) {
         if (err) throw err
     
         console.log('Success')
