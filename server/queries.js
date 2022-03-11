@@ -388,30 +388,30 @@ FROM (SELECT AVG(P.openness) as openness, AVG(P.agreeableness) As agreeableness,
 
 FROM films.personality_data P  
 
-WHERE P.movie_1 in (SELECT T.movieId FROM tags T, links lk WHERE T.movieId = lk.movieId AND lk.imdbId != 0114709 AND T.tag IN (SELECT tag FROM films.tags T, movies M, films.links lk  WHERE T.movieId = lk.movieId AND lk.imdbId = 0114709))  
+WHERE P.movie_1 in (SELECT T.movieId FROM tags T, links lk WHERE T.movieId = lk.movieId AND lk.imdbId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M, films.links lk  WHERE T.movieId = lk.movieId AND lk.imdbId = ?))  
 
-OR P.movie_2 IN (SELECT T.movieId FROM tags T, links lk WHERE T.movieId = lk.movieId AND lk.imdbId != 0114709 AND T.tag IN (SELECT tag FROM films.tags T, movies M, films.links lk  WHERE T.movieId = lk.movieId AND lk.imdbId = 0114709)) 
+OR P.movie_2 IN (SELECT T.movieId FROM tags T, links lk WHERE T.movieId = lk.movieId AND lk.imdbId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M, films.links lk  WHERE T.movieId = lk.movieId AND lk.imdbId = ?)) 
 
-OR P.movie_3 IN (SELECT T.movieId FROM tags T, links lk WHERE T.movieId = lk.movieId AND lk.imdbId != 0114709 AND T.tag IN (SELECT tag FROM films.tags T, movies M, films.links lk  WHERE T.movieId = lk.movieId AND lk.imdbId = 0114709))  
+OR P.movie_3 IN (SELECT T.movieId FROM tags T, links lk WHERE T.movieId = lk.movieId AND lk.imdbId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M, films.links lk  WHERE T.movieId = lk.movieId AND lk.imdbId = ?))  
 
-OR P.movie_4 IN (SELECT T.movieId FROM tags T, links lk WHERE T.movieId = lk.movieId AND lk.imdbId != 0114709 AND T.tag IN (SELECT tag FROM films.tags T, movies M, films.links lk  WHERE T.movieId = lk.movieId AND lk.imdbId = 0114709))  
+OR P.movie_4 IN (SELECT T.movieId FROM tags T, links lk WHERE T.movieId = lk.movieId AND lk.imdbId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M, films.links lk  WHERE T.movieId = lk.movieId AND lk.imdbId = ?))  
 
-OR P.movie_5 IN (SELECT T.movieId FROM tags T, links lk WHERE T.movieId = lk.movieId AND lk.imdbId != 0114709 AND T.tag IN (SELECT tag FROM films.tags T, movies M, films.links lk  WHERE T.movieId = lk.movieId AND lk.imdbId = 0114709))  
+OR P.movie_5 IN (SELECT T.movieId FROM tags T, links lk WHERE T.movieId = lk.movieId AND lk.imdbId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M, films.links lk  WHERE T.movieId = lk.movieId AND lk.imdbId = ?))  
 
-OR P.movie_6 IN (SELECT T.movieId FROM tags T, links lk WHERE T.movieId = lk.movieId AND lk.imdbId != 0114709 AND T.tag IN (SELECT tag FROM films.tags T, movies M, films.links lk  WHERE T.movieId = lk.movieId AND lk.imdbId = 0114709)) 
+OR P.movie_6 IN (SELECT T.movieId FROM tags T, links lk WHERE T.movieId = lk.movieId AND lk.imdbId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M, films.links lk  WHERE T.movieId = lk.movieId AND lk.imdbId = ?)) 
 
-OR P.movie_7 IN (SELECT T.movieId FROM tags T, links lk WHERE T.movieId = lk.movieId AND lk.imdbId != 0114709 AND T.tag IN (SELECT tag FROM films.tags T, movies M, films.links lk  WHERE T.movieId = lk.movieId AND lk.imdbId = 0114709)) 
+OR P.movie_7 IN (SELECT T.movieId FROM tags T, links lk WHERE T.movieId = lk.movieId AND lk.imdbId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M, films.links lk  WHERE T.movieId = lk.movieId AND lk.imdbId = ?)) 
 
-OR P.movie_8 IN (SELECT T.movieId FROM tags T, links lk WHERE T.movieId = lk.movieId AND lk.imdbId != 0114709 AND T.tag IN (SELECT tag FROM films.tags T, movies M, films.links lk  WHERE T.movieId = lk.movieId AND lk.imdbId = 0114709)) 
+OR P.movie_8 IN (SELECT T.movieId FROM tags T, links lk WHERE T.movieId = lk.movieId AND lk.imdbId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M, films.links lk  WHERE T.movieId = lk.movieId AND lk.imdbId = ?)) 
 
-OR P.movie_9 IN (SELECT T.movieId FROM tags T, links lk WHERE T.movieId = lk.movieId AND lk.imdbId != 0114709 AND T.tag IN (SELECT tag FROM films.tags T, movies M, films.links lk  WHERE T.movieId = lk.movieId AND lk.imdbId = 0114709))
+OR P.movie_9 IN (SELECT T.movieId FROM tags T, links lk WHERE T.movieId = lk.movieId AND lk.imdbId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M, films.links lk  WHERE T.movieId = lk.movieId AND lk.imdbId = ?))
 
-OR P.movie_10 IN (SELECT T.movieId FROM tags T, links lk WHERE T.movieId = lk.movieId AND lk.imdbId != 0114709 AND T.tag IN (SELECT tag FROM films.tags T, movies M, films.links lk  WHERE T.movieId = lk.movieId AND lk.imdbId = 0114709)) 
+OR P.movie_10 IN (SELECT T.movieId FROM tags T, links lk WHERE T.movieId = lk.movieId AND lk.imdbId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M, films.links lk  WHERE T.movieId = lk.movieId AND lk.imdbId = ?)) 
 
-OR P.movie_11 IN (SELECT T.movieId FROM tags T, links lk WHERE T.movieId = lk.movieId AND lk.imdbId != 0114709 AND T.tag IN (SELECT tag FROM films.tags T, movies M, films.links lk  WHERE T.movieId = lk.movieId AND lk.imdbId = 0114709))
-OR P.movie_12 IN (SELECT T.movieId FROM tags T, links lk WHERE T.movieId = lk.movieId AND lk.imdbId != 0114709 AND T.tag IN (SELECT tag FROM films.tags T, movies M, films.links lk  WHERE T.movieId = lk.movieId AND lk.imdbId = 0114709))) people_tag, (SELECT AVG(P.openness) as openness, AVG(P.agreeableness) As agreeableness, AVG(P.emotional_stability) AS emotional_stability, AVG(P.conscientiousness) AS conscientiousness, AVG(P.extraversion) AS extraversion 
+OR P.movie_11 IN (SELECT T.movieId FROM tags T, links lk WHERE T.movieId = lk.movieId AND lk.imdbId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M, films.links lk  WHERE T.movieId = lk.movieId AND lk.imdbId = ?))
+OR P.movie_12 IN (SELECT T.movieId FROM tags T, links lk WHERE T.movieId = lk.movieId AND lk.imdbId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M, films.links lk  WHERE T.movieId = lk.movieId AND lk.imdbId = ?))) people_tag, (SELECT AVG(P.openness) as openness, AVG(P.agreeableness) As agreeableness, AVG(P.emotional_stability) AS emotional_stability, AVG(P.conscientiousness) AS conscientiousness, AVG(P.extraversion) AS extraversion 
 
-FROM films.personality_data P,  (SELECT RP.userid as userId FROM films.ratings_personality RP, links lk  WHERE lk.imdbId = 0114709 AND RP.movie_id = lk.movieId AND RP.rating >=4) user_like 
+FROM films.personality_data P,  (SELECT RP.userid as userId FROM films.ratings_personality RP, links lk  WHERE lk.imdbId = ? AND RP.movie_id = lk.movieId AND RP.rating >=4) user_like 
 
 WHERE user_like.userId = P.userid) people_like;`;
 
