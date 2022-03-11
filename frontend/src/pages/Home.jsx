@@ -72,7 +72,7 @@ const Home = () => {
                            <OutlineButton className="small">View more</OutlineButton>
                        </Link>
                    </div>
-                   <MovieList category={category.popular} type={item}/>
+                   <MovieList category={category.pickGenre} type={item}/>
                </div>
                ))
                    

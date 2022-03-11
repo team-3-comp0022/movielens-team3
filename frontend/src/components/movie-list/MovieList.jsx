@@ -39,7 +39,7 @@ const MovieList = props => {
                         setItems(response.results); 
                         break;
 
-                    case category.popular:
+                    case category.pickGenre:
                             let responseSearch = null;
                             var getListOfFilmsInGenre = axios.get('http://localhost:3001/getFilmInGenre?query=' + props.type);
                             console.log("get films in genre", getListOfFilmsInGenre);
