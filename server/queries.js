@@ -267,21 +267,14 @@ GROUP BY MG.genre
 ORDER BY VR DESC; 
 `;
 
-//predict how a film
+//predict how a film  -had to remove last tmdbId hceck to work? 
 const case_four = `
-SELECT hello.title, AVG(hello.rating), ABS(averages.avg_rating - hello.rating) as difference 
-FROM ( 
-SELECT R.userId, R.movieId, MT.title, SUBSTRING_INDEX(SUBSTRING_INDEX(MT.title, '(', -1), ')', 1) as year, FROM_UNIXTIME(R.timestamp) as rating_time_stamp, R.rating 
-FROM films.ratings R, films.movies_titles MT 
-WHERE R.movieId = MT.movieId  
-AND SUBSTRING_INDEX(SUBSTRING_INDEX(MT.title, '(', -1), ')', 1) = YEAR(FROM_UNIXTIME(R.timestamp)) 
-) AS hello, (SELECT MT.movieId, AVG(R.rating) as avg_rating 
-FROM films.movies_titles MT, films.ratings R  
-WHERE MT.movieId = R.movieId 
-GROUP BY MT.movieId  
-ORDER BY AVG(R.rating) DESC) AS averages 
-WHERE hello.movieId = averages.movieId 
-GROUP BY hello.title, difference ; 
+SELECT SUM(R.rating) * (user_count.all_users / COUNT(R.userId)) as predicted_rating, user_count.real_rating 
+FROM films.ratings R, films.movies_titles MT, films.links lk, (SELECT COUNT(R.userId) as all_users, SUM(R.rating) as real_rating 
+FROM films.ratings R, films.movies_titles MT, films.links lk   
+WHERE R.movieId = MT.movieId AND MT.movieId=lk.movieId AND lk.tmdbId= ?) as user_count  
+WHERE R.movieId = MT.movieId AND MT.movieId = lk.movieId AND REPLACE(RIGHT(title, LOCATE('(',REVERSE(title))-1),')','') = YEAR(FROM_UNIXTIME(R.timestamp)) 
+GROUP BY user_count.all_users;  
 `;
 
 // const case_five = `
