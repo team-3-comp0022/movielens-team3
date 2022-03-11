@@ -177,10 +177,10 @@ GROUP BY MT.movieID;
 
 //rate movies by average popularity
 const case_two = `
-SELECT MT.title, AVG(R.rating) as average_rating
-FROM films.movies_titles MT, films.ratings R 
-WHERE MT.movieID = R.movieID 
-GROUP BY MT.title 
+SELECT lk.imdbId, AVG(R.rating) as average_rating
+FROM films.movies_titles MT, films.ratings R, links lk 
+WHERE MT.movieID = R.movieID AND MT.movieID = lk.movieId
+GROUP BY lk.imdbId
 ORDER BY AVG(R.rating) DESC; 
 `;
 
