@@ -23,7 +23,7 @@ function initialise_data(){
     makeTables()
     addData()
     const sleep = (waitTimeInMs) => new Promise(resolve => setTimeout(resolve, waitTimeInMs));
-    sleep(4000).then(() => {
+    sleep(40000).then(() => {
         makeSecondTables()
         makeSplitTable()
     });
@@ -32,17 +32,39 @@ function initialise_data(){
     });
 }
 
-initialise_data()
+var stuff_i_want = [];
+getReportData(862, function(result){
+   stuff_i_want = result;
+   console.log("here")
+   console.log(stuff_i_want)
+});
+
+//initialise_data()
 
 //firstQueryExample
-//var stuff_i_want = [];
-//firstQuery("Action","rating",function(result){
-//    stuff_i_want = result;
-//    console.log("here")
-//    console.log(stuff_i_want)
-// });
+//category is film category, type is filter type, order is ASC/DESC(CHANGE?)
+//rating
+//year
+//alphabetical
 
+/*
+var stuff_i_want = [];
+firstQuery("Action","alphabetical","desc",function(result){
+    stuff_i_want = result;
+    console.log("here")
+    console.log(stuff_i_want)
+ });
+*/
 
+//first query with year takes values (greater than first, less than second)
+/*
+var stuff_i_want = [];
+firstQuery(["Action",20,4000],"year","desc",function(result){
+    stuff_i_want = result;
+    console.log("here")
+    console.log(stuff_i_want)
+ });
+*/
 
 //test genre
 //var stuff_i_want = [];
@@ -56,7 +78,7 @@ initialise_data()
 //get new second query
 
 // var stuff_i_want = [];
-// secondQuery(114709, function(result){
+// secondQuery(862, function(result){//0114709
 //    stuff_i_want = result;
 //    console.log("here")
 //    console.log(stuff_i_want)
@@ -225,12 +247,29 @@ function firstQuery(title, callback){
 */
 
 //category is film category, type is filter type, order is ASC/DESC(CHANGE?)
-function firstQuery(category, type, callback){
-    let caseOne=null
-    if(type=="rating"){
-        caseOne = queries.case_one_rating
+function firstQuery(category, type, order,callback){//CATEGORY ALSO HAS FILM DATA 
+    let caseOne=queries.baseOne
+    if (type=="rating"){
+        caseOne += queries.baseROne
     }
-    connection.query(caseOne,[category], function (err, rows, fields) {
+    caseOne+= queries.baseTwo
+    if(type=="rating"){
+        caseOne += queries.baseRating
+    }
+    else if (type=="year"){
+        
+        caseOne += queries.baseYear
+    }
+    else if (type=="alphabetical"){
+        caseOne +=queries.baseAlpha
+    }
+    if(order == "desc"){
+        caseOne += queries.desc
+    }
+
+    console.log(caseOne)
+
+    connection.query(caseOne,category, function (err, rows, fields) {
         if (err) throw err
     
         console.log('Success')
@@ -315,10 +354,10 @@ function thirdQuery(callback){
     })
 }
 
-function fourthQuery(callback){
+function fourthQuery(val,callback){
     
     let caseFour = queries.case_four
-    connection.query(caseFour, function (err, rows, fields) {
+    connection.query(caseFour,[val], function (err, rows, fields) {
         if (err) throw err
     
         console.log('Success')
@@ -337,7 +376,7 @@ function fourthQuery(callback){
 function fifthQuery(title, callback){
     
     let caseFive = queries.case_five
-    connection.query(caseFive,[title], function (err, rows, fields) {
+    connection.query(caseFive,[title,title], function (err, rows, fields) {
         if (err) throw err
     
         console.log('Success')
@@ -348,7 +387,7 @@ function fifthQuery(title, callback){
 function sixthQuery(title, callback){
     
     let caseSix = queries.case_six
-    connection.query(caseSix,[title,title,title,title,title,title], function (err, rows, fields) {
+    connection.query(caseSix,[title,title,title,title,title,title,title,title,title,title,title,title,title,title,title,title,title,title,title,title,title,title,title,title,title], function (err, rows, fields) {
         if (err) throw err
     
         console.log('Success')
@@ -378,7 +417,30 @@ function getFilmInGenre(title, callback){
         return callback(rows);
     })
 }
-//connection.end();
+
+function getReportData(val, callback){
+    queryTwo=[]
+    queryFour=[]
+    queryFive=[]
+    querySix=[]
+    secondQuery(val, function(result){
+        queryTwo = result;
+        console.log(queryTwo)
+        fourthQuery(val, function(result){
+            queryFour = result;
+            console.log(queryFour)
+            fifthQuery(val, function(result){
+                queryFive = result;
+                console.log(queryFive)
+                sixthQuery(val, function(result){
+                    querySix = result;
+                    console.log(querySix)
+                    return callback([queryTwo, queryFour,queryFive,querySix])
+                 });
+             });
+         });
+     });
+}
 
 module.exports= {
     searchQuery,

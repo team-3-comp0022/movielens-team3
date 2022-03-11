@@ -41,7 +41,7 @@ CREATE TABLE ratings_personality (
     movie_id int,
     rating int,
     tstamp DATETIME,
-    PRIMARY KEY (userId, movie_id)
+    PRIMARY KEY (userId, movie_id, rating, tstamp)
 )
 `,  `
 CREATE TABLE personality_data (
@@ -167,40 +167,66 @@ const search =`
 SELECT links.imdbId FROM links where links.movieId IN (
   SELECT movies_titles.movieId FROM movies_titles WHERE movies_titles.title LIKE "%@%")
 `
-
+/*
 const case_one_alpha = `
 SELECT lk.imdbId 
-FROM movies_titles MT, links lk, movies_genres G  
-WHERE MT.movieId = lk.movieId and MT.movieID = G.movieId and G.genres = ?
-ORDER BY MT.title;
+FROM movies_years MY, links lk, movies_genres G  
+WHERE MY.movieId = lk.movieId and MY.movieID = G.movieId and G.genres = ?
+ORDER BY MY.title
 `;
 
 //combine for use-case 1
 const case_one_year=`
 SELECT lk.imdbId
-FROM movie_years MY, links lk  
-WHERE MY.movieId = lk.movieId and MY.year < ? MY.year > ? and MY.year!=""   
-ORDER BY year DESC; 
+FROM movie_years MY, links lk, movies_genres_sep G   
+WHERE MY.movieId = lk.movieId and MY.movieID = G.movieId and G.genre = ? and MY.year < ? and MY.year > ? and MY.year!="" 
+ORDER BY year
 `
+*/
 
+/*
 const case_one_tag=`
 SELECT lk.imdbId 
 FROM movies_titles MT, links lk 
 WHERE MT.movieId = lk.movieId
 `
+*/
 
+/*
 const case_one_rating=`
-SELECT lk.imdbId   
-FROM movies_titles MT, links lk   
-WHERE MT.movieId = lk.movieId  
-and MT.movieId IN(  
-SELECT MT.movieID  
-FROM films.movies_titles MT, films.ratings R, films.tags T 
-WHERE MT.movieID = R.movieId and T.tag = ? 
-GROUP BY MT.movieID  
-ORDER BY AVG(R.rating)
-); 
+SELECT lk.imdbId
+FROM movie_years MY, links lk, movies_genres G, films.ratings R   
+WHERE MY.movieId = lk.movieId and MY.movieID = G.movieId and G.genres = ? and MY.movieId = R.movieId
+GROUP BY MY.movieId
+ORDER BY AVG(R.rating) 
 `
+*/
+//dynamic
+
+const baseOne=`
+SELECT lk.imdbId 
+FROM movie_years MY, links lk, movies_genres_sep G `
+
+const baseROne=`, films.ratings R `
+
+const baseTwo=`WHERE MY.movieId = lk.movieId and MY.movieID = G.movieId and G.genre = ?
+`
+//baseOne + extra + order + (?desc)
+//alpha, year. rating
+const baseAlpha=`
+ORDER BY MY.title
+`
+const baseYear=`
+and MY.year > ? and MY.year < ? and MY.year!="" 
+ORDER BY year
+`
+const baseRating=`
+and MY.movieId = R.movieId
+GROUP BY MY.movieId
+ORDER BY AVG(R.rating) 
+`
+const desc=` DESC`
+
 const create_movies_years = ` 
 
 CREATE TABLE movie_years(PRIMARY KEY(movieId)) AS
@@ -241,21 +267,14 @@ GROUP BY MG.genre
 ORDER BY VR DESC; 
 `;
 
-//predict how a film
+//predict how a film  -had to remove last tmdbId hceck to work? 
 const case_four = `
-SELECT hello.title, AVG(hello.rating), ABS(averages.avg_rating - hello.rating) as difference 
-FROM ( 
-SELECT R.userId, R.movieId, MT.title, SUBSTRING_INDEX(SUBSTRING_INDEX(MT.title, '(', -1), ')', 1) as year, FROM_UNIXTIME(R.timestamp) as rating_time_stamp, R.rating 
-FROM films.ratings R, films.movies_titles MT 
-WHERE R.movieId = MT.movieId  
-AND SUBSTRING_INDEX(SUBSTRING_INDEX(MT.title, '(', -1), ')', 1) = YEAR(FROM_UNIXTIME(R.timestamp)) 
-) AS hello, (SELECT MT.movieId, AVG(R.rating) as avg_rating 
-FROM films.movies_titles MT, films.ratings R  
-WHERE MT.movieId = R.movieId 
-GROUP BY MT.movieId  
-ORDER BY AVG(R.rating) DESC) AS averages 
-WHERE hello.movieId = averages.movieId 
-GROUP BY hello.title, difference ; 
+SELECT SUM(R.rating) * (user_count.all_users / COUNT(R.userId)) as predicted_rating, user_count.real_rating 
+FROM films.ratings R, films.movies_titles MT, films.links lk, (SELECT COUNT(R.userId) as all_users, SUM(R.rating) as real_rating 
+FROM films.ratings R, films.movies_titles MT, films.links lk   
+WHERE R.movieId = MT.movieId AND MT.movieId=lk.movieId AND lk.tmdbId= ?) as user_count  
+WHERE R.movieId = MT.movieId AND MT.movieId = lk.movieId AND REPLACE(RIGHT(title, LOCATE('(',REVERSE(title))-1),')','') = YEAR(FROM_UNIXTIME(R.timestamp)) 
+GROUP BY user_count.all_users;  
 `;
 
 // const case_five = `
@@ -405,4 +424,28 @@ SELECT links.imdbId FROM links where links.movieId IN (SELECT movieID FROM films
 `
 
 
-module.exports = {create_list, drop_all, filenames, csv_queres, case_three, case_four,case_five,case_six, create_movies_genre, create_movies_title, create_movies_genres_sep, search, case_two_part_one, case_two_part_two, getGenres, getFilmsinGenre, case_one_rating, create_movies_years}
+module.exports = {
+    create_list, 
+    drop_all, 
+    filenames, 
+    csv_queres, 
+    case_three, 
+    case_four,
+    case_five,
+    case_six, 
+    create_movies_genre, 
+    create_movies_title, 
+    create_movies_genres_sep, 
+    search, 
+    case_two_part_one, 
+    case_two_part_two, 
+    getGenres, getFilmsinGenre, 
+    create_movies_years, 
+    baseAlpha, 
+    baseRating, 
+    baseYear, 
+    baseOne,
+    baseTwo,
+    baseROne,
+    desc
+}
