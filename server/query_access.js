@@ -41,6 +41,20 @@ getReportData(862, function(result){
 
 //initialise_data()
 
+//TESTNG FIFTH QUEREY AND SIXTH QUERY
+
+// fifthQuery("0114709",function(result){
+//     console.log("FIFTH QUERY--------------------------------------------------")
+//     solution = result;//returns array of Ids
+//     console.log(solution)//use it
+// });
+
+// sixthQuery("0114709",function(result){
+//     console.log("SIXTH QUERY--------------------------------------------------")
+//     solution = result;//returns array of Ids
+//     console.log(solution)//use it
+// });
+
 //firstQueryExample
 //category is film category, type is filter type, order is ASC/DESC(CHANGE?)
 //rating
