@@ -319,7 +319,7 @@ WHERE P.userId IN (SELECT X.userid
 
 FROM (SELECT R.userId as userid, @counter := @counter +1 AS counter    
 
-    FROM (select @counter:=0) AS var, (SELECT DISTINCT R.userId FROM films.ratings_personality R, films.movies M, films.links lk WHERE lk.imdbId = 0114709 AND lk.movieId = M.movieId AND R.movie_id = M.movieId AND R.rating >= 4) R  
+    FROM (select @counter:=0) AS var, (SELECT DISTINCT R.userId FROM films.ratings_personality R, films.movies M, films.links lk WHERE lk.imdbId = ? AND lk.movieId = M.movieId AND R.movie_id = M.movieId AND R.rating >= 4) R  
 
     ORDER BY R.userid DESC) AS X    
 
@@ -331,7 +331,7 @@ WHERE P.userId IN (SELECT X.userid
 
 FROM (SELECT R.userId as userid, @counter := @counter +1 AS counter    
 
-    FROM (select @counter:=0) AS var, (SELECT DISTINCT R.userId FROM films.ratings_personality R, films.movies M ,films.links lk WHERE lk.imdbId = 0114709 AND lk.movieId = M.movieId AND R.movie_id = M.movieId AND R.rating >= 4) R  
+    FROM (select @counter:=0) AS var, (SELECT DISTINCT R.userId FROM films.ratings_personality R, films.movies M ,films.links lk WHERE lk.imdbId = ? AND lk.movieId = M.movieId AND R.movie_id = M.movieId AND R.rating >= 4) R  
 
     ORDER BY R.userid DESC) AS X    
 
