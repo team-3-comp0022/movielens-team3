@@ -24,7 +24,7 @@ CREATE TABLE links (
 `,`
 CREATE TABLE movies (
     movieId int PRIMARY KEY,
-    title varchar(100),
+    title varchar(200),
     genres varchar(100)
 )
 `, `
@@ -37,10 +37,11 @@ CREATE TABLE tags (
 )
 ` ,`
 CREATE TABLE ratings_personality (
-    userid varchar(40) PRIMARY KEY,
+    userid varchar(40),
     movie_id int,
     rating int,
-    tstamp DATETIME
+    tstamp DATETIME,
+    PRIMARY KEY (userId, movie_id, rating, tstamp)
 )
 `,  `
 CREATE TABLE personality_data (
@@ -82,7 +83,7 @@ CREATE TABLE personality_data (
 `];
 
 
-const drop_all = `DROP TABLE IF EXISTS links, ratings, movies, tags, ratings_personality, personality_data, movies_titles, movies_genres, movies_genres_sep`
+const drop_all = `DROP TABLE IF EXISTS links, ratings, movies, tags, ratings_personality, personality_data, movies_titles, movies_genres, movies_genres_sep, movie_years`
 
 
 const filenames = ["./ml-latest-small/movies.csv","./ml-latest-small/links.csv", "./ml-latest-small/ratings.csv","./ml-latest-small/tags.csv", "./personality-isf2018/personality-data.csv","./personality-isf2018/ratings.csv"]
@@ -166,16 +167,75 @@ const search =`
 SELECT links.imdbId FROM links where links.movieId IN (
   SELECT movies_titles.movieId FROM movies_titles WHERE movies_titles.title LIKE "%@%")
 `
-
-// //substitute the Fair Game for %s
-const case_one = `
-SELECT MT.movieID, AVG(R.rating) as average_rating 
-FROM films.movies_titles MT, films.ratings R 
-WHERE MT.title = ? and MT.movieID = R.movieId
-GROUP BY MT.movieID;
+/*
+const case_one_alpha = `
+SELECT lk.imdbId 
+FROM movies_years MY, links lk, movies_genres G  
+WHERE MY.movieId = lk.movieId and MY.movieID = G.movieId and G.genres = ?
+ORDER BY MY.title
 `;
 
+//combine for use-case 1
+const case_one_year=`
+SELECT lk.imdbId
+FROM movie_years MY, links lk, movies_genres_sep G   
+WHERE MY.movieId = lk.movieId and MY.movieID = G.movieId and G.genre = ? and MY.year < ? and MY.year > ? and MY.year!="" 
+ORDER BY year
+`
+*/
+
+/*
+const case_one_tag=`
+SELECT lk.imdbId 
+FROM movies_titles MT, links lk 
+WHERE MT.movieId = lk.movieId
+`
+*/
+
+/*
+const case_one_rating=`
+SELECT lk.imdbId
+FROM movie_years MY, links lk, movies_genres G, films.ratings R   
+WHERE MY.movieId = lk.movieId and MY.movieID = G.movieId and G.genres = ? and MY.movieId = R.movieId
+GROUP BY MY.movieId
+ORDER BY AVG(R.rating) 
+`
+*/
+//dynamic
+
+const baseOne=`
+SELECT lk.imdbId 
+FROM movie_years MY, links lk, movies_genres_sep G `
+
+const baseROne=`, films.ratings R `
+
+const baseTwo=`WHERE MY.movieId = lk.movieId and MY.movieID = G.movieId and G.genre = ?
+`
+//baseOne + extra + order + (?desc)
+//alpha, year. rating
+const baseAlpha=`
+ORDER BY MY.title
+`
+const baseYear=`
+and MY.year > ? and MY.year < ? and MY.year!="" 
+ORDER BY year
+`
+const baseRating=`
+and MY.movieId = R.movieId
+GROUP BY MY.movieId
+ORDER BY AVG(R.rating) 
+`
+const desc=` DESC`
+
+const create_movies_years = ` 
+
+CREATE TABLE movie_years(PRIMARY KEY(movieId)) AS
+SELECT movieId, title, REPLACE(RIGHT(title, LOCATE('(',REVERSE(title))-1),')','') AS year FROM films.movies M; 
+
+`; 
+
 //rate movies by average popularity
+/*
 const case_two = `
 SELECT MT.title, AVG(R.rating) as average_rating
 FROM films.movies_titles MT, films.ratings R 
@@ -183,6 +243,7 @@ WHERE MT.movieID = R.movieID
 GROUP BY MT.title 
 ORDER BY AVG(R.rating) DESC; 
 `;
+*/
 
 const case_two_part_one = `
 SELECT AVG(R.rating) as average_rating, SUM(R.rating) as aggregate_Rating, variance(R.rating) as variance_Rating
@@ -207,38 +268,153 @@ GROUP BY MG.genre
 ORDER BY VR DESC; 
 `;
 
-//predict how a film
+//predict how a film  -had to remove last tmdbId check to work? 
 const case_four = `
-SELECT hello.title, AVG(hello.rating), ABS(averages.avg_rating - hello.rating) as difference 
-FROM ( 
-SELECT R.userId, R.movieId, MT.title, SUBSTRING_INDEX(SUBSTRING_INDEX(MT.title, '(', -1), ')', 1) as year, FROM_UNIXTIME(R.timestamp) as rating_time_stamp, R.rating 
-FROM films.ratings R, films.movies_titles MT 
-WHERE R.movieId = MT.movieId  
-AND SUBSTRING_INDEX(SUBSTRING_INDEX(MT.title, '(', -1), ')', 1) = YEAR(FROM_UNIXTIME(R.timestamp)) 
-) AS hello, (SELECT MT.movieId, AVG(R.rating) as avg_rating 
-FROM films.movies_titles MT, films.ratings R  
-WHERE MT.movieId = R.movieId 
-GROUP BY MT.movieId  
-ORDER BY AVG(R.rating) DESC) AS averages 
-WHERE hello.movieId = averages.movieId 
-GROUP BY hello.title, difference 
-ORDER BY r.rating; 
+SELECT SUM(R.rating) * (user_count.all_users / COUNT(R.userId)) as predicted_rating, user_count.real_rating 
+FROM films.ratings R, films.movies_titles MT, films.links lk, (SELECT COUNT(R.userId) as all_users, SUM(R.rating) as real_rating 
+FROM films.ratings R, films.movies_titles MT, films.links lk   
+WHERE R.movieId = MT.movieId AND MT.movieId=lk.movieId AND lk.tmdbId= ?) as user_count  
+WHERE R.movieId = MT.movieId AND MT.movieId = lk.movieId AND REPLACE(RIGHT(title, LOCATE('(',REVERSE(title))-1),')','') = YEAR(FROM_UNIXTIME(R.timestamp)) 
+GROUP BY user_count.all_users;  
 `;
 
-const case_five = `
-SELECT AVG(P.openness) as Openness, AVG(P.agreeableness) As Agreeableness, AVG(P.emotional_stability) AS Emotional_stability, AVG(P.conscientiousness) AS Conscientiousness, AVG(P.extraversion) AS Extraversion 
-FROM films.personality_data P JOIN films.ratings_personality R on P.userid = R.userId 
-WHERE P.userId IN (SELECT DISTINCT R.userId FROM films.ratings_personality R, films.movies M WHERE M.title=? AND R.movie_id = M.movieId AND R.rating >= 4); `;
+// const case_five = `
+// SELECT AVG(P.openness) as Openness, AVG(P.agreeableness) As Agreeableness, AVG(P.emotional_stability) AS Emotional_stability, AVG(P.conscientiousness) AS Conscientiousness, AVG(P.extraversion) AS Extraversion 
+// FROM films.personality_data P JOIN films.ratings_personality R on P.userid = R.userId 
+// WHERE P.userId IN (SELECT DISTINCT R.userId FROM films.ratings_personality R, films.movies M WHERE M.title=? AND R.movie_id = M.movieId AND R.rating >= 4); `;
+// const case_five = `SELECT top_70.openness as predicted_openness, top_30.openness as actual_openness, (top_70.openness - top_30.openness) as difference_openness, top_70.agreeableness as predicted_agreeableness, top_30.agreeableness as actual_agreeableness, (top_70.agreeableness - top_30.agreeableness) as difference_agreeableness, top_70.emotional_stability as predicted_emotional_stability, top_30.emotional_stability as actual_emotional_stability, (top_70.emotional_stability - top_30.emotional_stability) as difference_emotional_stability, top_70.conscientiousness as predicted_conscientiousness, top_30.conscientiousness as actual_conscientiousness, (top_70.conscientiousness - top_30.conscientiousness) as difference_conscientiousness, top_70.extraversion as predicted_extraversion, top_30.extraversion as actual_extraversion, (top_70.extraversion - top_30.extraversion) as difference_extraversion 
+
+// FROM (SELECT AVG(P.openness) as openness, AVG(P.agreeableness) As agreeableness, AVG(P.emotional_stability) AS emotional_stability, AVG(P.conscientiousness) AS conscientiousness, AVG(P.extraversion) AS extraversion  
+
+// FROM films.personality_data P JOIN films.ratings_personality R on P.userid = R.userId  
+
+// WHERE P.userId IN (SELECT X.userid    
+
+// FROM (SELECT R.userId as userid, @counter := @counter +1 AS counter    
+
+//     FROM (select @counter:=0) AS var, (SELECT DISTINCT R.userId FROM films.ratings_personality R, films.movies M WHERE M.movieId=? AND R.movie_id = M.movieId AND R.rating >= 4) R  
+
+//     ORDER BY R.userid DESC) AS X    
+
+// where (70/100 * @counter) >= counter)) top_70, (SELECT AVG(P.openness) as openness, AVG(P.agreeableness) As agreeableness, AVG(P.emotional_stability) AS emotional_stability, AVG(P.conscientiousness) AS conscientiousness, AVG(P.extraversion) AS extraversion  
+
+// FROM films.personality_data P JOIN films.ratings_personality R on P.userid = R.userId  
+
+// WHERE P.userId IN (SELECT X.userid    
+
+// FROM (SELECT R.userId as userid, @counter := @counter +1 AS counter    
+
+//     FROM (select @counter:=0) AS var, (SELECT DISTINCT R.userId FROM films.ratings_personality R, films.movies M WHERE M.movieId=? AND R.movie_id = M.movieId AND R.rating >= 4) R  
+
+//     ORDER BY R.userid DESC) AS X    
+
+// where (70/100 * @counter) <= counter)) top_30;`;
+
+const case_five = `SELECT top_70.openness as predicted_openness, top_30.openness as actual_openness, ABS(top_70.openness - top_30.openness) as difference_openness, top_70.agreeableness as predicted_agreeableness, top_30.agreeableness as actual_agreeableness, ABS(top_70.agreeableness - top_30.agreeableness) as difference_agreeableness, top_70.emotional_stability as predicted_emotional_stability, top_30.emotional_stability as actual_emotional_stability, ABS(top_70.emotional_stability - top_30.emotional_stability) as difference_emotional_stability, top_70.conscientiousness as predicted_conscientiousness, top_30.conscientiousness as actual_conscientiousness, ABS(top_70.conscientiousness - top_30.conscientiousness) as difference_conscientiousness, top_70.extraversion as predicted_extraversion, top_30.extraversion as actual_extraversion, ABS(top_70.extraversion - top_30.extraversion) as difference_extraversion 
+
+FROM (SELECT AVG(P.openness) as openness, AVG(P.agreeableness) As agreeableness, AVG(P.emotional_stability) AS emotional_stability, AVG(P.conscientiousness) AS conscientiousness, AVG(P.extraversion) AS extraversion  
+
+FROM films.personality_data P JOIN films.ratings_personality R on P.userid = R.userId  
+
+WHERE P.userId IN (SELECT X.userid    
+
+FROM (SELECT R.userId as userid, @counter := @counter +1 AS counter    
+
+    FROM (select @counter:=0) AS var, (SELECT DISTINCT R.userId FROM films.ratings_personality R, films.movies M, films.links lk WHERE lk.tmdbId = ? AND lk.movieId = M.movieId AND R.movie_id = M.movieId AND R.rating >= 4) R  
+
+    ORDER BY R.userid DESC) AS X    
+
+where (70/100 * @counter) >= counter)) top_70, (SELECT AVG(P.openness) as openness, AVG(P.agreeableness) As agreeableness, AVG(P.emotional_stability) AS emotional_stability, AVG(P.conscientiousness) AS conscientiousness, AVG(P.extraversion) AS extraversion  
+
+FROM films.personality_data P JOIN films.ratings_personality R on P.userid = R.userId  
+
+WHERE P.userId IN (SELECT X.userid    
+
+FROM (SELECT R.userId as userid, @counter := @counter +1 AS counter    
+
+    FROM (select @counter:=0) AS var, (SELECT DISTINCT R.userId FROM films.ratings_personality R, films.movies M ,films.links lk WHERE lk.tmdbId = ? AND lk.movieId = M.movieId AND R.movie_id = M.movieId AND R.rating >= 4) R  
+
+    ORDER BY R.userid DESC) AS X    
+
+where (70/100 * @counter) <= counter)) top_30;`;
+
+// const case_six = `
+// SELECT AVG(P.openness) as Openness, AVG(P.agreeableness) As Agreeableness, AVG(P.emotional_stability) AS Emotional_stability, AVG(P.conscientiousness) AS Conscientiousness, AVG(P.extraversion) AS Extraversion FROM films.personality_data P 
+// WHERE P.movie_1 in (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.title=?)) 
+// OR P.movie_2 IN (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.title=?)) 
+// OR P.movie_3 IN (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.title=?)) 
+// OR P.movie_4 IN (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.title=?)) 
+// OR P.movie_5 IN (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.title=?)) 
+// OR P.movie_6 IN (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.title=?));
+// `;
+
+// const case_six = `SELECT ABS(people_tag.openness - people_like.openness) AS diff_openness, ABS(people_tag.agreeableness - people_like. agreeableness) AS diff_agreeableness, ABS(people_tag.emotional_stability - people_like.emotional_stability) AS diff_emotional_stability, ABS(people_tag.conscientiousness - people_like.conscientiousness) AS diff_conscientiousness, ABS(people_tag.extraversion - people_like.extraversion) AS diff_extraversion 
+
+// FROM (SELECT AVG(P.openness) as openness, AVG(P.agreeableness) As agreeableness, AVG(P.emotional_stability) AS emotional_stability, AVG(P.conscientiousness) AS conscientiousness, AVG(P.extraversion) AS extraversion 
+
+// FROM films.personality_data P  
+
+// WHERE P.movie_1 in (SELECT T.movieId FROM tags T WHERE T.movieId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.movieId = ?))  
+
+// OR P.movie_2 IN (SELECT T.movieId FROM tags T WHERE T.movieId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.movieId = ?))  
+
+// OR P.movie_3 IN (SELECT T.movieId FROM tags T WHERE T.movieId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.movieId = ?))  
+
+// OR P.movie_4 IN (SELECT T.movieId FROM tags T WHERE T.movieId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.movieId = ?))  
+
+// OR P.movie_5 IN (SELECT T.movieId FROM tags T WHERE T.movieId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.movieId = ?))  
+
+// OR P.movie_6 IN (SELECT T.movieId FROM tags T WHERE T.movieId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.movieId = ?)) 
+
+// OR P.movie_7 IN (SELECT T.movieId FROM tags T WHERE T.movieId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.movieId = ?)) 
+
+// OR P.movie_8 IN (SELECT T.movieId FROM tags T WHERE T.movieId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.movieId = ?)) 
+
+// OR P.movie_9 IN (SELECT T.movieId FROM tags T WHERE T.movieId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.movieId = ?)) 
+
+// OR P.movie_10 IN (SELECT T.movieId FROM tags T WHERE T.movieId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.movieId = ?)) 
+
+// OR P.movie_11 IN (SELECT T.movieId FROM tags T WHERE T.movieId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.movieId = ?)) 
+
+// OR P.movie_12 IN (SELECT T.movieId FROM tags T WHERE T.movieId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.movieId = ?))) people_tag, (SELECT AVG(P.openness) as openness, AVG(P.agreeableness) As agreeableness, AVG(P.emotional_stability) AS emotional_stability, AVG(P.conscientiousness) AS conscientiousness, AVG(P.extraversion) AS extraversion 
+
+// FROM films.personality_data P,  (SELECT RP.userid as userId FROM films.ratings_personality RP  WHERE RP.movie_id = ? and RP.rating >=4) user_like 
+
+// WHERE user_like.userId = P.userid) people_like; `;
 
 const case_six = `
-SELECT AVG(P.openness) as Openness, AVG(P.agreeableness) As Agreeableness, AVG(P.emotional_stability) AS Emotional_stability, AVG(P.conscientiousness) AS Conscientiousness, AVG(P.extraversion) AS Extraversion FROM films.personality_data P 
-WHERE P.movie_1 in (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.title=?)) 
-OR P.movie_2 IN (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.title=?)) 
-OR P.movie_3 IN (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.title=?)) 
-OR P.movie_4 IN (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.title=?)) 
-OR P.movie_5 IN (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.title=?)) 
-OR P.movie_6 IN (SELECT T.movieId FROM tags T WHERE T.tag IN (SELECT tag FROM films.tags T, movies M  WHERE T.movieId = M.movieId AND M.title=?));
-`;
+SELECT ABS(people_tag.openness - people_like.openness) AS diff_openness, ABS(people_tag.agreeableness - people_like. agreeableness) AS diff_agreeableness, ABS(people_tag.emotional_stability - people_like.emotional_stability) AS diff_emotional_stability, ABS(people_tag.conscientiousness - people_like.conscientiousness) AS diff_conscientiousness, ABS(people_tag.extraversion - people_like.extraversion) AS diff_extraversion 
+
+FROM (SELECT AVG(P.openness) as openness, AVG(P.agreeableness) As agreeableness, AVG(P.emotional_stability) AS emotional_stability, AVG(P.conscientiousness) AS conscientiousness, AVG(P.extraversion) AS extraversion 
+
+FROM films.personality_data P  
+
+WHERE P.movie_1 in (SELECT T.movieId FROM tags T, links lk WHERE T.movieId = lk.movieId AND lk.tmdbId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M, films.links lk  WHERE T.movieId = lk.movieId AND lk.tmdbId = ?))  
+
+OR P.movie_2 IN (SELECT T.movieId FROM tags T, links lk WHERE T.movieId = lk.movieId AND lk.tmdbId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M, films.links lk  WHERE T.movieId = lk.movieId AND lk.tmdbId = ?)) 
+
+OR P.movie_3 IN (SELECT T.movieId FROM tags T, links lk WHERE T.movieId = lk.movieId AND lk.tmdbId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M, films.links lk  WHERE T.movieId = lk.movieId AND lk.tmdbId = ?))  
+
+OR P.movie_4 IN (SELECT T.movieId FROM tags T, links lk WHERE T.movieId = lk.movieId AND lk.tmdbId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M, films.links lk  WHERE T.movieId = lk.movieId AND lk.tmdbId = ?))  
+
+OR P.movie_5 IN (SELECT T.movieId FROM tags T, links lk WHERE T.movieId = lk.movieId AND lk.tmdbId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M, films.links lk  WHERE T.movieId = lk.movieId AND lk.tmdbId = ?))  
+
+OR P.movie_6 IN (SELECT T.movieId FROM tags T, links lk WHERE T.movieId = lk.movieId AND lk.tmdbId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M, films.links lk  WHERE T.movieId = lk.movieId AND lk.tmdbId = ?)) 
+
+OR P.movie_7 IN (SELECT T.movieId FROM tags T, links lk WHERE T.movieId = lk.movieId AND lk.tmdbId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M, films.links lk  WHERE T.movieId = lk.movieId AND lk.tmdbId = ?)) 
+
+OR P.movie_8 IN (SELECT T.movieId FROM tags T, links lk WHERE T.movieId = lk.movieId AND lk.tmdbId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M, films.links lk  WHERE T.movieId = lk.movieId AND lk.tmdbId = ?)) 
+
+OR P.movie_9 IN (SELECT T.movieId FROM tags T, links lk WHERE T.movieId = lk.movieId AND lk.tmdbId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M, films.links lk  WHERE T.movieId = lk.movieId AND lk.tmdbId = ?))
+
+OR P.movie_10 IN (SELECT T.movieId FROM tags T, links lk WHERE T.movieId = lk.movieId AND lk.tmdbId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M, films.links lk  WHERE T.movieId = lk.movieId AND lk.tmdbId = ?)) 
+
+OR P.movie_11 IN (SELECT T.movieId FROM tags T, links lk WHERE T.movieId = lk.movieId AND lk.tmdbId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M, films.links lk  WHERE T.movieId = lk.movieId AND lk.tmdbId = ?))
+OR P.movie_12 IN (SELECT T.movieId FROM tags T, links lk WHERE T.movieId = lk.movieId AND lk.tmdbId != ? AND T.tag IN (SELECT tag FROM films.tags T, movies M, films.links lk  WHERE T.movieId = lk.movieId AND lk.tmdbId = ?))) people_tag, (SELECT AVG(P.openness) as openness, AVG(P.agreeableness) As agreeableness, AVG(P.emotional_stability) AS emotional_stability, AVG(P.conscientiousness) AS conscientiousness, AVG(P.extraversion) AS extraversion 
+
+FROM films.personality_data P,  (SELECT RP.userid as userId FROM films.ratings_personality RP, links lk  WHERE lk.tmdbId = ? AND RP.movie_id = lk.movieId AND RP.rating >=4) user_like 
+
+WHERE user_like.userId = P.userid) people_like;`;
 
 const getGenres = `
 SELECT DISTINCT(genre) FROM films.movies_genres_sep
@@ -248,4 +424,28 @@ SELECT links.imdbId FROM links where links.movieId IN (SELECT movieID FROM films
 `
 
 
-module.exports = {create_list, drop_all, filenames, csv_queres, case_one, case_two, case_three, case_four,case_five,case_six, create_movies_genre, create_movies_title, create_movies_genres_sep, search, case_two_part_one, case_two_part_two, getGenres, getFilmsinGenre}
+module.exports = {
+    create_list, 
+    drop_all, 
+    filenames, 
+    csv_queres, 
+    case_three, 
+    case_four,
+    case_five,
+    case_six, 
+    create_movies_genre, 
+    create_movies_title, 
+    create_movies_genres_sep, 
+    search, 
+    case_two_part_one, 
+    case_two_part_two, 
+    getGenres, getFilmsinGenre, 
+    create_movies_years, 
+    baseAlpha, 
+    baseRating, 
+    baseYear, 
+    baseOne,
+    baseTwo,
+    baseROne,
+    desc
+}
