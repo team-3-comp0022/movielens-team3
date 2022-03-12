@@ -252,7 +252,7 @@ function fifthQuery(title, callback){
 function sixthQuery(title, callback){
     
     let caseSix = queries.case_six
-    connection.query(caseSix,[title,title,title,title,title,title], function (err, rows, fields) {
+    connection.query(caseSix,[title,title,title,title,title,title,title,title,title,title,title,title,title,title,title,title,title,title,title,title,title,title,title,title,title], function (err, rows, fields) {
         if (err) throw err
     
         console.log('Success')
