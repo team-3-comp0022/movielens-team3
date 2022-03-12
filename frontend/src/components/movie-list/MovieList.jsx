@@ -88,6 +88,7 @@ const MovieList = props => {
                                     responseSearch = {page:1, results: result2, total_pages: 4, total_results: value.data.length};                   
                                     setItems(responseSearch.results); 
                                 });
+                                // getByGenre(props.type);
                             break;
                   
                 }
@@ -98,6 +99,33 @@ const MovieList = props => {
         }
         getList();
     }, []);
+
+    const getByGenre = async () => {
+        let responseSearch = null;
+        var getListOfFilmsInGenre = axios.get('http://localhost:3001/getFilmInGenre?query=' + "Adventure");
+        // console.log("get films in genre", getListOfFilmsInGenre);
+
+        var result = [];
+        var getIndexes = [];
+        const params={};
+        getListOfFilmsInGenre.then(value => {  
+                for(var i=0; i< 10; i++)
+                    result.splice(i, 0, value.data[i]);
+                //console.log("params", result);
+                
+                getIndexes = tmdbApi.getMoviesFromOurDatabase(result, {params});
+                //console.log("new", getIndexes);
+
+                var result2 = []
+                for (var i = 0; i < 10; i++) 
+                    getIndexes[i].then(value => { 
+                        result2.push(value.movie_results[0]); 
+                    });
+                                    
+                responseSearch = {page:1, results: result2, total_pages: 4, total_results: value.data.length};                   
+                setItems(responseSearch.results); 
+            });
+    }
 
     return (
         <div className="movie-list">

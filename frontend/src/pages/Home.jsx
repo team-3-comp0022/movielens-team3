@@ -10,6 +10,7 @@ import { useParams } from 'react-router';
 import axios from 'axios';
 import '../components/movie-grid/movie-grid.scss';
 import '../components/movie-card/movie-card.scss';
+import getByGenre from '../components/movie-list/MovieList';
 
 const Home = () => {
     const [genres, setGenres] = useState([])
@@ -68,6 +69,7 @@ const Home = () => {
                         </Link>
                     </div>
                     <MovieList category={category.popular} type={movieType.top_rated}/>
+                    
                 </div>
 
                 <div className="section mb-3">
@@ -116,8 +118,13 @@ const Home = () => {
                    
                     
                 </div>
-               
-        
+                  {
+                <div className="movie-grid__loadmore">
+                {/* <OutlineButton className="small" onClick={getByGenre}>Load more movies</OutlineButton>
+                <OutlineButton className="small" >Load more movies</OutlineButton> */}
+
+                </div>
+                    }
                { 
                  genres.map((item, i) => (
                    <div className="section mb-3">
