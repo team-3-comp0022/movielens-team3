@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory, useParams } from 'react-router';
 import useCollapse from 'react-collapsed';
+import axios from "axios";
 
 import './movie-grid.scss';
 
@@ -8,63 +9,136 @@ import MovieCard from '../movie-card/MovieCard';
 import Button, { OutlineButton } from '../button/Button';
 import Input from '../input/Input'
 
-import tmdbApi, { category, movieType, tvType } from '../../api/tmdbApi';
+import tmdbApi, { category, movieType } from '../../api/tmdbApi';
 
-const MovieGrid = props => {
+const MovieGrid = (props) => {
 
-    const [items, setItems] = useState([]);
-
+    var [items, setItems] = useState([]);
     const [page, setPage] = useState(1);
     const [totalPage, setTotalPage] = useState(0);
-
+    const [totalResults, setTotalResults] = useState(0);
     const { keyword, collapse } = useParams();
 
     useEffect(() => {
         const getList = async () => {
             let response = null;
+            let responseSearch = null;
+            var result = [];
+            var getIndexesFromOurDatabase = [];
             if (keyword === undefined) {
                 const params = {};
                 switch(props.category) {
                     case category.movie:
-                        response = await tmdbApi.getMoviesList(movieType.upcoming, {params});
+                        getIndexesFromOurDatabase = await axios.get('http://localhost:3001/findMovieIds')
+                        console.log("before ids", getIndexesFromOurDatabase);
+                        // Permanently display first 20 movies and load more if necessary - load page 1
+                        for (var i = 0; i < 20; i++) // obtain all the movies we want to load max on the page
+                            result.push(getIndexesFromOurDatabase.data[i]); // result will have the imdbIds to be appended to the url sent to the api
+                        
+                        console.log("e in get freaking list", result);
+                        getIndexesFromOurDatabase = tmdbApi.getMoviesFromOurDatabase(result, {params}); // getIndexesFromOurDatabase will contained the urls in a list that can be accessed directly to retrieve the movies
+                        result = []
+                        for (var i = 0; i < 20; i++)  // display first 20 for page 1 
+                            getIndexesFromOurDatabase[i].then(value => { 
+                                result.push(value.movie_results[0]); // will append the objects or jsons with all the info for each movie
+                             });
+                                             
+                        response = {page:2, results: result, total_pages: 4, total_results: 70}; 
+                        console.log("response first", response);                      
+                        //response = await tmdbApi.getMoviesList(movieType.popular, {params});   
+                        setItems(response.results); // items will firstly contain the first 20 movies to be rendered
+                        setTotalResults(response.total_results);
+                        setTotalPage(response.total_pages);
+                        
                         break;
-                    default:
-                        response = await tmdbApi.getTvList(tvType.popular, {params});
+                       
                 }
+                
             } else {
                 const params = {
                     query: keyword
                 }
-                response = await tmdbApi.search(props.category, {params});
+                var getIndexesFromOurDatabase = [];
+                var getIndexes = [];
+                getIndexesFromOurDatabase = axios.get('http://localhost:3001/search?query=' + params.query);
+                console.log("my ids", getIndexesFromOurDatabase);
+
+                result = [];
+                getIndexesFromOurDatabase.then(value => {  
+                    console.log("idk", value.data.length);
+                    for(var i=0; i< value.data.length; i++)
+                        //result.push(value.data[0].imdbId); 
+                        result.splice(i, 0, value.data[i]);
+                    console.log("params", result);
+                    const params2 = {};
+                    getIndexes = tmdbApi.getMoviesFromOurDatabase(result, {params2});
+                    console.log("new", getIndexes);
+
+                    var result2 = []
+               
+                    for (var i = 0; i < value.data.length; i++)  // display first 20 for page 1 
+                         getIndexes[i].then(value => { 
+                            result2.push(value.movie_results[0]); // will append the objects or jsons with all the info for each movie
+                        });
+                                        
+                    responseSearch = {page:1, results: result2, total_pages: 4, total_results: value.data.length};                   
+                    console.log("responseSearch", responseSearch);    
+                    setItems(responseSearch.results); // items will firstly contain the first 20 movies to be rendered
+                    console.log("vreau sa vad", items);
+                    setTotalResults(responseSearch.total_results);
+                    setTotalPage(responseSearch.total_pages);
+                });
             }
-            setItems(response.results);
-            setTotalPage(response.total_pages);
         }
         getList();
+       
     }, [props.category, keyword]);
 
     const loadMore = async () => {
         let response = null;
+        var result = undefined || [];
+        var getIndexesFromOurDatabase = [];
         if (keyword === undefined) {
             const params = {
                 page: page + 1
             };
             switch(props.category) {
                 case category.movie:
-                    response = await tmdbApi.getMoviesList(movieType.upcoming, {params});
+                    getIndexesFromOurDatabase = await axios.get('http://localhost:3001/findMovieIds');
+
+                    //console.log("i am in loading"); console.log("mypage", page); 
+                    var limit; 
+                    var noOfMovies = 20;
+                    if(20*(page+1) >= totalResults) {limit =  totalResults; noOfMovies = totalResults - 20*(page);}
+                    else limit = 20*(page+1);
+                    for (var i=20*page; i < limit; i++) // obtain all the movies we want to load max on the page
+                        result.push(getIndexesFromOurDatabase.data[i]); // result will have the imdbIds to be appended to the url sent to the api
+                        
+                    getIndexesFromOurDatabase = tmdbApi.getMoviesFromOurDatabase(result, {params});
+                    var sp = [];
+                    //console.log("prior global", sp);
+                    for (var i = 0; i < noOfMovies; i++) {  
+                        getIndexesFromOurDatabase[i].then(value => {  // getIndexesFromOurDatabase will contained the urls in a list that can be accessed directly to retrieve the movies
+                            sp.splice(i, 0, value.movie_results[0]);
+                            setItems([...items, ...sp]);
+                        }); 
+                    }
+                    
+                    response = {page:page, results: sp, total_pages: 3, total_results: 50};
+                    //response = await tmdbApi.getMoviesList(movieType.popular, {params});
+                    //console.log("myitems", items); 
                     break;
-                default:
-                    response = await tmdbApi.getTvList(tvType.popular, {params});
+                
             }
         } else {
             const params = {
                 page: page + 1,
                 query: keyword
             }
-            response = await tmdbApi.search(props.category, {params});
+            response = await tmdbApi.search({params});
         }
-        setItems([...items, ...response.results]);
-        setPage(page + 1);
+        setPage(page+1);
+        //setItems([...items, ...response.results]);
     }
 
     return (
@@ -84,7 +158,8 @@ const MovieGrid = props => {
             {
                 page < totalPage ? (
                     <div className="movie-grid__loadmore">
-                        <OutlineButton className="small" onClick={loadMore}>Load more</OutlineButton>
+                        <OutlineButton className="small" onClick={loadMore}>Load page {page+1} of movies</OutlineButton>
+                    
                     </div>
                 ) : null
             }
@@ -101,7 +176,7 @@ const MovieSearch = props => {
     const goToSearch = useCallback(
         () => {
             if (keyword.trim().length > 0) {
-                history.push(`/${category[props.category]}/search/${keyword}`);
+                history.push(`/movie/search/${keyword}`);
             }
         },
         [keyword, props.category, history]
@@ -175,38 +250,6 @@ return (
         <div class="col2" style={{marginTop:38, marginLeft:-10,}}>
 	    <h5>   Runtime <br/><br/> </h5>
         <div class="hr"></div>
-
-        {/* <div class="slider-wrapper">
-      <div id="slider-range"></div>
-
-      <div class="range-wrapper">
-        <div class="range"></div>
-        <div class="range-alert">+</div>
-
-        <div class="gear-wrapper">
-          <div class="gear-large gear-one">
-            <div class="gear-tooth"></div>
-            <div class="gear-tooth"></div>
-            <div class="gear-tooth"></div>
-            <div class="gear-tooth"></div>
-          </div>
-          <div class="gear-large gear-two">
-            <div class="gear-tooth"></div>
-            <div class="gear-tooth"></div>
-            <div class="gear-tooth"></div>
-            <div class="gear-tooth"></div>
-          </div>
-        </div>
-
-      </div>
-
-      <div class="marker marker-0"><sup>$</sup>10,000</div>
-      <div class="marker marker-25"><sup>$</sup>35,000</div>
-      <div class="marker marker-50"><sup>$</sup>60,000</div>
-      <div class="marker marker-75"><sup>$</sup>85,000</div>
-      <div class="marker marker-100"><sup>$</sup>110,000+</div>
-    </div> */}
-
 
              </div>
 	   </div>
