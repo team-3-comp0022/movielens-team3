@@ -10,8 +10,6 @@ const MovieList = props => {
 
     var [items, setItems] = useState([]);
 
-    const [genre, setGenres] = useState([])
-
     useEffect(() => {
         const getList = async () => {
             let response = null;

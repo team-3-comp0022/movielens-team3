@@ -72,6 +72,16 @@ const Home = () => {
 
                 <div className="section mb-3">
                     <div className="section__header mb-2">
+                        <h2>Most Popular Kinds of Movies</h2>
+                        <Link to="/movie">
+                            <OutlineButton className="small">View more</OutlineButton>
+                        </Link>
+                    </div>
+                    
+                </div>
+
+                <div className="section mb-3">
+                    <div className="section__header mb-2">
                         <h2>Most Polarising Movies</h2>
                         <Link to="/movie">
                             <OutlineButton className="small">View more</OutlineButton>
@@ -79,6 +89,7 @@ const Home = () => {
                     </div>
                     <MovieList category={category.polarising} type={movieType.top_rated}/>
                 </div>
+                
                 <div className="section mb-3">
                     <div className="section__header mb-2">
                         <h2>Most Polarising Kinds of Movies</h2>

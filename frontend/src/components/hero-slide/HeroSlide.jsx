@@ -5,7 +5,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 
 import Button, { OutlineButton } from '../button/Button';
 import Modal, { ModalContent } from '../modal/Modal';
-
+import axios from 'axios';
 import tmdbApi, { category, movieType } from '../../api/tmdbApi';
 import apiConfig from '../../api/apiConfig';
 
@@ -17,14 +17,32 @@ const HeroSlide = () => {
     SwiperCore.use([Autoplay]);
 
     const [movieItems, setMovieItems] = useState([]);
+    
+    let response = null;
+    var result = [];
+    var getIndexesFromOurDatabase = [];
 
     useEffect(() => {
         const getMovies = async () => {
-            const params = {page: 1}
+            const params = {}
             try {
-                const response = await tmdbApi.getMoviesList(movieType.popular, {params});
-                setMovieItems(response.results.slice(1, 4));
-                console.log(response);
+               // const response = await tmdbApi.getMoviesList(movieType.popular, {params});
+                // console.log("print pop", response.results.slice(1,4))
+                result = [];
+                var getPopular = await axios.get('http://localhost:3001/getPopularMovies');
+                var numberOfPopularMovies = getPopular.data.length;
+                for (var i = 0; i < 3; i++) // obtain all the movies we want to load max on the page
+                    result.push(getPopular.data[i]); // result will have the imdbIds to be appended to the url sent to the api
+                    
+                getIndexesFromOurDatabase = tmdbApi.getMoviesFromOurDatabase(result, {params}); // getIndexesFromOurDatabase will contained the urls in a list that can be accessed directly to retrieve the movies
+                result = []
+                for (var i = 0; i < 3; i++) 
+                    getIndexesFromOurDatabase[i].then(value => { 
+                        result.push(value.movie_results[0]);            
+                    });
+                  
+                response = {page:1, results: result, total_pages: 482, total_results: numberOfPopularMovies}; 
+                setMovieItems(response.results);
             } catch {
                 console.log('error');
             }
