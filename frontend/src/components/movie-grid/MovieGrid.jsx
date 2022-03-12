@@ -158,7 +158,7 @@ const MovieGrid = (props) => {
             {
                 page < totalPage ? (
                     <div className="movie-grid__loadmore">
-                        <OutlineButton className="small" onClick={loadMore}>Load page {page+1} of movies</OutlineButton>
+                        <OutlineButton className="small" onClick={loadMore}>Load more movies</OutlineButton>
                            
                            
                     </div>
@@ -223,7 +223,7 @@ return (
         <div className="collapsible">
             <div className="header" {...getToggleProps({onClick: handleOnClick})}>
                
-                {isExpanded ? 'Collapse Advanced Search' : 'Click Here for Advanced Search' }
+                {isExpanded ? 'Collapse Advanced Search' : 'Tailor Your Search With Advanced Filters' }
                 
             </div>
             <div {...getCollapseProps()}>
