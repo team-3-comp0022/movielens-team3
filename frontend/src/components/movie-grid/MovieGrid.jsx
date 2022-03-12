@@ -159,7 +159,8 @@ const MovieGrid = (props) => {
                 page < totalPage ? (
                     <div className="movie-grid__loadmore">
                         <OutlineButton className="small" onClick={loadMore}>Load page {page+1} of movies</OutlineButton>
-                    
+                           
+                           
                     </div>
                 ) : null
             }

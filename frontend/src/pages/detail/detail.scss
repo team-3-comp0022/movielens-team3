@@ -34,6 +34,7 @@
     margin: 0 auto;
     background: rgba(0, 0, 0, 0.7);
     border-radius: 20px;
+    padding:10px;
 
     @media screen and (max-width: 768px) {
         display: block;
@@ -46,6 +47,7 @@
     background-position: center;
     padding: 100px 20px;
     animation: animateMovieInfo 1s;
+    width: 1000px;
 
     @keyframes animateMovieInfo {
         from {
@@ -94,12 +96,13 @@
     // margin-right: auto;
     // margin-top: -200px;
     // position: relative;
-    // padding: 0 2rem;
+    padding: 3rem;
     display: flex;
     // max-width: var(--maxWidth);
     // margin: 0 auto;
     background: rgba(0, 0, 0, 0.7);
     border-radius: 20px;
+    
 
     @media screen and (max-width: 768px) {
         display: block;
