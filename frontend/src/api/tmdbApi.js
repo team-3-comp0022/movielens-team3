@@ -33,7 +33,7 @@ const tmdbApi = {
            const url = 'find/' + 'tt'+ my_id;
            //console.log(url);
            const tailoredUrl = "https://api.themoviedb.org/3/"+ url +'?api_key=1a438c34cc51e3bef8fc7e078fa986fc&external_source=imdb_id';
-           //console.log(tailoredUrl);
+         // console.log(tailoredUrl);
            my_list.push(axiosClient.get(tailoredUrl,params));
         }
         return my_list;

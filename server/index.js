@@ -43,6 +43,14 @@ app.get("/findMovieIds", (req, res) => {
    res.send
  });
 
+ app.get("/getPopularMovies", (req, res) => {
+  qResults.getMoviesByPopularity(function(result){
+    console.log(result)
+    res.send(result)
+ });
+ res.send
+});
+
 app.get("/getGenre", (req, res) => {
   qResults.getGenre(function(result){
     console.log(result)

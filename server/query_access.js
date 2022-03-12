@@ -337,6 +337,17 @@ function getFilmInGenre(title, callback){
         return callback(rows);
     })
 }
+
+function getMoviesByPopularity(callback){
+    
+    let getMovies = queries.getPopularMovies
+    connection.query(getMovies, function (err, rows, fields) {
+        if (err) throw err
+    
+        console.log('Success')
+        return callback(rows);
+    })
+}
 //connection.end();
 
 module.exports= {
@@ -348,5 +359,6 @@ module.exports= {
     fifthQuery,
     sixthQuery,
     getGenre,
-    getFilmInGenre
+    getFilmInGenre,
+    getMoviesByPopularity
 }

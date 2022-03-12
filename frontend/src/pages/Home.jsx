@@ -28,13 +28,13 @@ const Home = () => {
             setGenres(listOfGenres);   
 
             var getPolarising = await axios.get('http://localhost:3001/thirdQuery')
-            console.log("get polarising", getPolarising.data);
-           for (var i = 0; i < getPolarising.data.length ; i++) 
-             if( getPolarising.data[i].genre != "(no genres listed)"){
+            for (var i = 0; i < getPolarising.data.length ; i++) 
+              if( getPolarising.data[i].genre != "(no genres listed)"){
                   genresPolarising.push( getPolarising.data[i].genre); 
                   //console.log("get kind", genresPolarising[i]);
                   VRsPolarising.push( getPolarising.data[i].VR.toFixed(5)); 
-           }
+            }
+
            setPolarising({genres: genresPolarising, VR: VRsPolarising})
            setPolarisingKinds(genresPolarising);  
            setPolarisingRates(VRsPolarising);
@@ -67,7 +67,7 @@ const Home = () => {
                             <OutlineButton className="small">View more</OutlineButton>
                         </Link>
                     </div>
-                    <MovieList category={category.movie} type={movieType.top_rated}/>
+                    <MovieList category={category.popular} type={movieType.top_rated}/>
                 </div>
 
                 <div className="section mb-3">

@@ -7,11 +7,17 @@ import apiConfig from '../../api/apiConfig';
 const MovieCard = props => {
     const item  = props.item;
 
-    const link = '/movie/' + item.id;
 
+    if(item  == null) return(
+        <div className="movie-card" style={{width:10}}>
+            </div>
+            
+    );
+    const link = '/movie/' + item.id;
+    console.log("card", link);
     const bg = apiConfig.w500Image(item.poster_path || item.backdrop_path);
 
-    return (
+      return (
         <Link to={link}>
             <div className="movie-card" style={{backgroundImage: `url(${bg})`}}>
                 <Button>
@@ -22,6 +28,8 @@ const MovieCard = props => {
             <h3 >{item.title || item.name}</h3>
         </Link>
     );
+   
+    
 }
 
 export default MovieCard;
