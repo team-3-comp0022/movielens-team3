@@ -119,7 +119,7 @@ app.get("/sixthQuery", (req, res) => {
 });
 
 app.get("/", (req, res) => {
-  res.send("Hi");
+  res.send("Backend");
 
   connection.ping(function (err) {
       if(err) {
@@ -128,13 +128,6 @@ app.get("/", (req, res) => {
       }
       console.log("Passed");
     });
-  /*connection.query(query, (err, result) => {
-      res.send("hello there");
-      console.log("Done");
-      console.log(result);
-  })
-  console.log("Hey");*/
-  res.send("hello world");
 })
 
 app.listen(3001, '0.0.0.0', () => {
