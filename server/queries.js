@@ -382,7 +382,7 @@ where (70/100 * @counter) <= counter)) top_30;`;
 // WHERE user_like.userId = P.userid) people_like; `;
 
 const case_six = `
-SELECT ABS(people_tag.openness - people_like.openness) AS diff_openness, ABS(people_tag.agreeableness - people_like. agreeableness) AS diff_agreeableness, ABS(people_tag.emotional_stability - people_like.emotional_stability) AS diff_emotional_stability, ABS(people_tag.conscientiousness - people_like.conscientiousness) AS diff_conscientiousness, ABS(people_tag.extraversion - people_like.extraversion) AS diff_extraversion 
+SELECT people_tag.openness as predicted_openness, people_like.openness as real_openness, ABS(people_tag.openness - people_like.openness) AS diff_openness, people_tag.agreeableness as predicted_agreeableness , people_like.agreeableness as real_agreeableness, ABS(people_tag.agreeableness - people_like. agreeableness) AS diff_agreeableness, people_tag.emotional_stability AS predicted_emotional_stability, people_like.emotional_stability as real_emotional_stability, ABS(people_tag.emotional_stability - people_like.emotional_stability) AS diff_emotional_stability, people_tag.conscientiousness as real_conscientiousness, people_like.conscientiousness as real_conscientiousness, ABS(people_tag.conscientiousness - people_like.conscientiousness) AS diff_conscientiousness, people_tag.extraversion as predicted_extraversion, people_like.extraversion as real_extraversion, ABS(people_tag.extraversion - people_like.extraversion) AS diff_extraversion 
 
 FROM (SELECT AVG(P.openness) as openness, AVG(P.agreeableness) As agreeableness, AVG(P.emotional_stability) AS emotional_stability, AVG(P.conscientiousness) AS conscientiousness, AVG(P.extraversion) AS extraversion 
 
