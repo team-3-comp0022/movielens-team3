@@ -252,10 +252,11 @@ WHERE MT.movieID = R.movieID and MT.movieID = lk.movieId and lk.tmdbId = ?;
 `;
 
 const case_two_part_two = `
-SELECT R.rating, count(R.rating) 
+SELECT R.rating, count(R.rating) as noOfRatings
 FROM films.movies_titles MT, films.ratings R, links lk 
 WHERE MT.movieID = R.movieID and MT.movieID = lk.movieId and lk.tmdbId = ?
-GROUP BY R.rating; 
+GROUP BY R.rating
+ORDER BY R.rating; 
 `;
 
 // //polarity
@@ -267,7 +268,7 @@ GROUP BY MG.genre
 ORDER BY VR DESC; 
 `;
 
-//predict how a film  -had to remove last tmdbId hceck to work? 
+//predict how a film  -had to remove last tmdbId check to work? 
 const case_four = `
 SELECT SUM(R.rating) * (user_count.all_users / COUNT(R.userId)) as predicted_rating, user_count.real_rating 
 FROM films.ratings R, films.movies_titles MT, films.links lk, (SELECT COUNT(R.userId) as all_users, SUM(R.rating) as real_rating 

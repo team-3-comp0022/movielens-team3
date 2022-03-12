@@ -52,8 +52,6 @@ app.get("/getGenre", (req, res) => {
 });
 
 app.get("/getFilmInGenre", (req, res) => {
-  console.log(req.query)
-  console.log(req.query.query)
   let genre = req.query.query
   qResults.getFilmInGenre(genre, function(result){
      console.log(result)

@@ -31,7 +31,6 @@ const MovieGrid = (props) => {
                     case category.movie:
                         getIndexesFromOurDatabase = await axios.get('http://localhost:3001/findMovieIds')
                         console.log("before ids", getIndexesFromOurDatabase);
-                        //console.log("do it", getIndexesFromOurDatabase.data.length)
                         // Permanently display first 20 movies and load more if necessary - load page 1
                         for (var i = 0; i < 20; i++) // obtain all the movies we want to load max on the page
                             result.push(getIndexesFromOurDatabase.data[i]); // result will have the imdbIds to be appended to the url sent to the api
@@ -85,6 +84,7 @@ const MovieGrid = (props) => {
                     responseSearch = {page:1, results: result2, total_pages: 4, total_results: value.data.length};                   
                     console.log("responseSearch", responseSearch);    
                     setItems(responseSearch.results); // items will firstly contain the first 20 movies to be rendered
+                    console.log("vreau sa vad", items);
                     setTotalResults(responseSearch.total_results);
                     setTotalPage(responseSearch.total_pages);
                 });

@@ -32,12 +32,14 @@ function initialise_data(){
     });
 }
 
+/*
 var stuff_i_want = [];
 getReportData(862, function(result){
    stuff_i_want = result;
    console.log("here")
    console.log(stuff_i_want)
 });
+*/
 
 //initialise_data()
 
