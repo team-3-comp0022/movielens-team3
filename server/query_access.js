@@ -467,5 +467,6 @@ module.exports= {
     fifthQuery,
     sixthQuery,
     getGenre,
-    getFilmInGenre
+    getFilmInGenre,
+    getReportData
 }

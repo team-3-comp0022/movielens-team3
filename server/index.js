@@ -118,6 +118,14 @@ app.get("/sixthQuery", (req, res) => {
   res.send
 });
 
+app.get("/getReportData", (req, res) => {
+  qResults.getReportData(req.query.query, function(result){
+     console.log(result)
+     res.send(result)
+  });
+  res.send
+});
+
 app.get("/", (req, res) => {
   res.send("Backend");
 

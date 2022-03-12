@@ -69,7 +69,7 @@ const Detail = () => {
                 // do some asynchronus work 
                 //responseFromOurDb = tmdbApi.getMovieInfo(id, {params:id});
 
-                responseFromOurDb = axios.get("http://localhost:3001/secondQuery?query="+id, {params:id}).then((response) => {
+                responseFromOurDb = axios.get("http://localhost:3001/getReportData?query="+id, {params:id}).then((response) => {
                     //RESPONSE IS THE IDS
                     console.log("Hey")
                     console.log(response);
