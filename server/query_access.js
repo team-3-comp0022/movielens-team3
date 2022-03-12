@@ -448,7 +448,8 @@ function getReportData(val, callback){
             fifthQuery(val, function(result){
                 queryFive = result;
                 console.log(queryFive)
-                sixthQuery(val, function(result){
+                // TODO: Change this to sixth Query!!
+                fifthQuery(val, function(result){
                     querySix = result;
                     console.log(querySix)
                     return callback([queryTwo, queryFour,queryFive,querySix])
