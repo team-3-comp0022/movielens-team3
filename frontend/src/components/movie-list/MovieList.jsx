@@ -39,20 +39,25 @@ const MovieList = props => {
                         setItems(response.results); 
                         break;
 
+                    case category.polarising:
+                        // getIndexesFromOurDatabase = await axios.get('http://localhost:3001/thirdQuery')
+                        // console.log("get polarising", getIndexesFromOurDatabase);
+                        break;
+
                     case category.pickGenre:
                             let responseSearch = null;
                             var getListOfFilmsInGenre = axios.get('http://localhost:3001/getFilmInGenre?query=' + props.type);
-                            console.log("get films in genre", getListOfFilmsInGenre);
+                            //console.log("get films in genre", getListOfFilmsInGenre);
 
                             result = [];
                             var getIndexes = [];
                             getListOfFilmsInGenre.then(value => {  
                                     for(var i=0; i< 10; i++)
                                         result.splice(i, 0, value.data[i]);
-                                    console.log("params", result);
+                                    //console.log("params", result);
                                     
                                     getIndexes = tmdbApi.getMoviesFromOurDatabase(result, {params});
-                                    console.log("new", getIndexes);
+                                    //console.log("new", getIndexes);
 
                                     var result2 = []
                                     for (var i = 0; i < 10; i++) 
