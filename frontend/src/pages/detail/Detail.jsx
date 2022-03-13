@@ -73,7 +73,7 @@ const Detail = () => {
                 // do some asynchronus work 
                 //responseFromOurDb = tmdbApi.getMovieInfo(id, {params:id});
 
-                responseFromOurDb = axios.get("http://localhost:3001/secondQuery?query="+id, {params:id}).then((response) => {
+                responseFromOurDb = axios.get("http://localhost:3001/getReportData?query="+id, {params:id}).then((response) => {
                     //RESPONSE IS THE IDS
                     console.log("Hey")
                     console.log(response);
@@ -100,9 +100,6 @@ const Detail = () => {
                     <>
                         <div className="wrapper" style={{backgroundImage: `url(${apiConfig.originalImage(item.backdrop_path || item.poster_path)})`}}>
                         <script>
-                            function log_console() {
-                                console.log("GeeksforGeeks is a portal for geeks.")
-                            }
                             function log_console() {
                                 console.log(dbItems)
                             }
@@ -134,46 +131,102 @@ const Detail = () => {
                                 <div className='rating-directors'>
                                 <div>
                                     <h3 > RATING</h3>
-                                     <div className="score" style={{marginTop:10, marginLeft:15}}>{dbItems[0][0].average_rating || 0}</div>
+                                     <div className="score" style={{marginTop:10, marginLeft:15}}>{dbItems[0][0][0].average_rating || 0}</div>
                                 </div>
-                                
+
 
                                 <div className='director'>
-                                        <h3>DIRECTOR{item.directors}</h3>
-                                        {
-                                            item.directors && item.directors.slice(0, 5).map((director, i) => (
-                                                
-                                                <p >{director.name}</p>
-                                            ))
-                                        }
-                                        {/* {item.directors.map(director => ( <p key={director.credit_id}>{director.name}</p> ))} */}
-                                 </div>
+                                    <h3 >PREDICTED RATING</h3>
+                                     <div className="score" style={{marginTop:10, marginLeft:15}}>{dbItems[1][0].p_rating || 0}</div>
+                                </div>
 
                                  
                                  </div>
 
-                                    <div className='ratings'>
+                                <div className='ratings'>
                                         {
-                                            dbItems && dbItems[1].map((r, i) => (
+                                            dbItems && dbItems[0][1].map((r, i) => (
                                                 <p >No. of users with rating {r.rating}: {r.noOfRatings}</p>
                                             ))
                                         }
-                                        {/* {item.directors.map(director => ( <p key={director.credit_id}>{director.name}</p> ))} */}
                                  </div>
 
                                  <div className="detailedRatings">
-                                    <h5>Aggregate rating: {(dbItems[0][0] && dbItems[0][0].aggregate_Rating) || 0}</h5>              
-                                    <h5>Total no. of users: </h5>              
-                                    <h5>Variance of the ratings: {(dbItems[0][0] && dbItems[0][0].variance_Rating) || 0}</h5>
+                                    <h3>Ratings Statistics</h3>
+                                    <h5>Aggregate rating: {(dbItems[0][0][0] && dbItems[0][0][0].aggregate_Rating) || 0}</h5>              
+                                    <h5>Total no. of reviewers: {dbItems[1][0].total_viewers}</h5>              
+                                    <h5>Variance of the ratings: {(dbItems[0][0][0] && dbItems[0][0][0].variance_Rating) || 0}</h5>
                                     <br />
-                                    <h5>Predicted rating: </h5>
+
+                                    <h3>Predicted Ratings</h3>
+                                    <h5>Actual Aggregate rating: {(dbItems[1][0] && dbItems[1][0].real_rating) || 0}</h5>
+                                    <h5>Predicted Aggregate rating: {(dbItems[1][0] && dbItems[1][0].predicted_rating) || 0}</h5>
                                     <br />
-                                    <h5>Predicted personality traits: </h5>
+                                    <h5>Actual Rating: {(dbItems[1][0] && dbItems[0][0][0].average_rating) || 0}</h5>
+                                    <h5>Predicted Rating: {(dbItems[1][0] && dbItems[1][0].p_rating) || 0}</h5>
                                     <br />
-                                    <h5>Predicted personality types: </h5>
+                                    <h5>Total no. of reviewers: {dbItems[1][0].total_viewers}</h5>              
+                                    <h5>No. of reviewers in subset: {dbItems[1][0].subset_viewers}</h5>              
+
+                                    <br />
+
+                                    <h3>Predicted Personality Ttraits</h3>
+                                    <h5>Actual Agreeableness: {(dbItems[2][0] && dbItems[2][0].actual_agreeableness) || 0}</h5>
+                                    <h5>Difference Agreeableness: {(dbItems[2][0] && dbItems[2][0].difference_agreeableness) || 0}</h5>
+                                    <h5>Predicted Agreeableness: {(dbItems[2][0] && dbItems[2][0].predicted_agreeableness) || 0}</h5>
+                                    <br />
+
+                                    <h5>Actual Conscientiousness: {(dbItems[2][0] && dbItems[2][0].actual_conscientiousness) || 0}</h5>
+                                    <h5>Difference Conscientiousness: {(dbItems[2][0] && dbItems[2][0].difference_conscientiousness) || 0}</h5>
+                                    <h5>Predicted Conscientiousness: {(dbItems[2][0] && dbItems[2][0].predicted_conscientiousness) || 0}</h5>
+                                    <br />
+
+                                    <h5>Actual Emotional Stability: {(dbItems[2][0] && dbItems[2][0].actual_emotional_stability) || 0}</h5>
+                                    <h5>Difference Emotional Stability: {(dbItems[2][0] && dbItems[2][0].difference_emotional_stability) || 0}</h5>
+                                    <h5>Predicted Emotional Stability: {(dbItems[2][0] && dbItems[2][0].predicted_emotional_stability) || 0}</h5>
+                                    <br />
+
+                                    <h5>Actual Extraversion: {(dbItems[2][0] && dbItems[2][0].actual_extraversion) || 0}</h5>
+                                    <h5>Difference Extraversion: {(dbItems[2][0] && dbItems[2][0].difference_extraversion) || 0}</h5>
+                                    <h5>Predicted Extraversion: {(dbItems[2][0] && dbItems[2][0].predicted_extraversion) || 0}</h5>
+                                    <br />
+
+                                    <h5>Actual Openness: {(dbItems[2][0] && dbItems[2][0].actual_openness) || 0}</h5>
+                                    <h5>Difference Openness: {(dbItems[2][0] && dbItems[2][0].difference_openness) || 0}</h5>
+                                    <h5>Predicted Openness: {(dbItems[2][0] && dbItems[2][0].predicted_openness) || 0}</h5>
+                                    <br />
+
+
+
+                                    <br />
+                                    <h3>Predicted Personality Types</h3>
+                                    <h5>Actual Agreeableness: {(dbItems[3][0] && dbItems[2][0].actual_agreeableness) || 0}</h5>
+                                    <h5>Difference Agreeableness: {(dbItems[3][0] && dbItems[2][0].difference_agreeableness) || 0}</h5>
+                                    <h5>Predicted Agreeableness: {(dbItems[3][0] && dbItems[2][0].predicted_agreeableness) || 0}</h5>
+                                    <br />
+
+                                    <h5>Actual Conscientiousness: {(dbItems[3][0] && dbItems[2][0].actual_conscientiousness) || 0}</h5>
+                                    <h5>Difference Conscientiousness: {(dbItems[3][0] && dbItems[2][0].difference_conscientiousness) || 0}</h5>
+                                    <h5>Predicted Conscientiousness: {(dbItems[3][0] && dbItems[2][0].predicted_conscientiousness) || 0}</h5>
+                                    <br />
+
+                                    <h5>Actual Emotional Stability: {(dbItems[3][0] && dbItems[2][0].actual_emotional_stability) || 0}</h5>
+                                    <h5>Difference Emotional Stability: {(dbItems[3][0] && dbItems[2][0].difference_emotional_stability) || 0}</h5>
+                                    <h5>Predicted Emotional Stability: {(dbItems[3][0] && dbItems[2][0].predicted_emotional_stability) || 0}</h5>
+                                    <br />
+
+                                    <h5>Actual Extraversion: {(dbItems[3][0] && dbItems[2][0].actual_extraversion) || 0}</h5>
+                                    <h5>Difference Extraversion: {(dbItems[3][0] && dbItems[2][0].difference_extraversion) || 0}</h5>
+                                    <h5>Predicted Extraversion: {(dbItems[3][0] && dbItems[2][0].predicted_extraversion) || 0}</h5>
+                                    <br />
+
+                                    <h5>Actual Openness: {(dbItems[3][0] && dbItems[2][0].actual_openness) || 0}</h5>
+                                    <h5>Difference Openness: {(dbItems[3][0] && dbItems[2][0].difference_openness) || 0}</h5>
+                                    <h5>Predicted Openness: {(dbItems[3][0] && dbItems[2][0].predicted_openness) || 0}</h5>
 
 
                                 </div>
+
 
                                 <h3 > PLOT</h3>
                                 <div className="overview" >{item.overview}</div>

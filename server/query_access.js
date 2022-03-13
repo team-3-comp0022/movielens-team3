@@ -373,6 +373,8 @@ function thirdQuery(callback){
 function fourthQuery(val,callback){
     
     let caseFour = queries.case_four
+    // TODO: Change this
+    //connection.query(caseFour,[val, val], function (err, rows, fields) {
     connection.query(caseFour,[val], function (err, rows, fields) {
         if (err) throw err
     
@@ -461,7 +463,7 @@ function getReportData(val, callback){
                 queryFive = result;
                 console.log(queryFive)
                 // TODO: Change this to sixth Query!!
-                fifthQuery(val, function(result){
+                sixthQuery(val, function(result){
                     querySix = result;
                     console.log(querySix)
                     return callback([queryTwo, queryFour,queryFive,querySix])
@@ -481,5 +483,6 @@ module.exports= {
     sixthQuery,
     getGenre,
     getFilmInGenre,
-    getMoviesByPopularity
+    getMoviesByPopularity,
+    getReportData
 }
