@@ -17,6 +17,26 @@ var connection = mysql.createConnection({
     port: '3306'
   });
 
+//   `CREATE TABLE personality_user(PRIMARY KEY(userid)) AS
+// (SELECT userid,agreeableness, conscientiousness, emotional_stability, extraversion, openness, assigned_condition, assigned_metric, is_personalized, enjoy_watching FROM films.personality_data);
+// `,`
+// CREATE TABLE personality_predictions_movies(PRIMARY KEY(userid, all_movies))
+// (SELECT *
+// FROM (
+//     SELECT userid, movie_1 as all_movies, predicted_rating_1 as all_predictions FROM personality_data p1
+//     UNION ALL SELECT userid, movie_2 as all_movies, predicted_rating_2 as all_predictions FROM personality_data p2
+//     UNION ALL SELECT userid, movie_3 as all_movies, predicted_rating_3 as all_predictions FROM personality_data p3
+//     UNION ALL SELECT userid, movie_4 as all_movies, predicted_rating_4 as all_predictions FROM personality_data p4
+//     UNION ALL SELECT userid, movie_5 as all_movies, predicted_rating_5 as all_predictions FROM personality_data p5
+//     UNION ALL SELECT userid, movie_6 as all_movies, predicted_rating_6 as all_predictions FROM personality_data p6
+//     UNION ALL SELECT userid, movie_7 as all_movies, predicted_rating_7 as all_predictions FROM personality_data p7
+//     UNION ALL SELECT userid, movie_8 as all_movies, predicted_rating_8 as all_predictions FROM personality_data p8
+//     UNION ALL SELECT userid, movie_9 as all_movies, predicted_rating_9 as all_predictions FROM personality_data p9
+//     UNION ALL SELECT userid, movie_10 as all_movies, predicted_rating_10 as all_predictions FROM personality_data p10
+//     UNION ALL SELECT userid, movie_11 as all_movies, predicted_rating_11 as all_predictions FROM personality_data p11
+//     UNION ALL SELECT userid, movie_12 as all_movies, predicted_rating_12 as all_predictions FROM personality_data p12
+// ) as every_movie_and_prediction);
+// `
 
 function initialise_data(){
     deleteTables()
@@ -26,6 +46,8 @@ function initialise_data(){
     sleep(40000).then(() => {
         makeSecondTables()
         makeSplitTable()
+        splitPersonalityTables()
+        
     });
     sleep(4000).then(() => {
         makeYearTable()
@@ -40,6 +62,7 @@ function initialise_data(){
 // });
 
 initialise_data()
+// deleteTables()
 
 //TESTNG FIFTH QUEREY AND SIXTH QUERY
 
@@ -49,7 +72,7 @@ initialise_data()
 //     console.log(solution)//use it
 // });
 
-// sixthQuery("0114709",function(result){
+// sixthQuery("862",function(result){
 //     console.log("SIXTH QUERY--------------------------------------------------")
 //     solution = result;//returns array of Ids
 //     console.log(solution)//use it
@@ -227,14 +250,48 @@ function makeSecondTables(){
     })
 }
 
+function splitPersonalityTables(){
+    const makePersonality = queries.create_userid_movie_personality
+
+    connection.query(makePersonality, function (err, rows, fields) {
+        if (err) throw err
+    
+        console.log('Success in creating personality traits table')
+    })
+
+    const makePredicted = queries.create_userid_movie_predicted
+
+    connection.query(makePredicted, function (err, rows, fields) {
+        if (err) throw err
+    
+        console.log('Success in creating predicted tables for personality')
+    })
+
+    const deletePersonality = queries.drop_personality_data
+
+    connection.query(deletePersonality, function (err, rows, fields) {
+        if (err) throw err
+    
+        console.log('Successfully deleted personality data')
+    })
+}
+
 function makeSplitTable(){
     const makeFinal = queries.create_movies_genres_sep
 
     connection.query(makeFinal, function (err, rows, fields) {
         if (err) throw err
     
-        console.log('Success')
+        console.log('Success in creating movies genres separated')
     })
+    
+    const deleteMovies = queries.drop_movie_tables
+    
+    connection.query(deleteMovies, function (err, rows, fields) {
+        if (err) throw err
+    
+        console.log('Successfully deleted movies and movies_genres')
+    })    
 }
 
 function searchQuery(keyword, callback){
@@ -401,7 +458,7 @@ function fifthQuery(title, callback){
 function sixthQuery(title, callback){
     
     let caseSix = queries.case_six
-    connection.query(caseSix,[title,title,title,title,title,title,title,title,title,title,title,title,title,title,title,title,title,title,title,title,title,title,title,title,title], function (err, rows, fields) {
+    connection.query(caseSix,[title,title,title], function (err, rows, fields) {
         if (err) throw err
     
         console.log('Success')
