@@ -428,7 +428,7 @@ function thirdQuery(callback){
 function fourthQuery(val,callback){
     
     let caseFour = queries.case_four
-    connection.query(caseFour,[val], function (err, rows, fields) {
+    connection.query(caseFour,[val, val], function (err, rows, fields) {
         if (err) throw err
     
         console.log('Success')

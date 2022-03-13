@@ -295,13 +295,18 @@ GROUP BY MG.genre
 ORDER BY VR DESC; 
 `;
 
-//predict how a film  -had to remove last tmdbId hceck to work? 
+//final
 const case_four = `
-SELECT SUM(R.rating) * (user_count.all_users / COUNT(R.userId)) as predicted_rating, user_count.real_rating 
-FROM films.ratings R, films.movies_titles MT, films.links lk, (SELECT COUNT(R.userId) as all_users, SUM(R.rating) as real_rating 
+SELECT SUM(top_20.RATING) * (user_count.all_users / COUNT(top_20.userId)) as predicted_rating, user_count.real_rating
+FROM (SELECT COUNT(R.userId) as all_users, SUM(R.rating) as real_rating 
 FROM films.ratings R, films.movies_titles MT, films.links lk   
-WHERE R.movieId = MT.movieId AND MT.movieId=lk.movieId AND lk.imdbId= ?) as user_count, films.movie_years MY  
-WHERE R.movieId = MT.movieId AND MT.movieId = lk.movieId AND MT.movieId = MY.movieId AND MY.year = YEAR(FROM_UNIXTIME(R.timestamp)) AND lk.imdbId= ? 
+WHERE R.movieId = MT.movieId AND MT.movieId=lk.movieId AND lk.imdbId= ?) as user_count, (SELECT X.userid, X.RATING  
+FROM    (  
+    SELECT R.userId as userid, @counter := @counter +1 AS counter, R.rating as RATING  
+    FROM (select @counter:=0) AS var, (SELECT R.userId, R.rating FROM films.ratings R, films.movies_titles MT, films.links lk WHERE R.movieId = MT.movieId AND MT.movieId=lk.movieId AND lk.imdbId= ?) R 
+    ORDER BY R.userid DESC     
+) AS X  
+where (20/100 * @counter) <= counter) top_20
 GROUP BY user_count.all_users;
 `;
 
@@ -364,6 +369,8 @@ FROM (SELECT R.userId as userid, @counter := @counter +1 AS counter
     ORDER BY R.userid DESC) AS X    
 
 where (70/100 * @counter) <= counter)) top_30;`;
+
+
 
 // const case_six = `
 // SELECT AVG(P.openness) as Openness, AVG(P.agreeableness) As Agreeableness, AVG(P.emotional_stability) AS Emotional_stability, AVG(P.conscientiousness) AS Conscientiousness, AVG(P.extraversion) AS Extraversion FROM films.personality_data P 
