@@ -15,6 +15,10 @@ import axios from 'axios';
 
 1. Browsing visual lists of films in the database, allowing lists to be selected and sorted by user specified parameters.
     - Not applicable to this
+    - popularity by asc, desc - no of viewers
+    - rating asc, desc - rating
+    - movie name alphabetical order, asc, desc - alphabetical order
+    - release date, asc, desc - releas
 
 
 2. Searching for a known film to obtain a report on the viewer reaction to it (i.e., an interpreted report with aggregated
