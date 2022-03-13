@@ -18,7 +18,7 @@ import axios from 'axios';
     - popularity by asc, desc - no of viewers
     - rating asc, desc - rating
     - movie name alphabetical order, asc, desc - alphabetical order
-    - release date, asc, desc - releas
+    - release date, asc, desc - release date
 
 
 2. Searching for a known film to obtain a report on the viewer reaction to it (i.e., an interpreted report with aggregated

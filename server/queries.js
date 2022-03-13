@@ -18,7 +18,7 @@ CREATE TABLE ratings (
 `,`
 CREATE TABLE links (
     movieId int PRIMARY KEY,
-    imdbId int,
+    imdbId varchar(8),
     tmdbId int
 )
 `,`
@@ -163,7 +163,7 @@ order by
 films.movies_genres.movieId, n); 
 `
 const search =`
-SELECT links.tmdbId FROM links where links.movieId IN (
+SELECT links.imdbId FROM links where links.movieId IN (
   SELECT movies_titles.movieId FROM movies_titles WHERE movies_titles.title LIKE "%@%")
 `
 
@@ -184,31 +184,37 @@ GROUP BY lk.imdbId
 ORDER BY AVG(R.rating) DESC; 
 `;
 
+const case_two_part_one = `
+SELECT AVG(R.rating) as average_rating, SUM(R.rating) as aggregate_Rating, variance(R.rating) as variance_Rating
+FROM films.movies_titles MT, films.ratings R, links lk 
+WHERE MT.movieID = R.movieID and MT.movieID = lk.movieId and lk.tmdbId = ?;
+`;
+
+const case_two_part_two = `
+SELECT R.rating, count(R.rating) as noOfRatings
+FROM films.movies_titles MT, films.ratings R, links lk 
+WHERE MT.movieID = R.movieID and MT.movieID = lk.movieId and lk.tmdbId = ?
+GROUP BY R.rating
+ORDER BY R.rating; 
+`;
 
 // //polarity
 const case_three = `
-SELECT MG.genre, variance(R.rating) as VR 
+SELECT MG.genre, variance(R.rating) as VR, count(R.movieId) as number_of_reviewers, AVG(R.rating) 
 FROM films.movies_genres_sep MG, films.ratings R 
 WHERE MG.movieId = R.movieId 
 GROUP BY MG.genre 
-ORDER BY VR DESC
+ORDER BY VR DESC; 
 `;
 
 //predict how a film
 const case_four = `
-SELECT hello.title, AVG(hello.rating), ABS(averages.avg_rating - hello.rating) as difference 
-FROM ( 
-SELECT R.userId, R.movieId, MT.title, SUBSTRING_INDEX(SUBSTRING_INDEX(MT.title, '(', -1), ')', 1) as year, FROM_UNIXTIME(R.timestamp) as rating_time_stamp, R.rating 
-FROM films.ratings R, films.movies_titles MT 
-WHERE R.movieId = MT.movieId  
-AND SUBSTRING_INDEX(SUBSTRING_INDEX(MT.title, '(', -1), ')', 1) = YEAR(FROM_UNIXTIME(R.timestamp)) 
-) AS hello, (SELECT MT.movieId, AVG(R.rating) as avg_rating 
-FROM films.movies_titles MT, films.ratings R  
-WHERE MT.movieId = R.movieId 
-GROUP BY MT.movieId  
-ORDER BY AVG(R.rating) DESC) AS averages 
-WHERE hello.movieId = averages.movieId 
-GROUP BY hello.title, difference ; 
+SELECT SUM(R.rating) * (user_count.all_users / COUNT(R.userId)) as predicted_rating, user_count.real_rating 
+FROM films.ratings R, films.movies_titles MT, films.links lk, (SELECT COUNT(R.userId) as all_users, SUM(R.rating) as real_rating 
+FROM films.ratings R, films.movies_titles MT, films.links lk   
+WHERE R.movieId = MT.movieId AND MT.movieId=lk.movieId AND lk.tmdbId= ?) as user_count  
+WHERE R.movieId = MT.movieId AND MT.movieId = lk.movieId AND REPLACE(RIGHT(title, LOCATE('(',REVERSE(title))-1),')','') = YEAR(FROM_UNIXTIME(R.timestamp)) 
+GROUP BY user_count.all_users;  
 `;
 
 const case_five = `
