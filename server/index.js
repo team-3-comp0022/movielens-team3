@@ -43,13 +43,30 @@ app.get("/findMovieIds", (req, res) => {
    res.send
  });
 
- app.get("/getPopularMovies", (req, res) => {
-  qResults.getMoviesByPopularity(function(result){
+ app.get("/getTopRatedMovies", (req, res) => {
+  qResults.getTopRatedMovies(function(result){
     console.log(result)
     res.send(result)
  });
  res.send
 });
+
+app.get("/getPopularMovies", (req, res) => {
+  qResults.getPopularMovies(function(result){
+    console.log(result)
+    res.send(result)
+ });
+ res.send
+});
+
+app.get("/getPolarisingMovies", (req, res) => {
+  qResults.getPolarisingMovies(function(result){
+    console.log(result)
+    res.send(result)
+ });
+ res.send
+});
+
 
 app.get("/getGenre", (req, res) => {
   qResults.getGenre(function(result){
@@ -88,8 +105,16 @@ app.get("/secondQuery", (req, res) => {
 });
 
 
-app.get("/thirdQuery", (req, res) => {
-  qResults.thirdQuery(function(result){
+app.get("/thirdQueryPartOne", (req, res) => {
+  qResults.thirdQueryPartOne(function(result){
+     console.log(result)
+     res.send(result)
+  });
+  res.send
+});
+
+app.get("/thirdQueryPartTwo", (req, res) => {
+  qResults.thirdQueryPartTwo(function(result){
      console.log(result)
      res.send(result)
   });

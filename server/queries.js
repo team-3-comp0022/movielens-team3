@@ -198,13 +198,22 @@ GROUP BY R.rating
 ORDER BY R.rating; 
 `;
 
-// //polarity
-const case_three = `
-SELECT MG.genre, variance(R.rating) as VR, count(R.movieId) as number_of_reviewers, AVG(R.rating) 
+// polarity - genres descending - VR
+const case_three_part_one = `
+SELECT MG.genre, variance(R.rating) as Polarity, count(R.movieId) as number_of_reviewers
 FROM films.movies_genres_sep MG, films.ratings R 
 WHERE MG.movieId = R.movieId 
 GROUP BY MG.genre 
-ORDER BY VR DESC; 
+ORDER BY Polarity DESC; 
+`;
+
+// popularity - genre descending - number_of_reviewers
+const case_three_part_two = `
+SELECT MG.genre, count(R.movieId) as number_of_reviewers, AVG(R.rating) as Popularity
+FROM films.movies_genres_sep MG, films.ratings R 
+WHERE MG.movieId = R.movieId 
+GROUP BY MG.genre 
+ORDER BY number_of_reviewers DESC; 
 `;
 
 //predict how a film
@@ -298,7 +307,8 @@ SELECT DISTINCT(genre) FROM films.movies_genres_sep
 const getFilmsinGenre = `
 SELECT links.imdbId FROM links where links.movieId IN (SELECT movieID FROM films.movies_genres_sep WHERE genre=?);
 `
-const getPopularMovies = `
+
+const getTopRatedMovies = `
 SELECT lk.imdbId, AVG(R.rating) as average_rating
 FROM films.movies_titles MT, films.ratings R, links lk 
 WHERE MT.movieID = R.movieID AND MT.movieID = lk.movieId
@@ -306,4 +316,20 @@ GROUP BY lk.imdbId
 ORDER BY AVG(R.rating) DESC; 
 `;
 
-module.exports = {create_list, drop_all, filenames, csv_queres, case_one, case_two, case_three, case_four,case_five,case_six, create_movies_genre, create_movies_title, create_movies_genres_sep, search, case_two_part_one, case_two_part_two, getGenres, getFilmsinGenre, getPopularMovies}
+const getPopulardMovies = `
+SELECT lk.imdbId, count(R.movieId) as number_of_reviewers
+FROM films.movies_titles MT, films.ratings R, links lk 
+WHERE MT.movieID = R.movieID AND MT.movieID = lk.movieId
+GROUP BY lk.imdbId
+ORDER BY number_of_reviewers DESC; 
+`;
+
+const getPolarisingMovies = `
+SELECT lk.imdbId, variance(R.rating) as Polarity
+FROM films.movies_titles MT, films.ratings R, links lk 
+WHERE MT.movieID = R.movieID AND MT.movieID = lk.movieId
+GROUP BY lk.imdbId
+ORDER BY Polarity DESC; 
+`;
+
+module.exports = {create_list, drop_all, filenames, csv_queres, case_one, case_two, case_three_part_one, case_three_part_two, case_four,case_five,case_six, create_movies_genre, create_movies_title, create_movies_genres_sep, search, case_two_part_one, case_two_part_two, getGenres, getFilmsinGenre, getTopRatedMovies, getPopulardMovies, getPolarisingMovies}

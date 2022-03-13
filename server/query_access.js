@@ -351,21 +351,22 @@ function secondQuery(val, callback){
      });
 }
 
-function thirdQuery(callback){
+function thirdQueryPartOne(callback){
     
-    let caseThree = queries.case_three
-    connection.query(caseThree, function (err, rows, fields) {
+    let caseThreePartOne = queries.case_three_part_one
+    connection.query(caseThreePartOne, function (err, rows, fields) {
         if (err) throw err
-    
         console.log('Success')
-        // console.log(rows)
-        // for (let i =0; i<rows.length;i++){
-        //     for (let j in rows[i]){
-        //         console.log(j +": "+rows[i][j]);
-        //     }
-        // }
-        // desired_data = rows[0];  // Scope is larger than function
-        // console.log(desired_data)
+        return callback(rows);
+    })
+}
+
+function thirdQueryPartTwo(callback){
+    
+    let caseThreePartTwo = queries.case_three_part_two
+    connection.query(caseThreePartTwo, function (err, rows, fields) {
+        if (err) throw err
+        console.log('Success')
         return callback(rows);
     })
 }
@@ -436,9 +437,9 @@ function getFilmInGenre(title, callback){
     })
 }
 
-function getMoviesByPopularity(callback){
+function getTopRatedMovies(callback){
     
-    let getMovies = queries.getPopularMovies
+    let getMovies = queries.getTopRatedMovies
     connection.query(getMovies, function (err, rows, fields) {
         if (err) throw err
     
@@ -446,6 +447,29 @@ function getMoviesByPopularity(callback){
         return callback(rows);
     })
 }
+
+function getPopularMovies(callback){
+    
+    let getMovies = queries.getPopulardMovies
+    connection.query(getMovies, function (err, rows, fields) {
+        if (err) throw err
+    
+        console.log('Success')
+        return callback(rows);
+    })
+}
+
+function getPolarisingMovies(callback){
+    
+    let getMovies = queries.getPolarisingMovies
+    connection.query(getMovies, function (err, rows, fields) {
+        if (err) throw err
+    
+        console.log('Success')
+        return callback(rows);
+    })
+}
+
 //connection.end();
 
 function getReportData(val, callback){
@@ -477,12 +501,15 @@ module.exports= {
     searchQuery,
     firstQuery,
     secondQuery,
-    thirdQuery,
+    thirdQueryPartOne,
+    thirdQueryPartTwo,
     fourthQuery,
     fifthQuery,
     sixthQuery,
     getGenre,
     getFilmInGenre,
-    getMoviesByPopularity,
-    getReportData
+    getReportData,
+    getTopRatedMovies, 
+    getPopularMovies, 
+    getPolarisingMovies
 }

@@ -10,6 +10,7 @@ import VideoList from './VideoList';
 
 import MovieList from '../../components/movie-list/MovieList';
 import axios from 'axios';
+import ReactSpeedometer from "react-d3-speedometer";
 
 /*
 
