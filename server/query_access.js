@@ -241,7 +241,7 @@ function makeSplitTable(){
 
 function searchQuery(keyword, callback){
     
-    let search = queries.search.replace('@', keyword)
+    let search = queries.search + connection.escape(keyword).slice(1, -1) + `%")`;
     console.log(search)
     connection.query(search, function (err, rows, fields) {
         if (err) throw err

@@ -164,8 +164,8 @@ films.movies_genres.movieId, n);
 `
 const search =`
 SELECT links.imdbId FROM links where links.movieId IN (
-  SELECT movies_titles.movieId FROM movies_titles WHERE movies_titles.title LIKE "%@%")
-`
+  SELECT movies_titles.movieId FROM movies_titles WHERE movies_titles.title LIKE "%`
+
 
 // //substitute the Fair Game for %s
 const case_one = `
