@@ -37,15 +37,10 @@ const MovieList = props => {
                         setItems(response.results); 
                         break;
 
-                    case category.polarising:
-                        // getIndexesFromOurDatabase = await axios.get('http://localhost:3001/thirdQuery')
-                        // console.log("get polarising", getIndexesFromOurDatabase);
-                        break;
-
-                    case category.popular:
+                    case category.topRated:
                         result = [];
                         var getIndexes = [];
-                        var getPopular = await axios.get('http://localhost:3001/getPopularMovies');
+                        var getPopular = await axios.get('http://localhost:3001/getTopRatedMovies');
                         
                         
                         var numberOfPopularMovies = getPopular.data.length;
@@ -63,6 +58,50 @@ const MovieList = props => {
                        
                         setItems(response.results); 
                         break;
+
+                        case category.popular:
+                            result = [];
+                            var getIndexes = [];
+                            var getPopular = await axios.get('http://localhost:3001/getPopularMovies');
+                            
+                            var numberOfPopularMovies = getPopular.data.length;
+                            for (var i = 0; i < 50; i++) // obtain all the movies we want to load max on the page
+                                result.push(getPopular.data[i]); // result will have the imdbIds to be appended to the url sent to the api
+                                
+                            getIndexesFromOurDatabase = tmdbApi.getMoviesFromOurDatabase(result, {params}); // getIndexesFromOurDatabase will contained the urls in a list that can be accessed directly to retrieve the movies
+                            result = []
+                            for (var i = 0; i < 50; i++) 
+                                getIndexesFromOurDatabase[i].then(value => { 
+                                    result.push(value.movie_results[0]);            
+                                });
+                                                 
+                            response = {page:1, results: result, total_pages: 482, total_results: numberOfPopularMovies}; 
+                           
+                            setItems(response.results); 
+                            break;
+
+                        case category.polarising:
+                            result = [];
+                            console.log("hello");
+                            var getIndexes = [];
+                            var getPolarising = await axios.get('http://localhost:3001/getPolarisingMovies');
+                            console.log("polaa", getPolarising)
+                            
+                            var numberOfPopularMovies = getPolarising.data.length;
+                            for (var i = 0; i < 50; i++) // obtain all the movies we want to load max on the page
+                                result.push(getPolarising.data[i]); // result will have the imdbIds to be appended to the url sent to the api
+                                
+                            getIndexesFromOurDatabase = tmdbApi.getMoviesFromOurDatabase(result, {params}); // getIndexesFromOurDatabase will contained the urls in a list that can be accessed directly to retrieve the movies
+                            result = []
+                            for (var i = 0; i < 50; i++) 
+                                getIndexesFromOurDatabase[i].then(value => { 
+                                    result.push(value.movie_results[0]);            
+                                });
+                                                 
+                            response = {page:1, results: result, total_pages: 482, total_results: numberOfPopularMovies}; 
+                           
+                            setItems(response.results); 
+                            break;
 
                     case category.pickGenre:
                             let responseSearch = null;

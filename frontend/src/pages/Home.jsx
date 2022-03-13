@@ -4,21 +4,21 @@ import { OutlineButton } from '../components/button/Button';
 import HeroSlide from '../components/hero-slide/HeroSlide';
 import MovieList from '../components/movie-list/MovieList';
 import ProgressBar from "@ramonak/react-progress-bar";
-import { SwiperSlide, Swiper } from 'swiper/react'
-import tmdbApi, { category, movieType, tvType } from '../api/tmdbApi';
-import { useParams } from 'react-router';
+import { category, movieType } from '../api/tmdbApi';
 import axios from 'axios';
 import '../components/movie-grid/movie-grid.scss';
 import '../components/movie-card/movie-card.scss';
-import getByGenre from '../components/movie-list/MovieList';
 
 const Home = () => {
     const [genres, setGenres] = useState([])
     const [polarisingKinds, setPolarisingKinds] = useState([])
     const [polarisingRates, setPolarisingRates] = useState([])
-    const [polarising, setPolarising] = useState({})
+    const [popularityKinds, setPopularityKinds] = useState([])
+    const [popularityRates, setPopularityRates] = useState([])
     var genresPolarising = []
     var VRsPolarising = []
+    var genresPopularity = []
+    var VRsPopularity = []
 
  useEffect(() => {
         const getDetail = async () => {
@@ -28,17 +28,26 @@ const Home = () => {
             listOfGenres[i] = listOfGenres[i].genre; 
             setGenres(listOfGenres);   
 
-            var getPolarising = await axios.get('http://localhost:3001/thirdQuery')
+            var getPolarising = await axios.get('http://localhost:3001/thirdQueryPartOne')
             for (var i = 0; i < getPolarising.data.length ; i++) 
               if( getPolarising.data[i].genre != "(no genres listed)"){
                   genresPolarising.push( getPolarising.data[i].genre); 
-                  //console.log("get kind", genresPolarising[i]);
-                  VRsPolarising.push( getPolarising.data[i].VR.toFixed(5)); 
+                  VRsPolarising.push( getPolarising.data[i].Polarity.toFixed(5)); 
             }
 
-           setPolarising({genres: genresPolarising, VR: VRsPolarising})
            setPolarisingKinds(genresPolarising);  
            setPolarisingRates(VRsPolarising);
+
+
+           var getPopularity = await axios.get('http://localhost:3001/thirdQueryPartTwo')
+           for (var i = 0; i < getPopularity.data.length ; i++) 
+             if( getPopularity.data[i].genre != "(no genres listed)"){
+                 genresPopularity.push( getPopularity.data[i].genre); 
+                 VRsPopularity.push( getPopularity.data[i].number_of_reviewers.toFixed(0)); 
+           }
+
+           setPopularityKinds(genresPopularity);  
+           setPopularityRates(VRsPopularity);
 
         }
         getDetail();
@@ -68,7 +77,7 @@ const Home = () => {
                             <OutlineButton className="small">View more</OutlineButton>
                         </Link>
                     </div>
-                    <MovieList category={category.popular} type={movieType.top_rated}/>
+                    <MovieList category={category.topRated} type={movieType.top_rated}/>
                     
                 </div>
 
@@ -79,7 +88,8 @@ const Home = () => {
                             <OutlineButton className="small">View more</OutlineButton>
                         </Link>
                     </div>
-                    
+                    <MovieList category={category.popular} type={movieType.top_rated}/>
+
                 </div>
 
                 <div className="section mb-3">
@@ -89,9 +99,25 @@ const Home = () => {
                             <OutlineButton className="small">View more</OutlineButton>
                         </Link>
                     </div>
-                    
+                    {
+                      
+                      popularityKinds.map((item, i) => (
+                        <div className="section" style={{marginTop:2, width:'80%'}}>
+                           
+                            <div class="grid">
+                                <div class="columnn" style={{paddignRight:-30, marginRight:-150}}> 
+                                   <h6>  { item}</h6>
+                                 </div>
+                                 <div class="columnn" style={{alignContent:"left", marginLeft:-100}}> 
+                                     <ProgressBar  animateOnRender={true} completed={popularityRates[i]*100/popularityRates[0]} maxCompleted={100} bgColor="#353638" customLabel={popularityRates[i]} barContainerClassName="container" /> 
+                                 </div>
+                        </div>
+                        </div>       
+                    ))
+                   }
                 </div>
 
+                
                 <div className="section mb-3">
                     <div className="section__header mb-2">
                         <h2>Most Polarising Movies</h2>
@@ -100,6 +126,7 @@ const Home = () => {
                         </Link>
                     </div>
                     <MovieList category={category.polarising} type={movieType.top_rated}/>
+
                 </div>
                 
                 <div className="section mb-3">
@@ -119,15 +146,11 @@ const Home = () => {
                                          <ProgressBar  animateOnRender={true} completed={polarisingRates[i]*100/polarisingRates[0]} maxCompleted={100} bgColor="#353638" customLabel={item} barContainerClassName="container" /> 
                                      </div>
                             </div>
-                            </div>
-                                    //  <h2> genre: {item} {polarisingRates[i]}</h2>
-                                  
+                            </div>       
                         ))
                        }
-                      
-                   
-                    
                 </div>
+
                   {
                 <div className="movie-grid__loadmore">
                 {/* <OutlineButton className="small" onClick={getByGenre}>Load more movies</OutlineButton>

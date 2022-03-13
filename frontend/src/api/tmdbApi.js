@@ -4,7 +4,8 @@ export const category = {
     movie: 'movie',
     popular: 'popular',
     polarising: 'polarising',
-    pickGenre: 'pickGenre'
+    pickGenre: 'pickGenre',
+    topRated: 'topRated'
 }
 
 export const movieType = {
