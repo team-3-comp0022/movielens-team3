@@ -18,7 +18,7 @@ CREATE TABLE ratings (
 `,`
 CREATE TABLE links (
     movieId int PRIMARY KEY,
-    imdbId varchar(8),
+    imdbId int,
     tmdbId int
 )
 `,`
@@ -163,7 +163,7 @@ order by
 films.movies_genres.movieId, n); 
 `
 const search =`
-SELECT links.imdbId FROM links where links.movieId IN (
+SELECT links.tmdbId FROM links where links.movieId IN (
   SELECT movies_titles.movieId FROM movies_titles WHERE movies_titles.title LIKE "%@%")
 `
 
@@ -184,27 +184,14 @@ GROUP BY lk.imdbId
 ORDER BY AVG(R.rating) DESC; 
 `;
 
-const case_two_part_one = `
-SELECT AVG(R.rating) as average_rating, SUM(R.rating) as aggregate_Rating, variance(R.rating) as variance_Rating
-FROM films.movies_titles MT, films.ratings R, links lk 
-WHERE MT.movieID = R.movieID and MT.movieID = lk.movieId and lk.tmdbId = ?;
-`;
-
-const case_two_part_two = `
-SELECT R.rating, count(R.rating) as noOfRatings
-FROM films.movies_titles MT, films.ratings R, links lk 
-WHERE MT.movieID = R.movieID and MT.movieID = lk.movieId and lk.tmdbId = ?
-GROUP BY R.rating
-ORDER BY R.rating; 
-`;
 
 // //polarity
 const case_three = `
-SELECT MG.genre, variance(R.rating) as VR, count(R.movieId) as number_of_reviewers, AVG(R.rating) 
+SELECT MG.genre, variance(R.rating) as VR 
 FROM films.movies_genres_sep MG, films.ratings R 
 WHERE MG.movieId = R.movieId 
 GROUP BY MG.genre 
-ORDER BY VR DESC; 
+ORDER BY VR DESC
 `;
 
 //predict how a film
@@ -221,8 +208,7 @@ WHERE MT.movieId = R.movieId
 GROUP BY MT.movieId  
 ORDER BY AVG(R.rating) DESC) AS averages 
 WHERE hello.movieId = averages.movieId 
-GROUP BY hello.title, difference 
-ORDER BY r.rating; 
+GROUP BY hello.title, difference ; 
 `;
 
 const case_five = `
