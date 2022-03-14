@@ -2,17 +2,22 @@
 const express = require('express');
 const app = express();
 const mysql = require('mysql');
+const MysqlCache = require('mysql-cache')
 var cors = require('cors')
 const { DEC8_BIN } = require('mysql/lib/protocol/constants/charsets');
 const qResults = require('./query_access.js')
+require("dotenv").config()
 
-var connection = mysql.createConnection({
-    host: "db",
-    user: "root",
-    password: "example",
-    database: "films",
-    port: '3306'
-  });
+const mysqlCache = new MysqlCache({
+  host: process.env.DB_DATABASE,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: "films",
+  port: '3306',
+  cacheProvider: 'LRU',
+});
+
+var connection = mysql.createConnection(mysqlCache);
 
 app.use(cors());
 
