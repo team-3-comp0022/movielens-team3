@@ -166,6 +166,36 @@ const search =`
 SELECT links.imdbId FROM links where links.movieId IN (
   SELECT movies_titles.movieId FROM movies_titles WHERE movies_titles.title LIKE "%`
 
+const baseOne=`
+SELECT lk.imdbId 
+FROM movie_years MY, links lk, movies_genres_sep G, movies_titles MT `
+
+const baseROne=`, films.ratings R `
+
+const baseTwo=`WHERE MY.movieId = lk.movieId and MY.movieID = G.movieId and MY.movieId = MT.movieId and G.genre = ?
+`
+const baseTwoNoGenre=`WHERE MY.movieId = lk.movieId and MY.movieID = G.movieId and MY.movieId = MT.movieId
+`
+//baseOne + extra + order + (?desc)
+//alpha, year. rating
+const baseAlpha=`
+ORDER BY MT.title
+`
+const baseYear=`
+and MY.year > ? and MY.year < ? and MY.year!="" 
+ORDER BY year
+`
+const baseRating=`
+and MY.movieId = R.movieId
+GROUP BY MY.movieId
+ORDER BY AVG(R.rating) 
+`
+const desc=` DESC`
+
+const create_movies_years = ` 
+CREATE TABLE movie_years(PRIMARY KEY(movieId)) AS
+SELECT movieId, REPLACE(RIGHT(title, LOCATE('(',REVERSE(title))-1),')','') AS year FROM films.movies M; 
+`; 
 
 // //substitute the Fair Game for %s
 const case_one = `
@@ -332,4 +362,36 @@ GROUP BY lk.imdbId
 ORDER BY Polarity DESC; 
 `;
 
-module.exports = {create_list, drop_all, filenames, csv_queres, case_one, case_two, case_three_part_one, case_three_part_two, case_four,case_five,case_six, create_movies_genre, create_movies_title, create_movies_genres_sep, search, case_two_part_one, case_two_part_two, getGenres, getFilmsinGenre, getTopRatedMovies, getPopulardMovies, getPolarisingMovies}
+module.exports = {
+    create_list, 
+    drop_all,
+    filenames, 
+    csv_queres, 
+    create_movies_years, 
+    baseAlpha, 
+    baseRating, 
+    baseYear, 
+    baseOne,
+    baseTwo,
+    baseTwoNoGenre,
+    baseROne,
+    desc,
+    case_one, 
+    case_two, 
+    case_three_part_one, 
+    case_three_part_two, 
+    case_four,
+    case_five,
+    case_six, 
+    create_movies_genre, 
+    create_movies_title, 
+    create_movies_genres_sep, 
+    search, 
+    case_two_part_one, 
+    case_two_part_two, 
+    getGenres, 
+    getFilmsinGenre, 
+    getTopRatedMovies, 
+    getPopulardMovies, 
+    getPolarisingMovies
+}

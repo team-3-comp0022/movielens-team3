@@ -59,7 +59,7 @@ const MovieList = props => {
                         setItems(response.results); 
                         break;
 
-                        case category.popular:
+                    case category.popular:
                             result = [];
                             var getIndexes = [];
                             var getPopular = await axios.get('http://localhost:3001/getPopularMovies');
@@ -80,12 +80,11 @@ const MovieList = props => {
                             setItems(response.results); 
                             break;
 
-                        case category.polarising:
+                     case category.polarising:
                             result = [];
-                            console.log("hello");
+                           
                             var getIndexes = [];
                             var getPolarising = await axios.get('http://localhost:3001/getPolarisingMovies');
-                            console.log("polaa", getPolarising)
                             
                             var numberOfPopularMovies = getPolarising.data.length;
                             for (var i = 0; i < 50; i++) // obtain all the movies we want to load max on the page
@@ -127,7 +126,6 @@ const MovieList = props => {
                                     responseSearch = {page:1, results: result2, total_pages: 4, total_results: value.data.length};                   
                                     setItems(responseSearch.results); 
                                 });
-                                // getByGenre(props.type);
                             break;
                   
                 }
@@ -142,8 +140,6 @@ const MovieList = props => {
     const getByGenre = async () => {
         let responseSearch = null;
         var getListOfFilmsInGenre = axios.get('http://localhost:3001/getFilmInGenre?query=' + "Adventure");
-        // console.log("get films in genre", getListOfFilmsInGenre);
-
         var result = [];
         var getIndexes = [];
         const params={};
@@ -171,8 +167,7 @@ const MovieList = props => {
             <Swiper
                 grabCursor={true}
                 spaceBetween={10}
-                slidesPerView={'auto'}
-            >
+                slidesPerView={'auto'} >
                 {
                      <script>
                      function log_console() {
@@ -182,18 +177,11 @@ const MovieList = props => {
                             <MovieCard item={item} />
                         </SwiperSlide>
                     ))
-                    }
-                          
+                    }  
                     </script>
-
-                   
-
                 }
             </Swiper>
-            
         </div>
-
-        
     );
 }
 

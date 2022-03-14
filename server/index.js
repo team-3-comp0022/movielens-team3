@@ -85,12 +85,19 @@ app.get("/getFilmInGenre", (req, res) => {
   res.send
 });
 
+// app.get("/firstQuery", (req, res) => {
+//   qResults.firstQuery(req.query.category, req.query.type, req.query.order, function(result){
+//     // qResults.firstQuery("*", "rating", "asc", function(result){
+//      console.log("ressslt", result)
+//      res.send(result)
+//   });
+//   res.send
+// });
+
 app.get("/firstQuery", (req, res) => {
-  console.log(req.query)
-  console.log(req.query.query)
-  let firstData = req.query.query
-  qResults.firstQuery(firstData, function(result){
-     console.log(result)
+  qResults.firstQuery(req.query.category, req.query.type, req.query.order, function(result){
+    // qResults.firstQuery(["", 2010, 2015],"year", "asc", function(result){
+     console.log("ressslt", result)
      res.send(result)
   });
   res.send

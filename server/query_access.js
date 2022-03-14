@@ -240,7 +240,7 @@ function makeSplitTable(){
 }
 
 function searchQuery(keyword, callback){
-    
+    //  http://localhost:3001/search?query=
     let search = queries.search + connection.escape(keyword).slice(1, -1) + `%")`;
     console.log(search)
     connection.query(search, function (err, rows, fields) {
@@ -263,12 +263,51 @@ function firstQuery(title, callback){
 */
 
 //category is film category, type is filter type, order is ASC/DESC(CHANGE?)
-function firstQuery(category, type, order,callback){//CATEGORY ALSO HAS FILM DATA 
+//http://localhost:3001/firstQuery?query=
+// function firstQuery(category, type, order,callback){//CATEGORY ALSO HAS FILM DATA 
+//     let caseOne=queries.baseOne
+//     if (type=="rating"){
+//         caseOne += queries.baseROne
+//     }
+//     caseOne+= queries.baseTwo
+//     if(type=="rating"){
+//         caseOne += queries.baseRating
+//     }
+//     else if (type=="year"){
+        
+//         caseOne += queries.baseYear
+//     }
+//     else if (type=="alphabetical"){
+//         caseOne +=queries.baseAlpha
+//     }
+//     if(order == "desc"){
+//         caseOne += queries.desc
+//     }
+
+//     console.log(caseOne)
+
+//     connection.query(caseOne,category, function (err, rows, fields) {
+//         if (err) throw err
+    
+//         console.log('Success')
+//         console.log(rows)
+//         return callback(rows);
+//     })
+// }
+
+function firstQuery(category, type, order,callback){
     let caseOne=queries.baseOne
     if (type=="rating"){
         caseOne += queries.baseROne
     }
-    caseOne+= queries.baseTwo
+    if(typeof category == "string"){ // only the genre is defined, not the years
+        if(category == "") caseOne+= queries.baseTwoNoGenre
+        else caseOne+= queries.baseTwo
+    }else {
+        if(category[0] == "") caseOne+= queries.baseTwoNoGenre
+        else caseOne+= queries.baseTwo
+    }
+
     if(type=="rating"){
         caseOne += queries.baseRating
     }
@@ -284,14 +323,17 @@ function firstQuery(category, type, order,callback){//CATEGORY ALSO HAS FILM DAT
     }
 
     console.log(caseOne)
+    console.log(typeof category)
+    console.log(category.slice(1,3))
 
-    connection.query(caseOne,category, function (err, rows, fields) {
+    connection.query(caseOne, category, function (err, rows, fields) {
         if (err) throw err
     
         console.log('Success')
         console.log(rows)
         return callback(rows);
     })
+    
 }
 
 /*
