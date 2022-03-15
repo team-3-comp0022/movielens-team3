@@ -24,7 +24,7 @@ CREATE TABLE links (
 `,`
 CREATE TABLE movies (
     movieId int PRIMARY KEY,
-    title varchar(100),
+    title varchar(200),
     genres varchar(100)
 )
 `, `
@@ -37,10 +37,11 @@ CREATE TABLE tags (
 )
 ` ,`
 CREATE TABLE ratings_personality (
-    userid varchar(40) PRIMARY KEY,
+    userid varchar(40),
     movie_id int,
     rating int,
-    tstamp DATETIME
+    tstamp DATETIME,
+    PRIMARY KEY (userId, movie_id, rating, tstamp)
 )
 `,  `
 CREATE TABLE personality_data (
@@ -410,7 +411,6 @@ const getFilmsinGenre = `
 SELECT links.imdbId FROM links where links.movieId IN (SELECT movieID FROM films.movies_genres_sep WHERE genre=?);
 `
 
-<<<<<<< HEAD
 const getTopRatedMovies = `
 SELECT lk.imdbId, AVG(R.rating) as average_rating
 FROM films.movies_titles MT, films.ratings R, links lk 
@@ -435,8 +435,6 @@ GROUP BY lk.imdbId
 ORDER BY Polarity DESC; 
 `;
 
-=======
->>>>>>> origin/newCSVParseBranch
 module.exports = {
     create_list, 
     drop_all,

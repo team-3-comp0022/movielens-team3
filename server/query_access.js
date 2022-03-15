@@ -209,7 +209,7 @@ function deleteTables(){
 }
 
 /* add records to tables */
-function addData(){
+/*function addData(){
     filenames.forEach((file, index)=>{
         const csv_query = csv_queres[index];
         let stream = fs.createReadStream(file);
@@ -229,6 +229,50 @@ function addData(){
             connection.query(query, [csvData], (error, response) => {
                 console.log(error || response);
             });
+        });
+        //stream.pipe(csvStream);
+    });
+}*/
+
+/* add records to tables */
+function addData(){
+    filenames.forEach((file, index)=>{
+        const csv_query = csv_queres[index];
+        let stream = fs.createReadStream(file);
+        let csvData = [];
+        let singleLen = 0
+        //let csvStream = fastcsv
+        fastcsv.parseFile(file)//parse()
+        .on("data", function(data) {
+            csvData.push(data);
+            singleLen+=1;
+        })
+        .on("end", function() {
+            // remove the first line: header
+            csvData.shift();//remove instead?
+            console.log(file)
+            console.log(csvData.length)
+            let query =csv_query
+            //ratings has 4 columns
+ 
+            //for(let i=0;i<csvData.length;i++){
+                //"INSERT INTO category (id, name, description, created_at) VALUES ?";
+ 
+            if(singleLen>400000){
+                console.log("here")
+                let bPoint=singleLen / 10///4
+                for(let x=0;x<10;x++){
+                    subData=csvData.slice(parseInt(x*bPoint),parseInt((x+1)*bPoint))
+                    connection.query(query, [subData], (error, response) => {
+                        console.log(error || response);
+                   });
+                }
+            }else{
+                connection.query(query, [csvData], (error, response) => {
+                    console.log(error || response);
+                })
+            }
+            //}
         });
         //stream.pipe(csvStream);
     });
