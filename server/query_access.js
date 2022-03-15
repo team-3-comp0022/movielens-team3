@@ -63,7 +63,7 @@ getReportData(862, function(result){
 });
 */
 
-initialise_data()
+// initialise_data()
 // deleteTables()
 
 //TESTNG FIFTH QUEREY AND SIXTH QUERY
