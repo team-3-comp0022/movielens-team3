@@ -94,8 +94,8 @@ app.get("/getFilmInGenre", (req, res) => {
 //   res.send
 // });
 
-app.get("/firstQuery", (req, res) => {
-  qResults.firstQuery(req.query.category, req.query.type, req.query.order, function(result){
+app.get("/firstQuerySorting", (req, res) => {
+  qResults.firstQuerySorting(req.query.genre, req.query.type, req.query.order, function(result){
     // qResults.firstQuery(["", 2010, 2015],"year", "asc", function(result){
      console.log("ressslt", result)
      res.send(result)

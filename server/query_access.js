@@ -295,7 +295,44 @@ function firstQuery(title, callback){
 //     })
 // }
 
-function firstQuery(category, type, order,callback){
+function firstQuerySorting(genre, type, order, callback){
+    let caseOne=queries.baseOne
+    if (type=="rating" || type=="popularity"){
+        caseOne += queries.baseOneWithRatingTable
+    }
+
+    if(genre != "") caseOne += queries. baseOneWithGenreTable + queries.baseTwo
+    else caseOne+=  queries.baseTwoNoGenre
+
+    if(type=="rating"){
+        caseOne += queries.baseRating
+    } 
+    else if (type=="year"){
+        caseOne += queries.baseYear
+    }
+    else if (type=="alphabetical"){
+        caseOne +=queries.baseAlpha
+    }
+    else if(type=="popularity"){
+        caseOne+=queries.basePopularity
+    }
+
+    if(order == "desc"){
+        caseOne += queries.desc
+    }
+
+    console.log(caseOne)
+
+    connection.query(caseOne, genre, function (err, rows, fields) {
+        if (err) throw err
+        console.log('Success')
+        console.log(rows)
+        return callback(rows);
+    })
+    
+}
+
+function firstQueryFiltering(category, type, order, callback){
     let caseOne=queries.baseOne
     if (type=="rating"){
         caseOne += queries.baseROne
@@ -541,7 +578,8 @@ function getReportData(val, callback){
 
 module.exports= {
     searchQuery,
-    firstQuery,
+    firstQuerySorting,
+    firstQueryFiltering,
     secondQuery,
     thirdQueryPartOne,
     thirdQueryPartTwo,

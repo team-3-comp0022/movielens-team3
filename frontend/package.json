@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@appbaseio/reactivesearch": "^3.29.0-gamma.1",
     "@ramonak/react-progress-bar": "^4.4.0",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^11.2.7",
@@ -16,6 +17,8 @@
     "react-collapsed": "^3.3.0",
     "react-d3-speedometer": "^1.0.2",
     "react-dom": "^17.0.2",
+    "react-gauge-chart": "^0.4.0",
+    "react-minimal-pie-chart": "^8.2.0",
     "react-router-dom": "^5.3.0",
     "react-scripts": "4.0.3",
     "sass": "^1.49.0",
@@ -47,6 +50,7 @@
     ]
   },
   "devDependencies": {
+    "bpk-component-barchart": "^4.2.1",
     "react-app-rewired": "^2.1.11"
   }
 }

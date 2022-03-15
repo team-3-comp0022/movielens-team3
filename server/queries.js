@@ -168,23 +168,33 @@ SELECT links.imdbId FROM links where links.movieId IN (
 
 const baseOne=`
 SELECT lk.imdbId 
-FROM movie_years MY, links lk, movies_genres_sep G, movies_titles MT `
+FROM movie_years MY, links lk, movies_titles MT `
 
-const baseROne=`, films.ratings R `
+const baseOneWithGenreTable =`, movies_genres_sep G `
+
+const baseOneWithRatingTable=`, films.ratings R `
 
 const baseTwo=`WHERE MY.movieId = lk.movieId and MY.movieID = G.movieId and MY.movieId = MT.movieId and G.genre = ?
 `
-const baseTwoNoGenre=`WHERE MY.movieId = lk.movieId and MY.movieID = G.movieId and MY.movieId = MT.movieId
+const baseTwoNoGenre=`WHERE MY.movieId = lk.movieId and MY.movieId = MT.movieId
 `
-//baseOne + extra + order + (?desc)
-//alpha, year. rating
 const baseAlpha=`
 ORDER BY MT.title
 `
 const baseYear=`
+and MY.year!="" 
+ORDER BY year
+`
+const userFilterYear = `
 and MY.year > ? and MY.year < ? and MY.year!="" 
 ORDER BY year
 `
+const basePopularity=`
+and MT.movieID = R.movieID
+GROUP BY lk.imdbId
+ORDER BY count(R.movieId)
+`
+
 const baseRating=`
 and MY.movieId = R.movieId
 GROUP BY MY.movieId
@@ -374,8 +384,11 @@ module.exports = {
     baseOne,
     baseTwo,
     baseTwoNoGenre,
-    baseROne,
+    baseOneWithGenreTable,
+    baseOneWithRatingTable,
+    basePopularity,
     desc,
+    userFilterYear,
     case_one, 
     case_two, 
     case_three_part_one, 

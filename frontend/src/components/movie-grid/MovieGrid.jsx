@@ -2,9 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory, useParams } from 'react-router';
 import useCollapse from 'react-collapsed';
 import axios from "axios";
-
 import './movie-grid.scss';
-
+// import { component-name } from '@appbaseio/reactivesearch';
 import MovieCard from '../movie-card/MovieCard';
 import Button, { OutlineButton } from '../button/Button';
 import Input from '../input/Input'

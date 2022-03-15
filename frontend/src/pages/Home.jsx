@@ -89,11 +89,11 @@ const Home = () => {
         var getIndexes = [];
         let response = null;
         var params = {
-        category: category_arg, //["Drama",2010,2015],
+        genre: category_arg, //["Drama",2010,2015],
         type: type_arg,
         order: order_arg
       }
-       var getFilms = axios.get('http://localhost:3001/firstQuery?category=' + params.category + "&type=" + params.type + "&order=" + params.order);
+       var getFilms = axios.get('http://localhost:3001/firstQuerySorting?genre=' + params.genre + "&type=" + params.type + "&order=" + params.order);
        console.log("pnm", getFilms);        
 
         getFilms.then(value => {  
@@ -166,10 +166,10 @@ const Home = () => {
                                     <a onClick={() => sorting("", "alphabetical", "desc")}>By Title Descending (Z-A)</a>
                                     <a onClick={() => sorting("", "rating", "asc")}>By Ratings Ascending</a>
                                     <a onClick={() => sorting("", "rating", "desc")}>By Ratings Descending</a>
-                                    <a href="#">By Popularity Ascending</a>
-                                    <a href="#">By Popularity Descending</a>
-                                    <a href="#">By Release Date Ascending</a>
-                                    <a href="#">By Release Date Descending</a>
+                                    <a onClick={() => sorting("", "popularity", "asc")}>By Popularity Ascending</a>
+                                    <a onClick={() => sorting("", "popularity", "desc")}>By Popularity Descending</a>
+                                    <a onClick={() => sorting("", "year", "asc")}>By Release Date Ascending</a>
+                                    <a onClick={() => sorting("", "year", "desc")}>By Release Date Descending</a>
                                 </div>
                     </div>
 
@@ -240,7 +240,9 @@ const Home = () => {
                                    <h6>  { item}</h6>
                                  </div>
                                  <div class="columnn" style={{alignContent:"left", marginLeft:-100}}> 
-                                     <ProgressBar  animateOnRender={true} completed={popularityRates[i]*100/popularityRates[0]} maxCompleted={100} bgColor="#353638" customLabel={popularityRates[i]} barContainerClassName="container" /> 
+                                
+                                   <ProgressBar  animateOnRender={true} completed={popularityRates[i]*100/popularityRates[0]} maxCompleted={100} bgColor="#353638" customLabel={popularityRates[i]} barContainerClassName="container" /> 
+
                                  </div>
                         </div>
                         </div>       
@@ -282,24 +284,35 @@ const Home = () => {
                        }
                 </div>
 
-                  {
-                <div className="movie-grid__loadmore">
-                {/* <OutlineButton className="small" onClick={getByGenre}>Load more movies</OutlineButton>
-                <OutlineButton className="small" >Load more movies</OutlineButton> */}
-
-                </div>
-                    }
                { 
                  genres.map((item, i) => (
                    <div className="section mb-3">
                    <div className="section__header mb-2">
                        <h2>All {item} Movies</h2>
+                       <div class="dropdown">
+                                <button class="dropbtn">Sort list of movies
+                                <i className="bx bx-caret-down"></i>
+                                </button>
+                                
+                                <div class="dropdown-content">
+
+                                    <a onClick={() => sorting(item, "alphabetical", "asc")}> By Title Ascending (A-Z)</a>
+                                    <a onClick={() => sorting(item, "alphabetical", "desc")}>By Title Descending (Z-A)</a>
+                                    <a onClick={() => sorting(item, "rating", "asc")}>By Ratings Ascending</a>
+                                    <a onClick={() => sorting(item, "rating", "desc")}>By Ratings Descending</a>
+                                    <a onClick={() => sorting(item, "popularity", "asc")}>By Popularity Ascending</a>
+                                    <a onClick={() => sorting(item, "popularity", "desc")}>By Popularity Descending</a>
+                                    <a onClick={() => sorting(item, "year", "asc")}>By Release Date Ascending</a>
+                                    <a onClick={() => sorting(item, "year", "desc")}>By Release Date Descending</a>
+                                </div>
+                     </div>
+
                        <Link to="/movie">
                            <OutlineButton className="small">View more</OutlineButton>
                        </Link>
                    </div>
                    <MovieList category={category.pickGenre} type={item}/>
-               </div>
+                </div>
                ))
                    
                }
