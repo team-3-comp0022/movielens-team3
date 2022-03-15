@@ -43,7 +43,7 @@ function initialise_data(){
     makeTables()
     addData()
     const sleep = (waitTimeInMs) => new Promise(resolve => setTimeout(resolve, waitTimeInMs));
-    sleep(40000).then(() => {
+    sleep(10000).then(() => {
         makeSecondTables()
         makeSplitTable()
         splitPersonalityTables()
@@ -63,7 +63,7 @@ getReportData(862, function(result){
 });
 */
 
-initialise_data()
+// initialise_data()
 // deleteTables()
 
 //TESTNG FIFTH QUEREY AND SIXTH QUERY

@@ -286,16 +286,16 @@ ORDER BY number_of_reviewers DESC;
 
 //final
 const case_four = `
-SELECT SUM(top_20.RATING) * (user_count.all_users / COUNT(top_20.userId)) as predicted_rating, user_count.real_rating
+SELECT SUM(top_20.RATING) * (user_count.all_users / COUNT(top_20.userId)) as predicted_rating, user_count.real_rating, AVG(top_20.RATING) as p_rating, user_count.all_users as total_viewers, COUNT(top_20.RATING) as subset_viewers
 FROM (SELECT COUNT(R.userId) as all_users, SUM(R.rating) as real_rating 
 FROM films.ratings R, films.movies_titles MT, films.links lk   
-WHERE R.movieId = MT.movieId AND MT.movieId=lk.movieId AND lk.imdbId= ?) as user_count, (SELECT X.userid, X.RATING  
+WHERE R.movieId = MT.movieId AND MT.movieId=lk.movieId AND lk.tmdbId= ?) as user_count, (SELECT X.userid, X.RATING  
 FROM    (  
     SELECT R.userId as userid, @counter := @counter +1 AS counter, R.rating as RATING  
-    FROM (select @counter:=0) AS var, (SELECT R.userId, R.rating FROM films.ratings R, films.movies_titles MT, films.links lk WHERE R.movieId = MT.movieId AND MT.movieId=lk.movieId AND lk.imdbId= ?) R 
+    FROM (select @counter:=0) AS var, (SELECT R.userId, R.rating FROM films.ratings R, films.movies_titles MT, films.links lk WHERE R.movieId = MT.movieId AND MT.movieId=lk.movieId AND lk.tmdbId= ?) R 
     ORDER BY R.userid DESC     
 ) AS X  
-where (20/100 * @counter) <= counter) top_20
+where (20/100 * @counter) >= counter) top_20
 GROUP BY user_count.all_users;
 `;
 
