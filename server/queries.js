@@ -89,6 +89,10 @@ const drop_movie_tables = `DROP TABLE IF EXISTS movies, movies_genres`
 
 const drop_personality_data = `DROP TABLE IF EXISTS personality_data`
 
+const drop_database = `DROP DATABASE films`;
+const create_database = `CREATE DATABASE films`; 
+const select_database = `USE films`;
+
 const filenames = ["./ml-latest-small/movies.csv","./ml-latest-small/links.csv", "./ml-latest-small/ratings.csv","./ml-latest-small/tags.csv", "./personality-isf2018/personality-data.csv","./personality-isf2018/ratings.csv"]
 const csv_queres = [`INSERT IGNORE INTO movies (movieId, title, genres) VALUES ?`, 
 `INSERT IGNORE INTO links (movieId, imdbId, tmdbId) VALUES ?`, 
@@ -406,6 +410,7 @@ const getFilmsinGenre = `
 SELECT links.imdbId FROM links where links.movieId IN (SELECT movieID FROM films.movies_genres_sep WHERE genre=?);
 `
 
+<<<<<<< HEAD
 const getTopRatedMovies = `
 SELECT lk.imdbId, AVG(R.rating) as average_rating
 FROM films.movies_titles MT, films.ratings R, links lk 
@@ -430,6 +435,8 @@ GROUP BY lk.imdbId
 ORDER BY Polarity DESC; 
 `;
 
+=======
+>>>>>>> origin/newCSVParseBranch
 module.exports = {
     create_list, 
     drop_all,
@@ -468,5 +475,8 @@ module.exports = {
     create_userid_movie_personality,
     create_userid_movie_predicted,
     drop_movie_tables,
-    drop_personality_data
+    drop_personality_data,
+    drop_database,
+    create_database,
+    select_database
 }
