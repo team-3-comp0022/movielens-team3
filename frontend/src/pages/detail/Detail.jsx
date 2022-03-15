@@ -11,6 +11,8 @@ import VideoList from './VideoList';
 import MovieList from '../../components/movie-list/MovieList';
 import axios from 'axios';
 import ReactSpeedometer from "react-d3-speedometer";
+import { PieChart } from 'react-minimal-pie-chart';
+// import BpkBarchart from 'bpk-component-barchart';
 
 /*
 
@@ -94,6 +96,17 @@ const Detail = () => {
         getDetail();
     }, [category, id]);
 
+    const priceData = [
+        {
+            "day": "mon",
+            "price": 320
+        },
+        {
+            "day": "tus",
+            "price": 340
+          }
+      ];
+
     return (
         <>
             {
@@ -131,14 +144,44 @@ const Detail = () => {
                                 </div>
                                 <div className='rating-directors'>
                                 <div>
-                                    <h3 > RATING</h3>
-                                     <div className="score" style={{marginTop:10, marginLeft:15}}>{dbItems[0][0][0].average_rating || 0}</div>
+                                    <h3 style={{marginLeft:35, marginBottom:10}} > RATING</h3>
+                                     <ReactSpeedometer
+                                        minValue={1}
+                                        maxValue={5}
+                                        value={dbItems[0][0][0].average_rating || 0}
+                                        needleColor="#666"
+                                        startColor="green"
+                                        segments={5}
+                                        endColor="blue"
+                                        width={150}
+                                        ringWidth={20}
+                                        height={250}
+                                        needleHeightRatio={0.7}
+                                        />
+                                        <h3 style={{marginLeft:70, marginBottom:10, marginTop:-180}} > {dbItems[0][0][0].average_rating || 0}</h3>
+                                {/* <div className="score" style={{marginTop:-170, marginLeft:60}}>{dbItems[0][0][0].average_rating || 0}</div> */}
+
                                 </div>
 
 
                                 <div className='director'>
-                                    <h3 >PREDICTED RATING</h3>
-                                     <div className="score" style={{marginTop:10, marginLeft:15}}>{dbItems[1][0].p_rating || 0}</div>
+                                    <h3 style={{marginLeft:-5, marginBottom:10}}>PREDICTED RATING</h3>
+                                    <div style={{marginLeft:20}}>
+                                    <ReactSpeedometer
+                                        minValue={1}
+                                        maxValue={5}
+                                        value={dbItems[1][0].p_rating || 0}
+                                        needleColor="#666"
+                                        startColor="yellow"
+                                        segments={5}
+                                        endColor="red"
+                                        width={150}
+                                        ringWidth={20}
+                                        height={250}
+                                        needleHeightRatio={0.7}
+                                        />
+                                        </div>
+                                     <h3  style={{marginLeft:70, marginBottom:10, marginTop:-180}}>{dbItems[1][0].p_rating || 0}</h3>
                                 </div>
 
                                  
@@ -150,16 +193,35 @@ const Detail = () => {
                                                 <p >No. of users with rating {r.rating}: {r.noOfRatings}</p>
                                             ))
                                         }
+
+                                        {/* <PieChart
+                                        data={[
+                                            { title: 'One', value: 10, color: '#E38627' },
+                                            { title: 'Two', value: 15, color: '#C13C37' },
+                                            { title: 'Three', value: 20, color: '#6A2135' },
+                                        ]}
+                                        radius={10}
+                                        /> */}
+
+                                        {/* <BpkBarchart
+                                            xAxisLabel="Weekday"
+                                            yAxisLabel="Price (£)"
+                                            xScaleDataKey="day"
+                                            yScaleDataKey="price"
+                                            initialWidth={500}
+                                            initialHeight={300}
+                                            data={priceData}
+                                        /> */}
                                  </div>
 
                                  <div className="detailedRatings">
-                                    <h3>Ratings Statistics</h3>
+                                    <h3>RATINGS STATISTICS</h3>
                                     <h5>Aggregate rating: {(dbItems[0][0][0] && dbItems[0][0][0].aggregate_Rating) || 0}</h5>              
                                     <h5>Total no. of reviewers: {dbItems[1][0].total_viewers}</h5>              
                                     <h5>Variance of the ratings: {(dbItems[0][0][0] && dbItems[0][0][0].variance_Rating) || 0}</h5>
                                     <br />
 
-                                    <h3>Predicted Ratings</h3>
+                                    <h3>PREDICTED RATINGS</h3>
                                     <h5>Actual Aggregate rating: {(dbItems[1][0] && dbItems[1][0].real_rating) || 0}</h5>
                                     <h5>Predicted Aggregate rating: {(dbItems[1][0] && dbItems[1][0].predicted_rating) || 0}</h5>
                                     <br />
@@ -171,7 +233,7 @@ const Detail = () => {
 
                                     <br />
 
-                                    <h3>Predicted Personality Ttraits</h3>
+                                    <h3>PREDICTED PERSONALITY TRAITS</h3>
                                     <h5>Actual Agreeableness: {(dbItems[2][0] && dbItems[2][0].actual_agreeableness) || 0}</h5>
                                     <h5>Difference Agreeableness: {(dbItems[2][0] && dbItems[2][0].difference_agreeableness) || 0}</h5>
                                     <h5>Predicted Agreeableness: {(dbItems[2][0] && dbItems[2][0].predicted_agreeableness) || 0}</h5>
@@ -200,7 +262,7 @@ const Detail = () => {
 
 
                                     <br />
-                                    <h3>Predicted Personality Types</h3>
+                                    <h3>PREDICTED PERSONALITY TYPES</h3>
                                     <h5>Actual Agreeableness: {(dbItems[3][0] && dbItems[2][0].actual_agreeableness) || 0}</h5>
                                     <h5>Difference Agreeableness: {(dbItems[3][0] && dbItems[2][0].difference_agreeableness) || 0}</h5>
                                     <h5>Predicted Agreeableness: {(dbItems[3][0] && dbItems[2][0].predicted_agreeableness) || 0}</h5>
