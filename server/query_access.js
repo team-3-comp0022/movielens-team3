@@ -68,7 +68,7 @@ getReportData(862, function(result){
 
 //TESTNG FIFTH QUEREY AND SIXTH QUERY
 
-// fifthQuery("0114709",function(result){
+// fifthQuery("862",function(result){
 //     console.log("FIFTH QUERY--------------------------------------------------")
 //     solution = result;//returns array of Ids
 //     console.log(solution)//use it
@@ -148,10 +148,10 @@ firstQuery(["Action",20,4000],"year","desc",function(result){
 //     console.log(solution)//use it
 //  });
 
-// fourthQuery(function(result){
-//     solution = result;//returns array of Ids
-//     console.log(solution)//use it
-//  });
+fourthQuery(862,function(result){
+    solution = result;//returns array of Ids
+    console.log(solution)//use it
+ });
 
 // fifthQuery("Jumanji (1995)",function(result){
 //     solution = result;//returns array of Ids
