@@ -3,5 +3,8 @@
     "@ramonak/react-progress-bar": "^4.4.0",
     "chart.js": "^3.7.1",
     "react-chartjs-2": "^4.0.1"
+  },
+  "devDependencies": {
+    "eslint-plugin-jest": "^26.1.1"
   }
 }
