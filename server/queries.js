@@ -209,19 +209,29 @@ const baseOneWithRatingTable=`, films.ratings R `
 
 const baseTwo=`WHERE MY.movieId = lk.movieId and MY.movieID = G.movieId and MY.movieId = MT.movieId and G.genre = ?
 `
+
 const baseTwoNoGenre=`WHERE MY.movieId = lk.movieId and MY.movieId = MT.movieId
 `
+
 const baseAlpha=`
 ORDER BY MT.title
 `
+
 const baseYear=`
 and MY.year!="" 
 ORDER BY year
 `
+
 const userFilterYear = `
 and MY.year > ? and MY.year < ? and MY.year!="" 
-ORDER BY year
+GROUP BY MY.movieId
 `
+
+const userFilterRating = `
+and R.movieID > ? and R.movieID <= 5 
+GROUP BY MY.movieId
+`
+
 const basePopularity=`
 and MT.movieID = R.movieID
 GROUP BY lk.imdbId
@@ -452,6 +462,7 @@ module.exports = {
     basePopularity,
     desc,
     userFilterYear,
+    userFilterRating,
     case_one, 
     case_two, 
     case_three_part_one, 

@@ -433,36 +433,23 @@ function firstQuerySorting(genre, type, order, callback){
     
 }
 
-function firstQueryFiltering(category, type, order, callback){
+function firstQueryFiltering(category, type, callback){
     let caseOne=queries.baseOne
     if (type=="rating"){
-        caseOne += queries.baseROne
+        caseOne += queries.baseOneWithRatingTable
     }
-    if(typeof category == "string"){ // only the genre is defined, not the years
-        if(category == "") caseOne+= queries.baseTwoNoGenre
-        else caseOne+= queries.baseTwo
-    }else {
-        if(category[0] == "") caseOne+= queries.baseTwoNoGenre
-        else caseOne+= queries.baseTwo
-    }
+
+    if(type == "genre") caseOne+= queries. baseOneWithGenreTable + queries.baseTwo
+    else caseOne+= queries.baseTwoNoGenre
 
     if(type=="rating"){
-        caseOne += queries.baseRating
+        caseOne += queries.userFilterRating
     }
     else if (type=="year"){
-        
-        caseOne += queries.baseYear
-    }
-    else if (type=="alphabetical"){
-        caseOne +=queries.baseAlpha
-    }
-    if(order == "desc"){
-        caseOne += queries.desc
+        caseOne += queries.userFilterYear
     }
 
-    console.log(caseOne)
-    console.log(typeof category)
-    console.log(category.slice(1,3))
+    console.log("filter", caseOne)
 
     connection.query(caseOne, category, function (err, rows, fields) {
         if (err) throw err
