@@ -2,7 +2,7 @@
 
 .movie-card {
     position: relative;
-    background-position: top;
+    background-position: bottom;
     background-repeat: no-repeat;
     background-size: cover;
     padding-top: 160%;
@@ -40,3 +40,68 @@
         }
     }
 }
+
+.barCompleted {
+    // background-color: rgba(255, 255, 255, 0.3);
+    background-color:#d8dee9;
+    border-radius: 16px;
+  }
+
+.containerbar {
+    background-color: rgba(0, 0, 0, 0.5);
+    // background-color: red;
+    border-radius: 16px;
+}
+
+.label {
+    font-size: 20px;
+    color: green;
+  }
+
+  .dropbtn {
+    background-color: white;
+    color: red;
+    padding: 6px;
+    font-size: 16px;
+    // border: none;
+    border-color: white;
+    border-radius:16px;
+    height: 35px;
+    text-align:center;
+    align-content: center;
+    font-weight: 500;
+  }
+  
+  .dropdown {
+    position: absolute;
+    display: inline-block;
+    margin-left:1000px;
+    align-content: center;
+  }
+  
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    visibility: visible;
+    background-color: #f1f1f1;
+    min-width: 150px;
+    min-height:100px;
+    font-size: 12px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 300;
+  }
+  
+  .dropdown-content a {
+    color: black;
+    padding: 10px 10px;
+    text-decoration: none;
+    display: block;
+  }
+  
+  .dropdown-content a:hover {background-color: #ddd;}
+  
+  .dropdown:hover .dropdown-content {display: block;}
+  
+  .dropdown:hover .dropbtn {background-color: black;}
+
+ 

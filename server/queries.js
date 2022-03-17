@@ -197,61 +197,37 @@ FROM (
 
 const search =`
 SELECT links.imdbId FROM links where links.movieId IN (
-  SELECT movies_titles.movieId FROM movies_titles WHERE movies_titles.title LIKE "%@%")
-`
-/*
-const case_one_alpha = `
-SELECT lk.imdbId 
-FROM movies_years MY, links lk, movies_genres G  
-WHERE MY.movieId = lk.movieId and MY.movieID = G.movieId and G.genres = ?
-ORDER BY MY.title
-`;
-
-//combine for use-case 1
-const case_one_year=`
-SELECT lk.imdbId
-FROM movie_years MY, links lk, movies_genres_sep G   
-WHERE MY.movieId = lk.movieId and MY.movieID = G.movieId and G.genre = ? and MY.year < ? and MY.year > ? and MY.year!="" 
-ORDER BY year
-`
-*/
-
-/*
-const case_one_tag=`
-SELECT lk.imdbId 
-FROM movies_titles MT, links lk 
-WHERE MT.movieId = lk.movieId
-`
-*/
-
-/*
-const case_one_rating=`
-SELECT lk.imdbId
-FROM movie_years MY, links lk, movies_genres G, films.ratings R   
-WHERE MY.movieId = lk.movieId and MY.movieID = G.movieId and G.genres = ? and MY.movieId = R.movieId
-GROUP BY MY.movieId
-ORDER BY AVG(R.rating) 
-`
-*/
-//dynamic
+  SELECT movies_titles.movieId FROM movies_titles WHERE movies_titles.title LIKE "%`
 
 const baseOne=`
 SELECT lk.imdbId 
-FROM movie_years MY, links lk, movies_genres_sep G `
+FROM movie_years MY, links lk, movies_titles MT `
 
-const baseROne=`, films.ratings R `
+const baseOneWithGenreTable =`, movies_genres_sep G `
 
-const baseTwo=`WHERE MY.movieId = lk.movieId and MY.movieID = G.movieId and G.genre = ?
+const baseOneWithRatingTable=`, films.ratings R `
+
+const baseTwo=`WHERE MY.movieId = lk.movieId and MY.movieID = G.movieId and MY.movieId = MT.movieId and G.genre = ?
 `
-//baseOne + extra + order + (?desc)
-//alpha, year. rating
+const baseTwoNoGenre=`WHERE MY.movieId = lk.movieId and MY.movieId = MT.movieId
+`
 const baseAlpha=`
-ORDER BY MY.title
+ORDER BY MT.title
 `
 const baseYear=`
+and MY.year!="" 
+ORDER BY year
+`
+const userFilterYear = `
 and MY.year > ? and MY.year < ? and MY.year!="" 
 ORDER BY year
 `
+const basePopularity=`
+and MT.movieID = R.movieID
+GROUP BY lk.imdbId
+ORDER BY count(R.movieId)
+`
+
 const baseRating=`
 and MY.movieId = R.movieId
 GROUP BY MY.movieId
@@ -260,22 +236,26 @@ ORDER BY AVG(R.rating)
 const desc=` DESC`
 
 const create_movies_years = ` 
-
 CREATE TABLE movie_years(PRIMARY KEY(movieId)) AS
 SELECT movieId, REPLACE(RIGHT(title, LOCATE('(',REVERSE(title))-1),')','') AS year FROM films.movies M; 
-
 `; 
 
-//rate movies by average popularity
-/*
-const case_two = `
-SELECT MT.title, AVG(R.rating) as average_rating
+// //substitute the Fair Game for %s
+const case_one = `
+SELECT MT.movieID, AVG(R.rating) as average_rating 
 FROM films.movies_titles MT, films.ratings R 
-WHERE MT.movieID = R.movieID 
-GROUP BY MT.title 
+WHERE MT.title = ? and MT.movieID = R.movieId
+GROUP BY MT.movieID;
+`;
+
+//rate movies by average popularity
+const case_two = `
+SELECT lk.imdbId, AVG(R.rating) as average_rating
+FROM films.movies_titles MT, films.ratings R, links lk 
+WHERE MT.movieID = R.movieID AND MT.movieID = lk.movieId
+GROUP BY lk.imdbId
 ORDER BY AVG(R.rating) DESC; 
 `;
-*/
 
 const case_two_part_one = `
 SELECT AVG(R.rating) as average_rating, SUM(R.rating) as aggregate_Rating, variance(R.rating) as variance_Rating
@@ -284,75 +264,67 @@ WHERE MT.movieID = R.movieID and MT.movieID = lk.movieId and lk.tmdbId = ?;
 `;
 
 const case_two_part_two = `
-SELECT R.rating, count(R.rating) 
+SELECT R.rating, count(R.rating) as noOfRatings
 FROM films.movies_titles MT, films.ratings R, links lk 
 WHERE MT.movieID = R.movieID and MT.movieID = lk.movieId and lk.tmdbId = ?
-GROUP BY R.rating; 
+GROUP BY R.rating
+ORDER BY R.rating; 
 `;
 
-// //polarity
-const case_three = `
-SELECT MG.genre, variance(R.rating) as VR, count(R.movieId) as number_of_reviewers, AVG(R.rating) 
+// polarity - genres descending - VR
+const case_three_part_one = `
+SELECT MG.genre, variance(R.rating) as Polarity, count(R.movieId) as number_of_reviewers
 FROM films.movies_genres_sep MG, films.ratings R 
 WHERE MG.movieId = R.movieId 
 GROUP BY MG.genre 
-ORDER BY VR DESC; 
+ORDER BY Polarity DESC; 
+`;
+
+// popularity - genre descending - number_of_reviewers
+const case_three_part_two = `
+SELECT MG.genre, count(R.movieId) as number_of_reviewers, AVG(R.rating) as Popularity
+FROM films.movies_genres_sep MG, films.ratings R 
+WHERE MG.movieId = R.movieId 
+GROUP BY MG.genre 
+ORDER BY number_of_reviewers DESC; 
 `;
 
 //final
 const case_four = `
-SELECT SUM(top_20.RATING) * (user_count.all_users / COUNT(top_20.userId)) as predicted_rating, user_count.real_rating
+SELECT SUM(top_20.RATING) * (user_count.all_users / COUNT(top_20.userId)) as predicted_rating, user_count.real_rating, AVG(top_20.RATING) as p_rating, user_count.all_users as total_viewers,
+ COUNT(top_20.RATING) as subset_viewers, ABS(SUM(top_20.RATING) * (user_count.all_users / COUNT(top_20.userId))-user_count.real_rating)/user_count.real_rating as Accuracy
 FROM (SELECT COUNT(R.userId) as all_users, SUM(R.rating) as real_rating 
 FROM films.ratings R, films.movies_titles MT, films.links lk   
-WHERE R.movieId = MT.movieId AND MT.movieId=lk.movieId AND lk.imdbId= ?) as user_count, (SELECT X.userid, X.RATING  
+WHERE R.movieId = MT.movieId AND MT.movieId=lk.movieId AND lk.tmdbId= ?) as user_count, (SELECT X.userid, X.RATING  
 FROM    (  
     SELECT R.userId as userid, @counter := @counter +1 AS counter, R.rating as RATING  
     FROM (select @counter:=0) AS var, (SELECT R.userId, R.rating FROM films.ratings R, films.movies_titles MT, films.links lk WHERE R.movieId = MT.movieId AND MT.movieId=lk.movieId AND lk.imdbId= ? ORDER BY R.timestamp) R  
 ) AS X  
-where (20/100 * @counter) <= counter) top_20
+where (20/100 * @counter) >= counter) top_20
 GROUP BY user_count.all_users;
 `;
 
-// const case_five = `
-// SELECT AVG(P.openness) as Openness, AVG(P.agreeableness) As Agreeableness, AVG(P.emotional_stability) AS Emotional_stability, AVG(P.conscientiousness) AS Conscientiousness, AVG(P.extraversion) AS Extraversion 
-// FROM films.personality_data P JOIN films.ratings_personality R on P.userid = R.userId 
-// WHERE P.userId IN (SELECT DISTINCT R.userId FROM films.ratings_personality R, films.movies M WHERE M.title=? AND R.movie_id = M.movieId AND R.rating >= 4); `;
-// const case_five = `SELECT top_70.openness as predicted_openness, top_30.openness as actual_openness, (top_70.openness - top_30.openness) as difference_openness, top_70.agreeableness as predicted_agreeableness, top_30.agreeableness as actual_agreeableness, (top_70.agreeableness - top_30.agreeableness) as difference_agreeableness, top_70.emotional_stability as predicted_emotional_stability, top_30.emotional_stability as actual_emotional_stability, (top_70.emotional_stability - top_30.emotional_stability) as difference_emotional_stability, top_70.conscientiousness as predicted_conscientiousness, top_30.conscientiousness as actual_conscientiousness, (top_70.conscientiousness - top_30.conscientiousness) as difference_conscientiousness, top_70.extraversion as predicted_extraversion, top_30.extraversion as actual_extraversion, (top_70.extraversion - top_30.extraversion) as difference_extraversion 
+/*
+const case_four = `
+SELECT SUM(R.rating) * (user_count.all_users / COUNT(R.userId)) as predicted_rating, user_count.real_rating, AVG(R.rating) as p_rating, user_count.all_users as total_viewers, COUNT(R.userId) as subset_viewers
+FROM films.ratings R, films.movies_titles MT, films.links lk, (SELECT COUNT(R.userId) as all_users, SUM(R.rating) as real_rating 
+FROM films.ratings R, films.movies_titles MT, films.links lk   
+WHERE R.movieId = MT.movieId AND MT.movieId=lk.movieId AND lk.tmdbId= ?) as user_count  
+WHERE R.movieId = MT.movieId AND MT.movieId = lk.movieId AND REPLACE(RIGHT(title, LOCATE('(',REVERSE(title))-1),')','') = YEAR(FROM_UNIXTIME(R.timestamp)) AND lk.tmdbId= ? 
+GROUP BY user_count.all_users;  
+`;
+*/
 
-// FROM (SELECT AVG(P.openness) as openness, AVG(P.agreeableness) As agreeableness, AVG(P.emotional_stability) AS emotional_stability, AVG(P.conscientiousness) AS conscientiousness, AVG(P.extraversion) AS extraversion  
-
-// FROM films.personality_data P JOIN films.ratings_personality R on P.userid = R.userId  
-
-// WHERE P.userId IN (SELECT X.userid    
-
-// FROM (SELECT R.userId as userid, @counter := @counter +1 AS counter    
-
-//     FROM (select @counter:=0) AS var, (SELECT DISTINCT R.userId FROM films.ratings_personality R, films.movies M WHERE M.movieId=? AND R.movie_id = M.movieId AND R.rating >= 4) R  
-
-//     ORDER BY R.userid DESC) AS X    
-
-// where (70/100 * @counter) >= counter)) top_70, (SELECT AVG(P.openness) as openness, AVG(P.agreeableness) As agreeableness, AVG(P.emotional_stability) AS emotional_stability, AVG(P.conscientiousness) AS conscientiousness, AVG(P.extraversion) AS extraversion  
-
-// FROM films.personality_data P JOIN films.ratings_personality R on P.userid = R.userId  
-
-// WHERE P.userId IN (SELECT X.userid    
-
-// FROM (SELECT R.userId as userid, @counter := @counter +1 AS counter    
-
-//     FROM (select @counter:=0) AS var, (SELECT DISTINCT R.userId FROM films.ratings_personality R, films.movies M WHERE M.movieId=? AND R.movie_id = M.movieId AND R.rating >= 4) R  
-
-//     ORDER BY R.userid DESC) AS X    
-
-// where (70/100 * @counter) <= counter)) top_30;`;
-
-const case_five = `SELECT COALESCE(top_70.openness,0) as predicted_openness, COALESCE(top_30.openness,0) as actual_openness, ABS(COALESCE(top_70.openness,0) - COALESCE(top_30.openness,0)) as difference_openness, COALESCE(top_70.agreeableness,0) as predicted_agreeableness, COALESCE(top_30.agreeableness,0) as actual_agreeableness, ABS(COALESCE(top_70.agreeableness,0) - COALESCE(top_30.agreeableness,0)) as difference_agreeableness, COALESCE(top_70.emotional_stability,0) as predicted_emotional_stability, COALESCE(top_30.emotional_stability,0) as actual_emotional_stability, ABS(COALESCE(top_70.emotional_stability,0) - COALESCE(top_30.emotional_stability,0)) as difference_emotional_stability, COALESCE(top_70.conscientiousness,0) as predicted_conscientiousness,  COALESCE(top_30.conscientiousness,0) as actual_conscientiousness, ABS(COALESCE(top_70.conscientiousness,0) - COALESCE(top_30.conscientiousness,0)) as difference_conscientiousness, COALESCE(top_70.extraversion,0) as predicted_extraversion, COALESCE(top_30.extraversion,0) as actual_extraversion, ABS(COALESCE(top_70.extraversion,0) -  COALESCE(top_30.extraversion,0)) as difference_extraversion 
-
+const case_five = `SELECT COALESCE(top_70.openness,0) as predicted_openness, COALESCE(top_30.openness,0) as actual_openness, ABS(COALESCE(top_70.openness,0) - COALESCE(top_30.openness,0)) as difference_openness, COALESCE(top_70.agreeableness,0) as predicted_agreeableness, COALESCE(top_30.agreeableness,0) as actual_agreeableness, ABS(COALESCE(top_70.agreeableness,0) - COALESCE(top_30.agreeableness,0)) as difference_agreeableness, COALESCE(top_70.emotional_stability,0) as predicted_emotional_stability, COALESCE(top_30.emotional_stability,0) as actual_emotional_stability, ABS(COALESCE(top_70.emotional_stability,0) - COALESCE(top_30.emotional_stability,0)) as difference_emotional_stability, COALESCE(top_70.conscientiousness,0) as predicted_conscientiousness,  COALESCE(top_30.conscientiousness,0) as actual_conscientiousness, ABS(COALESCE(top_70.conscientiousness,0) - COALESCE(top_30.conscientiousness,0)) as difference_conscientiousness, COALESCE(top_70.extraversion,0) as predicted_extraversion, COALESCE(top_30.extraversion,0) as actual_extraversion, ABS(COALESCE(top_70.extraversion,0) -  COALESCE(top_30.extraversion,0)) as difference_extraversion ,
+ABS(COALESCE(top_70.openness,0) - COALESCE(top_30.openness,0))/COALESCE(top_30.openness,1) as openAcc, 
+ABS(COALESCE(top_70.agreeableness,0) - COALESCE(top_30.agreeableness,0))/COALESCE(top_30.agreeableness,1) as agreeAcc, 
+ABS(COALESCE(top_70.emotional_stability,0) - COALESCE(top_30.emotional_stability,0))/COALESCE(top_30.emotional_stability,1) as emoAcc,
+ABS(COALESCE(top_70.conscientiousness,0) - COALESCE(top_30.conscientiousness,0))/COALESCE(top_30.conscientiousness,1) as conAcc,
+ABS(COALESCE(top_70.extraversion, 0) - COALESCE(top_30.extraversion,0))/COALESCE(top_30.extraversion,1) as extrAcc,
+(ABS(COALESCE(top_70.openness,0) - COALESCE(top_30.openness,0))/COALESCE(top_30.openness,1)+ ABS(COALESCE(top_70.agreeableness,0) - COALESCE(top_30.agreeableness,0))/COALESCE(top_30.agreeableness,1) + ABS(COALESCE(top_70.emotional_stability,0) - COALESCE(top_30.emotional_stability,0))/COALESCE(top_30.emotional_stability,1)) + ABS((COALESCE(top_70.conscientiousness,0) - COALESCE(top_30.conscientiousness,0))/COALESCE(top_30.conscientiousness,1) + ABS(COALESCE(top_70.extraversion,0) - COALESCE(top_30.extraversion,0))/COALESCE(top_30.extraversion,1))/5 as totalAcc
 FROM (SELECT AVG(P.openness) as openness, AVG(P.agreeableness) As agreeableness, AVG(P.emotional_stability) AS emotional_stability, AVG(P.conscientiousness) AS conscientiousness, AVG(P.extraversion) AS extraversion  
-
 FROM films.personality_user P JOIN films.ratings_personality R on P.userid = R.userId  
-
 WHERE P.userId IN (SELECT X.userid    
-
 FROM (SELECT R.userId as userid, @counter := @counter +1 AS counter    
 
     FROM (select @counter:=0) AS var, (SELECT DISTINCT R.userId FROM films.ratings_personality R, films.movies_titles M, films.links lk WHERE lk.imdbId = ? AND lk.movieId = M.movieId AND R.movie_id = M.movieId AND R.rating >= 4) R  
@@ -360,11 +332,8 @@ FROM (SELECT R.userId as userid, @counter := @counter +1 AS counter
     ORDER BY RAND()) AS X    
 
 where (70/100 * @counter) >= counter)) top_70, (SELECT AVG(P.openness) as openness, AVG(P.agreeableness) As agreeableness, AVG(P.emotional_stability) AS emotional_stability, AVG(P.conscientiousness) AS conscientiousness, AVG(P.extraversion) AS extraversion  
-
 FROM films.personality_user P JOIN films.ratings_personality R on P.userid = R.userId  
-
 WHERE P.userId IN (SELECT X.userid    
-
 FROM (SELECT R.userId as userid, @counter := @counter +1 AS counter    
 
     FROM (select @counter:=0) AS var, (SELECT DISTINCT R.userId FROM films.ratings_personality R, films.movies_titles M ,films.links lk WHERE lk.imdbId = ? AND lk.movieId = M.movieId AND R.movie_id = M.movieId AND R.rating >= 4) R  
@@ -420,13 +389,26 @@ where (70/100 * @counter) <= counter)) top_30;`;
 // WHERE user_like.userId = P.userid) people_like; `;
 
 const case_six = `
-SELECT COALESCE(people_tag.openness,0) as predicted_openness, COALESCE(people_like.openness,0) as real_openness, ABS(COALESCE(people_tag.openness,0) - COALESCE(people_like.openness,0)) AS diff_openness, COALESCE(people_tag.agreeableness,0) as predicted_agreeableness, COALESCE(people_like.agreeableness,0) as real_agreeableness, ABS(COALESCE(people_tag.agreeableness,0) - COALESCE(people_like.agreeableness,0)) AS diff_agreeableness, COALESCE(people_tag.emotional_stability,0) AS predicted_emotional_stability, COALESCE(people_like.emotional_stability,0) as real_emotional_stability,  ABS(COALESCE(people_tag.emotional_stability,0) - COALESCE(people_like.emotional_stability,0)) AS diff_emotional_stability, COALESCE (people_tag.conscientiousness,0) as predicted_conscientiousness, COALESCE (people_like.conscientiousness,0) as real_conscientiousness,  ABS(COALESCE(people_tag.conscientiousness,0) - COALESCE(people_like.conscientiousness,0)) AS diff_conscientiousness, COALESCE(people_tag.extraversion,0) as predicted_extraversion, COALESCE(people_like.extraversion,0) as real_extraversion, ABS(COALESCE(people_tag.extraversion,0) - COALESCE(people_like.extraversion,0)) AS diff_extraversion   
-FROM (SELECT AVG(P.openness) as openness, AVG(P.agreeableness) As agreeableness, AVG(P.emotional_stability) AS emotional_stability, AVG(P.conscientiousness) AS conscientiousness, AVG(P.extraversion) AS extraversion 
-FROM films.personality_user P, films.personality_predictions_movies PR  
-WHERE P.userid =PR.userid and PR.all_movies in (SELECT T.movieId FROM tags T, links lk WHERE T.movieId = lk.movieId AND lk.imdbId != ? AND T.tag IN (SELECT tag FROM films.tags T, movie_years M, films.links lk  WHERE T.movieId = lk.movieId AND lk.imdbId = ?))    
-) people_tag, (SELECT AVG(P.openness) as openness, AVG(P.agreeableness) As agreeableness, AVG(P.emotional_stability) AS emotional_stability, AVG(P.conscientiousness) AS conscientiousness, AVG(P.extraversion) AS extraversion   
-FROM films.personality_user P,  (SELECT RP.userid as userId FROM films.ratings_personality RP, links lk  WHERE lk.imdbId = ? AND RP.movie_id = lk.movieId AND RP.rating >=4) user_like   
-WHERE user_like.userId = P.userid) people_like;`;
+SELECT COALESCE(top_70.openness,0) as predicted_openness, COALESCE(top_30.openness,0) as actual_openness, ABS(COALESCE(top_70.openness,0) - COALESCE(top_30.openness,0)) as difference_openness, COALESCE(top_70.agreeableness,0) as predicted_agreeableness, COALESCE(top_30.agreeableness,0) as actual_agreeableness, ABS(COALESCE(top_70.agreeableness,0) - COALESCE(top_30.agreeableness,0)) as difference_agreeableness, COALESCE(top_70.emotional_stability,0) as predicted_emotional_stability, COALESCE(top_30.emotional_stability,0) as actual_emotional_stability, ABS(COALESCE(top_70.emotional_stability,0) - COALESCE(top_30.emotional_stability,0)) as difference_emotional_stability, COALESCE(top_70.conscientiousness,0) as predicted_conscientiousness,  COALESCE(top_30.conscientiousness,0) as actual_conscientiousness, ABS(COALESCE(top_70.conscientiousness,0) - COALESCE(top_30.conscientiousness,0)) as difference_conscientiousness, COALESCE(top_70.extraversion,0) as predicted_extraversion, COALESCE(top_30.extraversion,0) as actual_extraversion, ABS(COALESCE(top_70.extraversion,0) -  COALESCE(top_30.extraversion,0)) as difference_extraversion ,
+ABS(COALESCE(top_70.openness,0) - COALESCE(top_30.openness,0))/COALESCE(top_30.openness,1) as openAcc, 
+ABS(COALESCE(top_70.agreeableness,0) - COALESCE(top_30.agreeableness,0))/COALESCE(top_30.agreeableness,1) as agreeAcc, 
+ABS(COALESCE(top_70.emotional_stability,0) - COALESCE(top_30.emotional_stability,0))/COALESCE(top_30.emotional_stability,1) as emoAcc,
+ABS(COALESCE(top_70.conscientiousness,0) - COALESCE(top_30.conscientiousness,0))/COALESCE(top_30.conscientiousness,1) as conAcc,
+ABS(COALESCE(top_70.extraversion, 0) - COALESCE(top_30.extraversion,0))/COALESCE(top_30.extraversion,1) as extrAcc,
+(ABS(COALESCE(top_70.openness,0) - COALESCE(top_30.openness,0))/COALESCE(top_30.openness,1)+ ABS(COALESCE(top_70.agreeableness,0) - COALESCE(top_30.agreeableness,0))/COALESCE(top_30.agreeableness,1) + ABS(COALESCE(top_70.emotional_stability,0) - COALESCE(top_30.emotional_stability,0))/COALESCE(top_30.emotional_stability,1)) + ABS((COALESCE(top_70.conscientiousness,0) - COALESCE(top_30.conscientiousness,0))/COALESCE(top_30.conscientiousness,1) + ABS(COALESCE(top_70.extraversion,0) - COALESCE(top_30.extraversion,0))/COALESCE(top_30.extraversion,1))/5 as totalAcc
+FROM (SELECT AVG(P.openness) as openness, AVG(P.agreeableness) As agreeableness, AVG(P.emotional_stability) AS emotional_stability, AVG(P.conscientiousness) AS conscientiousness, AVG(P.extraversion) AS extraversion  
+FROM films.personality_user P JOIN films.ratings_personality R on P.userid = R.userId  
+WHERE P.userId IN (SELECT X.userid    
+FROM (SELECT R.userId as userid, @counter := @counter +1 AS counter    
+    FROM (select @counter:=0) AS var, (SELECT DISTINCT R.userId FROM films.ratings_personality R, films.movies_titles M, films.links lk WHERE lk.imdbId = ? AND lk.movieId = M.movieId AND R.movie_id = M.movieId AND R.rating >= 4) R  
+    ORDER BY R.userid DESC) AS X    
+where (70/100 * @counter) >= counter)) top_70, (SELECT AVG(P.openness) as openness, AVG(P.agreeableness) As agreeableness, AVG(P.emotional_stability) AS emotional_stability, AVG(P.conscientiousness) AS conscientiousness, AVG(P.extraversion) AS extraversion  
+FROM films.personality_user P JOIN films.ratings_personality R on P.userid = R.userId  
+WHERE P.userId IN (SELECT X.userid    
+FROM (SELECT R.userId as userid, @counter := @counter +1 AS counter    
+    FROM (select @counter:=0) AS var, (SELECT DISTINCT R.userId FROM films.ratings_personality R, films.movies_titles M ,films.links lk WHERE lk.imdbId = ? AND lk.movieId = M.movieId AND R.movie_id = M.movieId AND R.rating >= 4) R  
+    ORDER BY R.userid DESC) AS X    
+where (70/100 * @counter) <= counter)) top_30;`;
 
 const getGenres = `
 SELECT DISTINCT(genre) FROM films.movies_genres_sep
@@ -435,12 +417,51 @@ const getFilmsinGenre = `
 SELECT links.imdbId FROM links where links.movieId IN (SELECT movieID FROM films.movies_genres_sep WHERE genre=?);
 `
 
+const getTopRatedMovies = `
+SELECT lk.imdbId, AVG(R.rating) as average_rating
+FROM films.movies_titles MT, films.ratings R, links lk 
+WHERE MT.movieID = R.movieID AND MT.movieID = lk.movieId
+GROUP BY lk.imdbId
+ORDER BY AVG(R.rating) DESC; 
+`;
+
+const getPopulardMovies = `
+SELECT lk.imdbId, count(R.movieId) as number_of_reviewers
+FROM films.movies_titles MT, films.ratings R, links lk 
+WHERE MT.movieID = R.movieID AND MT.movieID = lk.movieId
+GROUP BY lk.imdbId
+ORDER BY number_of_reviewers DESC; 
+`;
+
+const getPolarisingMovies = `
+SELECT lk.imdbId, variance(R.rating) as Polarity
+FROM films.movies_titles MT, films.ratings R, links lk 
+WHERE MT.movieID = R.movieID AND MT.movieID = lk.movieId
+GROUP BY lk.imdbId
+ORDER BY Polarity DESC; 
+`;
+
 module.exports = {
     create_list, 
-    drop_all, 
+    drop_all,
     filenames, 
     csv_queres, 
-    case_three, 
+    create_movies_years, 
+    baseAlpha, 
+    baseRating, 
+    baseYear, 
+    baseOne,
+    baseTwo,
+    baseTwoNoGenre,
+    baseOneWithGenreTable,
+    baseOneWithRatingTable,
+    basePopularity,
+    desc,
+    userFilterYear,
+    case_one, 
+    case_two, 
+    case_three_part_one, 
+    case_three_part_two, 
     case_four,
     case_five,
     case_six, 
@@ -450,15 +471,11 @@ module.exports = {
     search, 
     case_two_part_one, 
     case_two_part_two, 
-    getGenres, getFilmsinGenre, 
-    create_movies_years, 
-    baseAlpha, 
-    baseRating, 
-    baseYear, 
-    baseOne,
-    baseTwo,
-    baseROne,
-    desc,
+    getGenres, 
+    getFilmsinGenre, 
+    getTopRatedMovies, 
+    getPopulardMovies, 
+    getPolarisingMovies,
     create_userid_movie_personality,
     create_userid_movie_predicted,
     drop_movie_tables,

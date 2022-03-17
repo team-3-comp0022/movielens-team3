@@ -39,10 +39,7 @@ var connection = mysql.createConnection({
 // `
 
 function initialise_data(){
-    // deleteTables()
-    deleteDatabase()
-    makeDatabase()
-    useDatabase()
+    deleteTables()
     makeTables()
     addData()
     const sleep = (waitTimeInMs) => new Promise(resolve => setTimeout(resolve, waitTimeInMs));
@@ -57,19 +54,21 @@ function initialise_data(){
     });
 }
 
-// var stuff_i_want = [];
-// getReportData(862, function(result){
-//    stuff_i_want = result;
-//    console.log("here")
-//    console.log(stuff_i_want)
-// });
+/*
+var stuff_i_want = [];
+getReportData(862, function(result){
+   stuff_i_want = result;
+   console.log("here")
+   console.log(stuff_i_want)
+});
+*/
 
-initialise_data()
+// initialise_data()
 // deleteTables()
 
 //TESTNG FIFTH QUEREY AND SIXTH QUERY
 
-// fifthQuery("0114709",function(result){
+// fifthQuery("862",function(result){
 //     console.log("FIFTH QUERY--------------------------------------------------")
 //     solution = result;//returns array of Ids
 //     console.log(solution)//use it
@@ -149,10 +148,10 @@ firstQuery(["Action",20,4000],"year","desc",function(result){
 //     console.log(solution)//use it
 //  });
 
-// fourthQuery(function(result){
-//     solution = result;//returns array of Ids
-//     console.log(solution)//use it
-//  });
+fourthQuery(862,function(result){
+    solution = result;//returns array of Ids
+    console.log(solution)//use it
+ });
 
 // fifthQuery("Jumanji (1995)",function(result){
 //     solution = result;//returns array of Ids
@@ -172,35 +171,6 @@ function test(){
     //console.log(rows[0])
     console.log('The solution is: ', rows[0].solution)
     })
-}
-
-/*create database */
-function makeDatabase(){
-    const create_database = queries.create_database
-    connection.query(create_database, function (err, rows, fields) {
-        if (err) throw err
-        
-        console.log('Successfully create database')
-    });
-}
-
-/*delete database */
-function deleteDatabase(){
-    const drop_database = queries.drop_database
-    connection.query(drop_database, function (err, rows, fields) {
-        if (err) throw err
-        
-        console.log('Successfully dropped database')
-    });
-}
-
-function useDatabase(){
-    const use_database = queries.select_database
-    connection.query(use_database, function (err, rows, fields) {
-        if (err) throw err
-        
-        console.log('Successfully dropped database')
-    });
 }
 
 /* create tables */
@@ -239,30 +209,30 @@ function deleteTables(){
 }
 
 /* add records to tables */
-// function addData(){
-//     filenames.forEach((file, index)=>{
-//         const csv_query = csv_queres[index];
-//         let stream = fs.createReadStream(file);
-//         let csvData = [];
-//         //let csvStream = fastcsv
-//         fastcsv.parseFile(file)//parse()
-//         .on("data", function(data) {
-//             csvData.push(data);
-//         })
-//         .on("end", function() {
-//             // remove the first line: header
-//             csvData.shift();
+/*function addData(){
+    filenames.forEach((file, index)=>{
+        const csv_query = csv_queres[index];
+        let stream = fs.createReadStream(file);
+        let csvData = [];
+        //let csvStream = fastcsv
+        fastcsv.parseFile(file)//parse()
+        .on("data", function(data) {
+            csvData.push(data);
+        })
+        .on("end", function() {
+            // remove the first line: header
+            csvData.shift();
 
-//             let query =
-//                 csv_query
-//                 //"INSERT INTO category (id, name, description, created_at) VALUES ?";
-//             connection.query(query, [csvData], (error, response) => {
-//                 console.log(error || response);
-//             });
-//         });
-//         //stream.pipe(csvStream);
-//     });
-// }
+            let query =
+                csv_query
+                //"INSERT INTO category (id, name, description, created_at) VALUES ?";
+            connection.query(query, [csvData], (error, response) => {
+                console.log(error || response);
+            });
+        });
+        //stream.pipe(csvStream);
+    });
+}*/
 
 /* add records to tables */
 function addData(){
@@ -371,8 +341,8 @@ function makeSplitTable(){
 }
 
 function searchQuery(keyword, callback){
-    
-    let search = queries.search.replace('@', keyword)
+    //  http://localhost:3001/search?query=
+    let search = queries.search + connection.escape(keyword).slice(1, -1) + `%")`;
     console.log(search)
     connection.query(search, function (err, rows, fields) {
         if (err) throw err
@@ -394,12 +364,88 @@ function firstQuery(title, callback){
 */
 
 //category is film category, type is filter type, order is ASC/DESC(CHANGE?)
-function firstQuery(category, type, order,callback){//CATEGORY ALSO HAS FILM DATA 
+//http://localhost:3001/firstQuery?query=
+// function firstQuery(category, type, order,callback){//CATEGORY ALSO HAS FILM DATA 
+//     let caseOne=queries.baseOne
+//     if (type=="rating"){
+//         caseOne += queries.baseROne
+//     }
+//     caseOne+= queries.baseTwo
+//     if(type=="rating"){
+//         caseOne += queries.baseRating
+//     }
+//     else if (type=="year"){
+        
+//         caseOne += queries.baseYear
+//     }
+//     else if (type=="alphabetical"){
+//         caseOne +=queries.baseAlpha
+//     }
+//     if(order == "desc"){
+//         caseOne += queries.desc
+//     }
+
+//     console.log(caseOne)
+
+//     connection.query(caseOne,category, function (err, rows, fields) {
+//         if (err) throw err
+    
+//         console.log('Success')
+//         console.log(rows)
+//         return callback(rows);
+//     })
+// }
+
+function firstQuerySorting(genre, type, order, callback){
+    let caseOne=queries.baseOne
+    if (type=="rating" || type=="popularity"){
+        caseOne += queries.baseOneWithRatingTable
+    }
+
+    if(genre != "") caseOne += queries. baseOneWithGenreTable + queries.baseTwo
+    else caseOne+=  queries.baseTwoNoGenre
+
+    if(type=="rating"){
+        caseOne += queries.baseRating
+    } 
+    else if (type=="year"){
+        caseOne += queries.baseYear
+    }
+    else if (type=="alphabetical"){
+        caseOne +=queries.baseAlpha
+    }
+    else if(type=="popularity"){
+        caseOne+=queries.basePopularity
+    }
+
+    if(order == "desc"){
+        caseOne += queries.desc
+    }
+
+    console.log(caseOne)
+
+    connection.query(caseOne, genre, function (err, rows, fields) {
+        if (err) throw err
+        console.log('Success')
+        console.log(rows)
+        return callback(rows);
+    })
+    
+}
+
+function firstQueryFiltering(category, type, order, callback){
     let caseOne=queries.baseOne
     if (type=="rating"){
         caseOne += queries.baseROne
     }
-    caseOne+= queries.baseTwo
+    if(typeof category == "string"){ // only the genre is defined, not the years
+        if(category == "") caseOne+= queries.baseTwoNoGenre
+        else caseOne+= queries.baseTwo
+    }else {
+        if(category[0] == "") caseOne+= queries.baseTwoNoGenre
+        else caseOne+= queries.baseTwo
+    }
+
     if(type=="rating"){
         caseOne += queries.baseRating
     }
@@ -415,14 +461,17 @@ function firstQuery(category, type, order,callback){//CATEGORY ALSO HAS FILM DAT
     }
 
     console.log(caseOne)
+    console.log(typeof category)
+    console.log(category.slice(1,3))
 
-    connection.query(caseOne,category, function (err, rows, fields) {
+    connection.query(caseOne, category, function (err, rows, fields) {
         if (err) throw err
     
         console.log('Success')
         console.log(rows)
         return callback(rows);
     })
+    
 }
 
 /*
@@ -482,21 +531,22 @@ function secondQuery(val, callback){
      });
 }
 
-function thirdQuery(callback){
+function thirdQueryPartOne(callback){
     
-    let caseThree = queries.case_three
-    connection.query(caseThree, function (err, rows, fields) {
+    let caseThreePartOne = queries.case_three_part_one
+    connection.query(caseThreePartOne, function (err, rows, fields) {
         if (err) throw err
-    
         console.log('Success')
-        // console.log(rows)
-        // for (let i =0; i<rows.length;i++){
-        //     for (let j in rows[i]){
-        //         console.log(j +": "+rows[i][j]);
-        //     }
-        // }
-        // desired_data = rows[0];  // Scope is larger than function
-        // console.log(desired_data)
+        return callback(rows);
+    })
+}
+
+function thirdQueryPartTwo(callback){
+    
+    let caseThreePartTwo = queries.case_three_part_two
+    connection.query(caseThreePartTwo, function (err, rows, fields) {
+        if (err) throw err
+        console.log('Success')
         return callback(rows);
     })
 }
@@ -565,6 +615,41 @@ function getFilmInGenre(title, callback){
     })
 }
 
+function getTopRatedMovies(callback){
+    
+    let getMovies = queries.getTopRatedMovies
+    connection.query(getMovies, function (err, rows, fields) {
+        if (err) throw err
+    
+        console.log('Success')
+        return callback(rows);
+    })
+}
+
+function getPopularMovies(callback){
+    
+    let getMovies = queries.getPopulardMovies
+    connection.query(getMovies, function (err, rows, fields) {
+        if (err) throw err
+    
+        console.log('Success')
+        return callback(rows);
+    })
+}
+
+function getPolarisingMovies(callback){
+    
+    let getMovies = queries.getPolarisingMovies
+    connection.query(getMovies, function (err, rows, fields) {
+        if (err) throw err
+    
+        console.log('Success')
+        return callback(rows);
+    })
+}
+
+//connection.end();
+
 function getReportData(val, callback){
     queryTwo=[]
     queryFour=[]
@@ -579,6 +664,7 @@ function getReportData(val, callback){
             fifthQuery(val, function(result){
                 queryFive = result;
                 console.log(queryFive)
+                // TODO: Change this to sixth Query!!
                 sixthQuery(val, function(result){
                     querySix = result;
                     console.log(querySix)
@@ -591,12 +677,18 @@ function getReportData(val, callback){
 
 module.exports= {
     searchQuery,
-    firstQuery,
+    firstQuerySorting,
+    firstQueryFiltering,
     secondQuery,
-    thirdQuery,
+    thirdQueryPartOne,
+    thirdQueryPartTwo,
     fourthQuery,
     fifthQuery,
     sixthQuery,
     getGenre,
-    getFilmInGenre
+    getFilmInGenre,
+    getReportData,
+    getTopRatedMovies, 
+    getPopularMovies, 
+    getPolarisingMovies
 }

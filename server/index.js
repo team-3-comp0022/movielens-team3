@@ -2,17 +2,29 @@
 const express = require('express');
 const app = express();
 const mysql = require('mysql');
+const MysqlCache = require('mysql-cache')
 var cors = require('cors')
 const { DEC8_BIN } = require('mysql/lib/protocol/constants/charsets');
 const qResults = require('./query_access.js')
+require("dotenv").config()
 
+const mysqlCache = new MysqlCache({
+  host: process.env.DB_DATABASE,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: "films",
+  port: '3306',
+  cacheProvider: 'LRU',
+});
+
+// var connection = mysql.createConnection(mysqlCache);
 var connection = mysql.createConnection({
-    host: "db",
-    user: "root",
-    password: "example",
-    database: "films",
-    port: '3306'
-  });
+  host: process.env.DB_DATABASE,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: "films",
+  port: '3306',
+});
 
 app.use(cors());
 
@@ -27,7 +39,7 @@ app.get("/findMovies", (req, res) => {
 });
 
 app.get("/findMovieIds", (req, res) => {
-  var query = "SELECT imdbId FROM links INNER JOIN movies ON movies.movieId = links.movieId";
+  var query = "SELECT imdbId FROM links INNER JOIN movies_titles ON movies_titles.movieId = links.movieId";
   connection.query(query, (err, result) => {
     res.send(result)
   });
@@ -43,6 +55,31 @@ app.get("/findMovieIds", (req, res) => {
    res.send
  });
 
+ app.get("/getTopRatedMovies", (req, res) => {
+  qResults.getTopRatedMovies(function(result){
+    console.log(result)
+    res.send(result)
+ });
+ res.send
+});
+
+app.get("/getPopularMovies", (req, res) => {
+  qResults.getPopularMovies(function(result){
+    console.log(result)
+    res.send(result)
+ });
+ res.send
+});
+
+app.get("/getPolarisingMovies", (req, res) => {
+  qResults.getPolarisingMovies(function(result){
+    console.log(result)
+    res.send(result)
+ });
+ res.send
+});
+
+
 app.get("/getGenre", (req, res) => {
   qResults.getGenre(function(result){
     console.log(result)
@@ -52,8 +89,6 @@ app.get("/getGenre", (req, res) => {
 });
 
 app.get("/getFilmInGenre", (req, res) => {
-  console.log(req.query)
-  console.log(req.query.query)
   let genre = req.query.query
   qResults.getFilmInGenre(genre, function(result){
      console.log(result)
@@ -62,12 +97,19 @@ app.get("/getFilmInGenre", (req, res) => {
   res.send
 });
 
-app.get("/firstQuery", (req, res) => {
-  console.log(req.query)
-  console.log(req.query.query)
-  let firstData = req.query.query
-  qResults.firstQuery(firstData, function(result){
-     console.log(result)
+// app.get("/firstQuery", (req, res) => {
+//   qResults.firstQuery(req.query.category, req.query.type, req.query.order, function(result){
+//     // qResults.firstQuery("*", "rating", "asc", function(result){
+//      console.log("ressslt", result)
+//      res.send(result)
+//   });
+//   res.send
+// });
+
+app.get("/firstQuerySorting", (req, res) => {
+  qResults.firstQuerySorting(req.query.genre, req.query.type, req.query.order, function(result){
+    // qResults.firstQuery(["", 2010, 2015],"year", "asc", function(result){
+     console.log("ressslt", result)
      res.send(result)
   });
   res.send
@@ -82,8 +124,16 @@ app.get("/secondQuery", (req, res) => {
 });
 
 
-app.get("/thirdQuery", (req, res) => {
-  qResults.thirdQuery(function(result){
+app.get("/thirdQueryPartOne", (req, res) => {
+  qResults.thirdQueryPartOne(function(result){
+     console.log(result)
+     res.send(result)
+  });
+  res.send
+});
+
+app.get("/thirdQueryPartTwo", (req, res) => {
+  qResults.thirdQueryPartTwo(function(result){
      console.log(result)
      res.send(result)
   });
@@ -116,6 +166,15 @@ app.get("/sixthQuery", (req, res) => {
   qResults.sixthQuery(sixthData,function(result){
      console.log(result)
      res.send(result)
+  });
+  res.send
+});
+
+app.get("/getReportData", (req, res) => {
+  let reportData = req.query.query;
+  qResults.getReportData(reportData, function(result){
+     console.log("reportData", result);
+     res.send(result);
   });
   res.send
 });

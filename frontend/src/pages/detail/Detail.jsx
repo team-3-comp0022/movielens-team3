@@ -9,11 +9,20 @@ import CastList from './CastList';
 import VideoList from './VideoList';
 
 import MovieList from '../../components/movie-list/MovieList';
+import axios from 'axios';
+import ReactSpeedometer from "react-d3-speedometer";
+import { PieChart } from 'react-minimal-pie-chart';
+// import BpkBarchart from 'bpk-component-barchart';
 
 /*
 
 1. Browsing visual lists of films in the database, allowing lists to be selected and sorted by user specified parameters.
     - Not applicable to this
+    - popularity by asc, desc - no of viewers
+    - rating asc, desc - rating
+    - movie name alphabetical order, asc, desc - alphabetical order
+    - release date, asc, desc - release date
+
 
 2. Searching for a known film to obtain a report on the viewer reaction to it (i.e., an interpreted report with aggregated
 viewer ratings, etc.).
@@ -25,6 +34,7 @@ viewer ratings, etc.).
 3. Reporting which are the most popular kinds of movies and which are the most polarising kinds of movie (extreme
 difference in ratings).
     - Not applicable to this
+    - Most poopular an 
 
 4. Predicting how a film will be rated after its release from the reactions of a small preview audience, i.e., taking a sub-set of
 the viewers for a particular movie in the data set and treating them as though they were people at a preview, is it possible
@@ -55,12 +65,47 @@ const Detail = () => {
             const response = await tmdbApi.detail(category, id, {params:{}});
             setItem(response);
 
-            const responseFromOurDb = await tmdbApi.getMovieInfo(id, {params:id});
-            setItems(responseFromOurDb);
+            function functionOne(_callback){
+                // do some asynchronus work 
+                _callback();
+            }
+
+            var responseFromOurDb = [];
+            
+            function functionTwo(){
+                // do some asynchronus work 
+                //responseFromOurDb = tmdbApi.getMovieInfo(id, {params:id});
+
+                responseFromOurDb = axios.get("http://localhost:3001/getReportData?query="+id, {params:id}).then((response) => {
+                    //RESPONSE IS THE IDS
+                    console.log("Hey")
+                    console.log(response);
+                    setItems(response.data);
+                });
+
+
+                functionOne(()=>{
+
+                });
+            }
+            
+            functionTwo();
+
             window.scrollTo(0,0);
         }
         getDetail();
     }, [category, id]);
+
+    const priceData = [
+        {
+            "day": "mon",
+            "price": 320
+        },
+        {
+            "day": "tus",
+            "price": 340
+          }
+      ];
 
     return (
         <>
@@ -68,7 +113,17 @@ const Detail = () => {
                 dbItems && item && (
                     <>
                         <div className="wrapper" style={{backgroundImage: `url(${apiConfig.originalImage(item.backdrop_path || item.poster_path)})`}}>
-                            
+                        <script>
+                            function log_console() {
+                                console.log(dbItems)
+                            }
+                            function log_console() {
+                                console.log(item)
+                            }
+                            function log_console() {
+                                console.log(dbItems[0])
+                            }
+                        </script>
                              
                             
                         {/* <div className="banner" style={{backgroundImage: `url(${apiConfig.originalImage(item.backdrop_path || item.poster_path)})`}}></div> */}
@@ -89,40 +144,152 @@ const Detail = () => {
                                 </div>
                                 <div className='rating-directors'>
                                 <div>
-                                    <h3 > RATING</h3>
-                                     <div className="score" style={{marginTop:10, marginLeft:15}}>{dbItems.rating}</div>
+                                    <h3 style={{marginLeft:35, marginBottom:10}} > RATING</h3>
+                                     <ReactSpeedometer
+                                        minValue={1}
+                                        maxValue={5}
+                                        value={dbItems[0][0][0].average_rating || 0}
+                                        needleColor="#666"
+                                        startColor="green"
+                                        segments={5}
+                                        endColor="blue"
+                                        width={150}
+                                        ringWidth={20}
+                                        height={250}
+                                        needleHeightRatio={0.7}
+                                        />
+                                        <h3 style={{marginLeft:70, marginBottom:10, marginTop:-180}} > {dbItems[0][0][0].average_rating || 0}</h3>
+                                {/* <div className="score" style={{marginTop:-170, marginLeft:60}}>{dbItems[0][0][0].average_rating || 0}</div> */}
+
                                 </div>
-                                
+
 
                                 <div className='director'>
-                                        <h3>DIRECTOR{item.directors}</h3>
+                                    <h3 style={{marginLeft:-5, marginBottom:10}}>PREDICTED RATING</h3>
+                                    <div style={{marginLeft:20}}>
+                                    <ReactSpeedometer
+                                        minValue={1}
+                                        maxValue={5}
+                                        value={dbItems[1][0].p_rating || 0}
+                                        needleColor="#666"
+                                        startColor="yellow"
+                                        segments={5}
+                                        endColor="red"
+                                        width={150}
+                                        ringWidth={20}
+                                        height={250}
+                                        needleHeightRatio={0.7}
+                                        />
+                                        </div>
+                                     <h3  style={{marginLeft:70, marginBottom:10, marginTop:-180}}>{dbItems[1][0].p_rating || 0}</h3>
+                                </div>
+
+                                 
+                                 </div>
+
+                                <div className='ratings'>
                                         {
-                                            item.directors && item.directors.slice(0, 5).map((director, i) => (
-                                                
-                                                <p >{director.name}</p>
+                                            dbItems && dbItems[0][1].map((r, i) => (
+                                                <p >No. of users with rating {r.rating}: {r.noOfRatings}</p>
                                             ))
                                         }
-                                        {/* {item.directors.map(director => ( <p key={director.credit_id}>{director.name}</p> ))} */}
-                                 </div>
+
+                                        {/* <PieChart
+                                        data={[
+                                            { title: 'One', value: 10, color: '#E38627' },
+                                            { title: 'Two', value: 15, color: '#C13C37' },
+                                            { title: 'Three', value: 20, color: '#6A2135' },
+                                        ]}
+                                        radius={10}
+                                        /> */}
+
+                                        {/* <BpkBarchart
+                                            xAxisLabel="Weekday"
+                                            yAxisLabel="Price (£)"
+                                            xScaleDataKey="day"
+                                            yScaleDataKey="price"
+                                            initialWidth={500}
+                                            initialHeight={300}
+                                            data={priceData}
+                                        /> */}
                                  </div>
 
                                  <div className="detailedRatings">
-                                    <h5>No. of users with rating 1: </h5>
-                                    <h5>No. of users with rating 2: </h5>
-                                    <h5>No. of users with rating 3: </h5>
-                                    <h5>No. of users with rating 4: </h5>
-                                    <h5>No. of users with rating 5: </h5>
-                                    <h5>Total no. of users: </h5>
-                                    <h5>Variance of the ratings: </h5>
+                                    <h3>RATINGS STATISTICS</h3>
+                                    <h5>Aggregate rating: {(dbItems[0][0][0] && dbItems[0][0][0].aggregate_Rating) || 0}</h5>              
+                                    <h5>Total no. of reviewers: {dbItems[1][0].total_viewers}</h5>              
+                                    <h5>Variance of the ratings: {(dbItems[0][0][0] && dbItems[0][0][0].variance_Rating) || 0}</h5>
                                     <br />
-                                    <h5>Predicted rating: </h5>
+
+                                    <h3>PREDICTED RATINGS</h3>
+                                    <h5>Actual Aggregate rating: {(dbItems[1][0] && dbItems[1][0].real_rating) || 0}</h5>
+                                    <h5>Predicted Aggregate rating: {(dbItems[1][0] && dbItems[1][0].predicted_rating) || 0}</h5>
                                     <br />
-                                    <h5>Predicted personality traits: </h5>
+                                    <h5>Actual Rating: {(dbItems[1][0] && dbItems[0][0][0].average_rating) || 0}</h5>
+                                    <h5>Predicted Rating: {(dbItems[1][0] && dbItems[1][0].p_rating) || 0}</h5>
                                     <br />
-                                    <h5>Predicted personality types: </h5>
+                                    <h5>Total no. of reviewers: {dbItems[1][0].total_viewers}</h5>              
+                                    <h5>No. of reviewers in subset: {dbItems[1][0].subset_viewers}</h5>              
+
+                                    <br />
+
+                                    <h3>PREDICTED PERSONALITY TRAITS</h3>
+                                    <h5>Actual Agreeableness: {(dbItems[2][0] && dbItems[2][0].actual_agreeableness) || 0}</h5>
+                                    <h5>Difference Agreeableness: {(dbItems[2][0] && dbItems[2][0].difference_agreeableness) || 0}</h5>
+                                    <h5>Predicted Agreeableness: {(dbItems[2][0] && dbItems[2][0].predicted_agreeableness) || 0}</h5>
+                                    <br />
+
+                                    <h5>Actual Conscientiousness: {(dbItems[2][0] && dbItems[2][0].actual_conscientiousness) || 0}</h5>
+                                    <h5>Difference Conscientiousness: {(dbItems[2][0] && dbItems[2][0].difference_conscientiousness) || 0}</h5>
+                                    <h5>Predicted Conscientiousness: {(dbItems[2][0] && dbItems[2][0].predicted_conscientiousness) || 0}</h5>
+                                    <br />
+
+                                    <h5>Actual Emotional Stability: {(dbItems[2][0] && dbItems[2][0].actual_emotional_stability) || 0}</h5>
+                                    <h5>Difference Emotional Stability: {(dbItems[2][0] && dbItems[2][0].difference_emotional_stability) || 0}</h5>
+                                    <h5>Predicted Emotional Stability: {(dbItems[2][0] && dbItems[2][0].predicted_emotional_stability) || 0}</h5>
+                                    <br />
+
+                                    <h5>Actual Extraversion: {(dbItems[2][0] && dbItems[2][0].actual_extraversion) || 0}</h5>
+                                    <h5>Difference Extraversion: {(dbItems[2][0] && dbItems[2][0].difference_extraversion) || 0}</h5>
+                                    <h5>Predicted Extraversion: {(dbItems[2][0] && dbItems[2][0].predicted_extraversion) || 0}</h5>
+                                    <br />
+
+                                    <h5>Actual Openness: {(dbItems[2][0] && dbItems[2][0].actual_openness) || 0}</h5>
+                                    <h5>Difference Openness: {(dbItems[2][0] && dbItems[2][0].difference_openness) || 0}</h5>
+                                    <h5>Predicted Openness: {(dbItems[2][0] && dbItems[2][0].predicted_openness) || 0}</h5>
+                                    <br />
+
+
+
+                                    <br />
+                                    <h3>PREDICTED PERSONALITY TYPES</h3>
+                                    <h5>Actual Agreeableness: {(dbItems[3][0] && dbItems[2][0].actual_agreeableness) || 0}</h5>
+                                    <h5>Difference Agreeableness: {(dbItems[3][0] && dbItems[2][0].difference_agreeableness) || 0}</h5>
+                                    <h5>Predicted Agreeableness: {(dbItems[3][0] && dbItems[2][0].predicted_agreeableness) || 0}</h5>
+                                    <br />
+
+                                    <h5>Actual Conscientiousness: {(dbItems[3][0] && dbItems[2][0].actual_conscientiousness) || 0}</h5>
+                                    <h5>Difference Conscientiousness: {(dbItems[3][0] && dbItems[2][0].difference_conscientiousness) || 0}</h5>
+                                    <h5>Predicted Conscientiousness: {(dbItems[3][0] && dbItems[2][0].predicted_conscientiousness) || 0}</h5>
+                                    <br />
+
+                                    <h5>Actual Emotional Stability: {(dbItems[3][0] && dbItems[2][0].actual_emotional_stability) || 0}</h5>
+                                    <h5>Difference Emotional Stability: {(dbItems[3][0] && dbItems[2][0].difference_emotional_stability) || 0}</h5>
+                                    <h5>Predicted Emotional Stability: {(dbItems[3][0] && dbItems[2][0].predicted_emotional_stability) || 0}</h5>
+                                    <br />
+
+                                    <h5>Actual Extraversion: {(dbItems[3][0] && dbItems[2][0].actual_extraversion) || 0}</h5>
+                                    <h5>Difference Extraversion: {(dbItems[3][0] && dbItems[2][0].difference_extraversion) || 0}</h5>
+                                    <h5>Predicted Extraversion: {(dbItems[3][0] && dbItems[2][0].predicted_extraversion) || 0}</h5>
+                                    <br />
+
+                                    <h5>Actual Openness: {(dbItems[3][0] && dbItems[2][0].actual_openness) || 0}</h5>
+                                    <h5>Difference Openness: {(dbItems[3][0] && dbItems[2][0].difference_openness) || 0}</h5>
+                                    <h5>Predicted Openness: {(dbItems[3][0] && dbItems[2][0].predicted_openness) || 0}</h5>
 
 
                                 </div>
+
 
                                 <h3 > PLOT</h3>
                                 <div className="overview" >{item.overview}</div>
