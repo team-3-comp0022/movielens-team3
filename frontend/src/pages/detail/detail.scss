@@ -1,4 +1,10 @@
 @use "../../scss/" as *;
+.col {
+    width:100px;
+    // position: relative;
+    background-color: rgba(43, 40, 40);
+    text-align: center;
+}
 
 .banner {
     height: 50vh;
@@ -32,7 +38,7 @@
     display: flex;
     max-width: var(--maxWidth);
     margin: 0 auto;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.3);
     border-radius: 20px;
     padding:10px;
 
@@ -100,7 +106,7 @@
     display: flex;
     // max-width: var(--maxWidth);
     // margin: 0 auto;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.9);
     border-radius: 20px;
     
 

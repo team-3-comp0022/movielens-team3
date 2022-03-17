@@ -94,10 +94,39 @@ const Home = () => {
         order: order_arg
       }
        var getFilms = axios.get('http://localhost:3001/firstQuerySorting?genre=' + params.genre + "&type=" + params.type + "&order=" + params.order);
-       console.log("pnm", getFilms);        
-
         getFilms.then(value => {  
             
+            for(var i=0; i< 50; i++)
+                result.splice(i, 0, value.data[i]);
+            
+            const params2 = {};
+            getIndexes = tmdbApi.getMoviesFromOurDatabase(result, {params2});
+            var sp = [];
+            for (var i = 0; i < 50; i++) {  
+                getIndexes[i].then(value => {  
+                    sp.splice(i, 0, value.movie_results[0]);
+                    setItems([items, ...sp]);
+                }); 
+            }    
+                                
+            response = {page:1, results: sp, total_pages: 4, total_results: value.data.length};                   
+        });
+    }
+
+    function filtering(category_arg, type_arg) {
+        var result = [];
+        var getIndexes = [];
+        let response = null;
+        var params = {
+        category: category_arg, //[2010, 2020]
+        type: type_arg
+        }
+
+        console.log("second", category_arg);
+        var getFilms = axios.get('http://localhost:3001/firstQueryFiltering?category=' + params.category + "&type=" + params.type);
+        console.log("my films", getFilms);
+
+        getFilms.then(value => {  
             for(var i=0; i< 50; i++)
                 result.splice(i, 0, value.data[i]);
             
@@ -122,9 +151,7 @@ const Home = () => {
         let response = null;
       if(renderCase == "all"){
         var getFilms =  axios.get('http://localhost:3001/findMovieIds');
-      }
-      console.log("pnm", getFilms);        
-
+      }     
       getFilms.then(value => {  
             
             for(var i=0; i< 50; i++)
@@ -132,7 +159,6 @@ const Home = () => {
             
             const params2 = {};
             getIndexes = tmdbApi.getMoviesFromOurDatabase(result, {params2});
-            console.log("params", getIndexes);
             var sp = [];
             for (var i = 0; i < 50; i++) {  
                 getIndexes[i].then(value => {  
@@ -155,7 +181,7 @@ const Home = () => {
                 <div className="section mb-3">
                     <div className="section__header mb-2">
                         <h2> All Available Movies </h2>
-                        <div class="dropdown">
+                        <div class="dropdown"  style={{ marginLeft:270}}>
                                 <button class="dropbtn">Sort list of movies
                                 <i className="bx bx-caret-down"></i>
                                 </button>
@@ -173,8 +199,52 @@ const Home = () => {
                                 </div>
                     </div>
 
+                    <div class="dropdown"  style={{ marginLeft:460}}>
+                                <button class="dropbtn"> Filter movies by genre
+                                      <i className="bx bx-caret-down"></i>
+                                </button>
+                                
+                                <div class="dropdown-content">
+                                { 
+                                genres.map((item, i) => (
+                                            <a onClick={() => filtering(item, "genre")}> {item}</a>
+                                        ))
+                                }       
+                                </div>
+                    </div>
+
+                    <div class="dropdown"  style={{ marginLeft:690}}>
+                                <button class="dropbtn">Filter movies by rating
+                                <i className="bx bx-caret-down"></i>
+                                </button>
+                                
+                                <div class="dropdown-content">
+                                    <a onClick={() => filtering("1", "rating")}> Above rating 1</a>
+                                    <a onClick={() => filtering("2", "rating")}>Above rating 2</a>
+                                    <a onClick={() => filtering("3", "rating")}>Above rating 3</a>
+                                    <a onClick={() => filtering("4", "rating")}>Above rating 4</a>
+                                    <a onClick={() => filtering("5", "rating")}>Above rating 5</a>
+                                </div>
+                    </div>
+
+
+                    <div class="dropdown"  style={{ marginLeft:920}}>
+                                <button class="dropbtn">Filter movies by release years
+                                <i className="bx bx-caret-down"></i>
+                                </button>
+                                <div class="dropdown-content">
+                                     <a >View movies between your chosen year and 2022</a>
+                                     <input type="number" id="minYear" name="quantity" min="1970" max="2022"  style={{marginLeft:80, backgroundColor:'red'}} onChange={() => filtering([document.getElementById("minYear").value, 2022], "year")}></input>
+                                     <a >View movies between 1970 and your chosen year</a>
+                                     <input type="number" id="maxYear" name="quantity" min="1970" max="2022"  style={{marginLeft:80, backgroundColor:'red', marginBottom:10}} onChange={() => filtering([1970, document.getElementById("maxYear").value], "year")}></input>
+                                </div>
+
+                                
+                    </div>
+                   
+                                    
                         <Link to="/movie">
-                            <OutlineButton className="small">View more</OutlineButton>
+                            <OutlineButton className="small" style={{marginTop:190}}>View more</OutlineButton>
                         </Link>
                     </div>
                     <div className="movie-list">
@@ -289,7 +359,7 @@ const Home = () => {
                    <div className="section mb-3">
                    <div className="section__header mb-2">
                        <h2>All {item} Movies</h2>
-                       <div class="dropdown">
+                       <div class="dropdown" style={{ marginLeft:1000}}>
                                 <button class="dropbtn">Sort list of movies
                                 <i className="bx bx-caret-down"></i>
                                 </button>

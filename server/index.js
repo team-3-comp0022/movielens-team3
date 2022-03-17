@@ -115,6 +115,17 @@ app.get("/firstQuerySorting", (req, res) => {
   res.send
 });
 
+
+app.get("/firstQueryFiltering", (req, res) => {
+  console.log("reqqq", req.query.category)
+  qResults.firstQueryFiltering(req.query.category, req.query.type, function(result){
+    // qResults.firstQueryFiltering([2010, 2015],"year", function(result){
+     console.log("ressslt", result)
+     res.send(result)
+  });
+  res.send
+});
+
 app.get("/secondQuery", (req, res) => {
   qResults.secondQuery(req.query.query, function(result){
      console.log(result)
