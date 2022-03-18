@@ -24,6 +24,10 @@ var connection = mysql.createConnection({
   password: process.env.DB_PASSWORD,
   database: "films",
   port: '3306',
+  TTL: 0,
+  connectionLimit: 100, 
+  verbose: true, 
+  caching: true 
 });
 
 app.use(cors());

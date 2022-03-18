@@ -123,25 +123,25 @@ const Detail = () => {
                 (responseFromOurDb.data[2][0] && responseFromOurDb.data[2][0].predicted_openness) || 0,
              ]
              var barItemsTemp2 = [
-             (responseFromOurDb.data[3][0] && responseFromOurDb.data[2][0].actual_agreeableness) || 0,
-             (responseFromOurDb.data[3][0] && responseFromOurDb.data[2][0].difference_agreeableness) || 0,
-             (responseFromOurDb.data[3][0] && responseFromOurDb.data[2][0].predicted_agreeableness) || 0,
+             (responseFromOurDb.data[3][0] && responseFromOurDb.data[3][0][0].real_agreeableness) || 0,
+             (responseFromOurDb.data[3][0] && responseFromOurDb.data[3][0][0].diff_agreeableness) || 0,
+             (responseFromOurDb.data[3][0] && responseFromOurDb.data[3][0][0].predicted_agreeableness) || 0,
 
-             (responseFromOurDb.data[3][0] && responseFromOurDb.data[2][0].actual_conscientiousness) || 0,
-             (responseFromOurDb.data[3][0] && responseFromOurDb.data[2][0].difference_conscientiousness) || 0,
-             (responseFromOurDb.data[3][0] && responseFromOurDb.data[2][0].predicted_conscientiousness) || 0,
+             (responseFromOurDb.data[3][0] && responseFromOurDb.data[3][0][0].real_conscientiousness) || 0,
+             (responseFromOurDb.data[3][0] && responseFromOurDb.data[3][0][0].diff_conscientiousness) || 0,
+             (responseFromOurDb.data[3][0] && responseFromOurDb.data[3][0][0].predicted_conscientiousness) || 0,
 
-             (responseFromOurDb.data[3][0] && responseFromOurDb.data[2][0].actual_emotional_stability) || 0,
-             (responseFromOurDb.data[3][0] && responseFromOurDb.data[2][0].difference_emotional_stability) || 0,
-             (responseFromOurDb.data[3][0] && responseFromOurDb.data[2][0].predicted_emotional_stability) || 0,
+             (responseFromOurDb.data[3][0] && responseFromOurDb.data[3][0][0].real_emotional_stability) || 0,
+             (responseFromOurDb.data[3][0] && responseFromOurDb.data[3][0][0].diff_emotional_stability) || 0,
+             (responseFromOurDb.data[3][0] && responseFromOurDb.data[3][0][0].predicted_emotional_stability) || 0,
 
-             (responseFromOurDb.data[3][0] && responseFromOurDb.data[2][0].actual_extraversion) || 0,
-             (responseFromOurDb.data[3][0] && responseFromOurDb.data[2][0].difference_extraversion) || 0,
-             (responseFromOurDb.data[3][0] && responseFromOurDb.data[2][0].predicted_extraversion) || 0,
+             (responseFromOurDb.data[3][0] && responseFromOurDb.data[3][0][0].real_extraversion) || 0,
+             (responseFromOurDb.data[3][0] && responseFromOurDb.data[3][0][0].diff_extraversion) || 0,
+             (responseFromOurDb.data[3][0] && responseFromOurDb.data[3][0][0].predicted_extraversion) || 0,
 
-             (responseFromOurDb.data[3][0] && responseFromOurDb.data[2][0].actual_openness) || 0,
-             (responseFromOurDb.data[3][0] && responseFromOurDb.data[2][0].difference_openness) || 0,
-             (responseFromOurDb.data[3][0] && responseFromOurDb.data[2][0].predicted_openness) || 0,
+             (responseFromOurDb.data[3][0] && responseFromOurDb.data[3][0][0].real_openness) || 0,
+             (responseFromOurDb.data[3][0] && responseFromOurDb.data[3][0][0].diff_openness) || 0,
+             (responseFromOurDb.data[3][0] && responseFromOurDb.data[3][0][0].predicted_openness) || 0,
              ]
 
             setBarItems(barItemsTemp);
@@ -327,29 +327,29 @@ const Detail = () => {
     </div>  
                                     <br />
                                     <h3>PREDICTED PERSONALITY TYPES</h3>
-                                    <h5 className="genres__item"  style={{backgroundColor:"rgba(255, 159, 64, 0.4)"}}> Actual Agreeableness: {(dbItems[3][0] && dbItems[2][0].actual_agreeableness) || 0}</h5>
-                                    <h5 className="genres__item"  style={{backgroundColor:"rgba(54, 162, 235, 0.4)"}}>Difference Agreeableness: {(dbItems[3][0] && dbItems[2][0].difference_agreeableness) || 0}</h5>
-                                    <h5 className="genres__item"  style={{backgroundColor:"rgba(153, 102, 255, 0.4)"}}>Predicted Agreeableness: {(dbItems[3][0] && dbItems[2][0].predicted_agreeableness) || 0}</h5>
+                                    <h5 className="genres__item"  style={{backgroundColor:"rgba(255, 159, 64, 0.4)"}}> Actual Agreeableness: {(dbItems[3][0] && dbItems[3][0][0].real_agreeableness) || 0}</h5>
+                                    <h5 className="genres__item"  style={{backgroundColor:"rgba(54, 162, 235, 0.4)"}}>Difference Agreeableness: {(dbItems[3][0] && dbItems[3][0][0].diff_agreeableness) || 0}</h5>
+                                    <h5 className="genres__item"  style={{backgroundColor:"rgba(153, 102, 255, 0.4)"}}>Predicted Agreeableness: {(dbItems[3][0] && dbItems[3][0][0].predicted_agreeableness) || 0}</h5>
                                     <br />
 
-                                    <h5 className="genres__item"  style={{backgroundColor:"rgba(255, 159, 64, 0.4)"}}>Actual Conscientiousness: {(dbItems[3][0] && dbItems[2][0].actual_conscientiousness) || 0}</h5>
-                                    <h5 className="genres__item"  style={{backgroundColor:"rgba(54, 162, 235, 0.4)"}}>Difference Conscientiousness: {(dbItems[3][0] && dbItems[2][0].difference_conscientiousness) || 0}</h5>
-                                    <h5 className="genres__item"  style={{backgroundColor:"rgba(153, 102, 255, 0.4)"}}>Predicted Conscientiousness: {(dbItems[3][0] && dbItems[2][0].predicted_conscientiousness) || 0}</h5>
+                                    <h5 className="genres__item"  style={{backgroundColor:"rgba(255, 159, 64, 0.4)"}}>Actual Conscientiousness: {(dbItems[3][0] && dbItems[3][0][0].real_conscientiousness) || 0}</h5>
+                                    <h5 className="genres__item"  style={{backgroundColor:"rgba(54, 162, 235, 0.4)"}}>Difference Conscientiousness: {(dbItems[3][0] && dbItems[3][0][0].diff_conscientiousness) || 0}</h5>
+                                    <h5 className="genres__item"  style={{backgroundColor:"rgba(153, 102, 255, 0.4)"}}>Predicted Conscientiousness: {(dbItems[3][0] && dbItems[3][0][0].predicted_conscientiousness) || 0}</h5>
                                     <br />
 
-                                    <h5 className="genres__item"  style={{backgroundColor:"rgba(255, 159, 64, 0.4)"}}>Actual Emotional Stability: {(dbItems[3][0] && dbItems[2][0].actual_emotional_stability) || 0}</h5>
-                                    <h5 className="genres__item"  style={{backgroundColor:"rgba(54, 162, 235, 0.4)"}}>Difference Emotional Stability: {(dbItems[3][0] && dbItems[2][0].difference_emotional_stability) || 0}</h5>
-                                    <h5 className="genres__item"  style={{backgroundColor:"rgba(153, 102, 255, 0.4)"}}>Predicted Emotional Stability: {(dbItems[3][0] && dbItems[2][0].predicted_emotional_stability) || 0}</h5>
+                                    <h5 className="genres__item"  style={{backgroundColor:"rgba(255, 159, 64, 0.4)"}}>Actual Emotional Stability: {(dbItems[3][0] && dbItems[3][0][0].real_emotional_stability) || 0}</h5>
+                                    <h5 className="genres__item"  style={{backgroundColor:"rgba(54, 162, 235, 0.4)"}}>Difference Emotional Stability: {(dbItems[3][0] && dbItems[3][0][0].diff_emotional_stability) || 0}</h5>
+                                    <h5 className="genres__item"  style={{backgroundColor:"rgba(153, 102, 255, 0.4)"}}>Predicted Emotional Stability: {(dbItems[3][0] && dbItems[3][0][0].predicted_emotional_stability) || 0}</h5>
                                     <br />
 
-                                    <h5 className="genres__item"  style={{backgroundColor:"rgba(255, 159, 64, 0.4)"}}>Actual Extraversion: {(dbItems[3][0] && dbItems[2][0].actual_extraversion) || 0}</h5>
-                                    <h5 className="genres__item"  style={{backgroundColor:"rgba(54, 162, 235, 0.4)"}}>Difference Extraversion: {(dbItems[3][0] && dbItems[2][0].difference_extraversion) || 0}</h5>
-                                    <h5 className="genres__item"  style={{backgroundColor:"rgba(153, 102, 255, 0.4)"}}>Predicted Extraversion: {(dbItems[3][0] && dbItems[2][0].predicted_extraversion) || 0}</h5>
+                                    <h5 className="genres__item"  style={{backgroundColor:"rgba(255, 159, 64, 0.4)"}}>Actual Extraversion: {(dbItems[3][0] && dbItems[3][0][0].real_extraversion) || 0}</h5>
+                                    <h5 className="genres__item"  style={{backgroundColor:"rgba(54, 162, 235, 0.4)"}}>Difference Extraversion: {(dbItems[3][0] && dbItems[3][0][0].diff_extraversion) || 0}</h5>
+                                    <h5 className="genres__item"  style={{backgroundColor:"rgba(153, 102, 255, 0.4)"}}>Predicted Extraversion: {(dbItems[3][0] && dbItems[3][0][0].predicted_extraversion) || 0}</h5>
                                     <br />
 
-                                    <h5 className="genres__item"  style={{backgroundColor:"rgba(255, 159, 64, 0.4)"}}>Actual Openness: {(dbItems[3][0] && dbItems[2][0].actual_openness) || 0}</h5>
-                                    <h5 className="genres__item"  style={{backgroundColor:"rgba(54, 162, 235, 0.4)"}}>Difference Openness: {(dbItems[3][0] && dbItems[2][0].difference_openness) || 0}</h5>
-                                    <h5 className="genres__item"  style={{backgroundColor:"rgba(153, 102, 255, 0.4)"}}>Predicted Openness: {(dbItems[3][0] && dbItems[2][0].predicted_openness) || 0}</h5>
+                                    <h5 className="genres__item"  style={{backgroundColor:"rgba(255, 159, 64, 0.4)"}}>Actual Openness: {(dbItems[3][0] && dbItems[3][0][0].real_openness) || 0}</h5>
+                                    <h5 className="genres__item"  style={{backgroundColor:"rgba(54, 162, 235, 0.4)"}}>Difference Openness: {(dbItems[3][0] && dbItems[3][0][0].diff_openness) || 0}</h5>
+                                    <h5 className="genres__item"  style={{backgroundColor:"rgba(153, 102, 255, 0.4)"}}>Predicted Openness: {(dbItems[3][0] && dbItems[3][0][0].predicted_openness) || 0}</h5>
 
         <Bar 
         data={{
