@@ -382,7 +382,7 @@ where (70/100 * @counter) <= counter)) top_30;`;
 
 // WHERE user_like.userId = P.userid) people_like; `;
 
-const case_six = `
+const case_six_part_one = `
 SELECT COALESCE(top_70.openness,0) as predicted_openness, COALESCE(top_30.openness,0) as actual_openness, ABS(COALESCE(top_70.openness,0) - COALESCE(top_30.openness,0)) as difference_openness, COALESCE(top_70.agreeableness,0) as predicted_agreeableness, COALESCE(top_30.agreeableness,0) as actual_agreeableness, ABS(COALESCE(top_70.agreeableness,0) - COALESCE(top_30.agreeableness,0)) as difference_agreeableness, COALESCE(top_70.emotional_stability,0) as predicted_emotional_stability, COALESCE(top_30.emotional_stability,0) as actual_emotional_stability, ABS(COALESCE(top_70.emotional_stability,0) - COALESCE(top_30.emotional_stability,0)) as difference_emotional_stability, COALESCE(top_70.conscientiousness,0) as predicted_conscientiousness,  COALESCE(top_30.conscientiousness,0) as actual_conscientiousness, ABS(COALESCE(top_70.conscientiousness,0) - COALESCE(top_30.conscientiousness,0)) as difference_conscientiousness, COALESCE(top_70.extraversion,0) as predicted_extraversion, COALESCE(top_30.extraversion,0) as actual_extraversion, ABS(COALESCE(top_70.extraversion,0) -  COALESCE(top_30.extraversion,0)) as difference_extraversion ,
 ABS(COALESCE(top_70.openness,0) - COALESCE(top_30.openness,0))/COALESCE(top_30.openness,1) as openAcc, 
 ABS(COALESCE(top_70.agreeableness,0) - COALESCE(top_30.agreeableness,0))/COALESCE(top_30.agreeableness,1) as agreeAcc, 
@@ -403,6 +403,19 @@ FROM (SELECT R.userId as userid, @counter := @counter +1 AS counter
     FROM (select @counter:=0) AS var, (SELECT DISTINCT R.userId FROM films.ratings_personality R, films.movies_titles M ,films.links lk WHERE lk.imdbId = ? AND lk.movieId = M.movieId AND R.movie_id = M.movieId AND R.rating >= 4) R  
     ORDER BY R.userid DESC) AS X    
 where (70/100 * @counter) <= counter)) top_30;`;
+
+const case_six_part_two = `SELECT most_associated_trait.tag, most_associated_trait.highest_value_column_name
+FROM (SELECT tag_personality_traits.tag as tag, @highest_val:=GREATEST(tag_personality_traits.openness, tag_personality_traits.agreeableness,tag_personality_traits.emotional_stability,tag_personality_traits.conscientiousness,tag_personality_traits.extraversion) AS highest_col_value,
+CASE @highest_val WHEN tag_personality_traits.openness THEN 'openness'
+WHEN tag_personality_traits.agreeableness THEN 'agreeableness'
+WHEN tag_personality_traits.emotional_stability THEN 'emotional_stability'
+WHEN tag_personality_traits.conscientiousness THEN 'conscientiousness'
+WHEN tag_personality_traits.extraversion THEN 'extraversion'
+END AS highest_value_column_name
+FROM (SELECT AVG(P.openness) as openness, AVG(P.agreeableness) As agreeableness, AVG(P.emotional_stability) AS emotional_stability, AVG(P.conscientiousness) AS conscientiousness, AVG(P.extraversion) AS extraversion, d_tags.tag AS tag
+FROM films.personality_user P, films.personality_predictions_movies PR, (SELECT T.movieId, T.tag FROM tags T, links lk, (SELECT DISTINCT T.tag FROM tags T, links lk WHERE T.movieId = lk.movieId AND lk.imdbId = ?) tags WHERE T.movieId = lk.movieId AND lk.imdbId != ? AND T.tag = tags.tag) d_tags
+WHERE P.userid =PR.userid and PR.all_movies = d_tags.movieId
+GROUP BY d_tags.tag) tag_personality_traits) most_associated_trait;`;
 
 const getGenres = `
 SELECT DISTINCT(genre) FROM films.movies_genres_sep
@@ -458,7 +471,8 @@ module.exports = {
     case_three_part_two, 
     case_four,
     case_five,
-    case_six, 
+    case_six_part_one,
+    case_six_part_two, 
     create_movies_genre, 
     create_movies_title, 
     create_movies_genres_sep, 

@@ -65,7 +65,7 @@ getReportData(862, function(result){
 });
 */
 
-// initialise_data()
+initialise_data()
 // deleteTables()
 
 //TESTNG FIFTH QUEREY AND SIXTH QUERY
@@ -599,16 +599,52 @@ function fifthQuery(title, callback){
     })
 }
 
-function sixthQuery(title, callback){
+function sixthQueryOne(title, callback){
     
-    let caseSix = queries.case_six
-    connection.query(caseSix,[title,title,title], function (err, rows, fields) {
+    let caseSixOne = queries.case_six_part_one
+    connection.query(caseSixOne,[title,title,title], function (err, rows, fields) {
         if (err) throw err
     
         console.log('Success')
         return callback(rows);
     })
 }
+
+function sixthQueryTwo(title, callback){
+    
+    let caseSixTwo = queries.case_six_part_two
+    connection.query(caseSixTwo, [title,title,title], function (err, rows, fields) {
+        if (err) throw err
+    
+        console.log('Success')
+        return callback(rows);
+    })
+}
+
+function sixthQuery(val, callback){
+    first=[]
+    second=[]
+    sixthQueryOne(val, function(result){
+        first = result;
+        console.log(first)
+        sixthQueryTwo(val, function(result){
+            second = result;
+            console.log(first, second)
+            return callback([first, second])
+         });
+     });
+}
+
+// function sixthQuery(title, callback){
+    
+//     let caseSix = queries.case_six
+//     connection.query(caseSix,[title,title,title], function (err, rows, fields) {
+//         if (err) throw err
+    
+//         console.log('Success')
+//         return callback(rows);
+//     })
+// }
 
 function getGenre(callback){
     
