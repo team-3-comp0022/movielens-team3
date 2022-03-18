@@ -298,7 +298,7 @@ FROM films.ratings R, films.movies_titles MT, films.links lk
 WHERE R.movieId = MT.movieId AND MT.movieId=lk.movieId AND lk.tmdbId= ?) as user_count, (SELECT X.userid, X.RATING  
 FROM    (  
     SELECT R.userId as userid, @counter := @counter +1 AS counter, R.rating as RATING  
-    FROM (select @counter:=0) AS var, (SELECT R.userId, R.rating FROM films.ratings R, films.movies_titles MT, films.links lk WHERE R.movieId = MT.movieId AND MT.movieId=lk.movieId AND lk.imdbId= ? ORDER BY R.timestamp) R  
+    FROM (select @counter:= -1) AS var, (SELECT R.userId, R.rating FROM films.ratings R, films.movies_titles MT, films.links lk WHERE R.movieId = MT.movieId AND MT.movieId=lk.movieId AND lk.imdbId= ? ORDER BY R.timestamp) R  
 ) AS X  
 where (20/100 * @counter) >= counter) top_20
 GROUP BY user_count.all_users;
