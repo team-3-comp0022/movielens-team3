@@ -39,7 +39,9 @@ var connection = mysql.createConnection({
 // `
 
 function initialise_data(){
-    deleteTables()
+    deleteDatabase()
+    makeDatabase()
+    useDatabase()
     makeTables()
     addData()
     const sleep = (waitTimeInMs) => new Promise(resolve => setTimeout(resolve, waitTimeInMs));
@@ -171,6 +173,35 @@ function test(){
     //console.log(rows[0])
     console.log('The solution is: ', rows[0].solution)
     })
+}
+
+/*create database */
+function makeDatabase(){
+    const create_database = queries.create_database
+    connection.query(create_database, function (err, rows, fields) {
+        if (err) throw err
+        
+        console.log('Successfully create database')
+    });
+}
+
+/*delete database */
+function deleteDatabase(){
+    const drop_database = queries.drop_database
+    connection.query(drop_database, function (err, rows, fields) {
+        if (err) throw err
+        
+        console.log('Successfully dropped database')
+    });
+}
+
+function useDatabase(){
+    const use_database = queries.select_database
+    connection.query(use_database, function (err, rows, fields) {
+        if (err) throw err
+        
+        console.log('Successfully dropped database')
+    });
 }
 
 /* create tables */
