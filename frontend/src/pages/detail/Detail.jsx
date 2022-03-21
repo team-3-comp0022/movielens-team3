@@ -105,27 +105,27 @@ const Detail = () => {
                 (responseFromOurDb.data[2][0] && responseFromOurDb.data[2][0].actual_agreeableness) || 0,
                 (responseFromOurDb.data[2][0] && responseFromOurDb.data[2][0].difference_agreeableness) || 0,
                 (responseFromOurDb.data[2][0] && responseFromOurDb.data[2][0].predicted_agreeableness) || 0,
-                (responseFromOurDb.data[2][0] && responseFromOurDb.data[2][0].agreeAcc) && responseFromOurDb.data[2][0].agreeAcc * 100 || 0,
+                //(responseFromOurDb.data[2][0] && responseFromOurDb.data[2][0].agreeAcc) && responseFromOurDb.data[2][0].agreeAcc * 100 || 0,
 
                 (responseFromOurDb.data[2][0] && responseFromOurDb.data[2][0].actual_conscientiousness) || 0,
                 (responseFromOurDb.data[2][0] && responseFromOurDb.data[2][0].difference_conscientiousness) || 0,
                 (responseFromOurDb.data[2][0] && responseFromOurDb.data[2][0].predicted_conscientiousness) || 0,
-                (responseFromOurDb.data[2][0] && responseFromOurDb.data[2][0].conAcc) && responseFromOurDb.data[2][0].conAcc * 100 || 0,
+                //(responseFromOurDb.data[2][0] && responseFromOurDb.data[2][0].conAcc) && responseFromOurDb.data[2][0].conAcc * 100 || 0,
 
                 (responseFromOurDb.data[2][0] && responseFromOurDb.data[2][0].actual_emotional_stability) || 0,
                 (responseFromOurDb.data[2][0] && responseFromOurDb.data[2][0].difference_emotional_stability) || 0,
                 (responseFromOurDb.data[2][0] && responseFromOurDb.data[2][0].predicted_emotional_stability) || 0,
-                (responseFromOurDb.data[2][0] && responseFromOurDb.data[2][0].emoAcc) && responseFromOurDb.data[2][0].emoAcc * 100 || 0,
+                //(responseFromOurDb.data[2][0] && responseFromOurDb.data[2][0].emoAcc) && responseFromOurDb.data[2][0].emoAcc * 100 || 0,
 
                 (responseFromOurDb.data[2][0] && responseFromOurDb.data[2][0].actual_extraversion) || 0,
                 (responseFromOurDb.data[2][0] && responseFromOurDb.data[2][0].difference_extraversion) || 0,
                 (responseFromOurDb.data[2][0] && responseFromOurDb.data[2][0].predicted_extraversion) || 0,
-                (responseFromOurDb.data[2][0] && responseFromOurDb.data[2][0].extrAcc) && responseFromOurDb.data[2][0].extrAcc * 100 || 0,
+                //(responseFromOurDb.data[2][0] && responseFromOurDb.data[2][0].extrAcc) && responseFromOurDb.data[2][0].extrAcc * 100 || 0,
 
                 (responseFromOurDb.data[2][0] && responseFromOurDb.data[2][0].actual_openness) || 0,
                 (responseFromOurDb.data[2][0] && responseFromOurDb.data[2][0].difference_openness) || 0,
                 (responseFromOurDb.data[2][0] && responseFromOurDb.data[2][0].predicted_openness) || 0,
-                (responseFromOurDb.data[2][0] && responseFromOurDb.data[2][0].openAcc) && responseFromOurDb.data[2][0].openAcc * 100 || 0,
+                //(responseFromOurDb.data[2][0] && responseFromOurDb.data[2][0].openAcc) && responseFromOurDb.data[2][0].openAcc * 100 || 0,
              ]
              var barItemsTemp2 = [
              (responseFromOurDb.data[3][0] && responseFromOurDb.data[3][0][0].real_agreeableness) || 0,
