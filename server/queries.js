@@ -436,6 +436,22 @@ GROUP BY lk.imdbId
 ORDER BY Polarity DESC; 
 `;
 
+const alter_foreign_key_list = [`ALTER TABLE personality_predictions_movies
+ADD FOREIGN KEY (userid) REFERENCES personality_user(userid);`,
+`ALTER TABLE ratings_personality
+ADD FOREIGN KEY (userid) REFERENCES personality_user(userid);`,
+`ALTER TABLE movies_titles
+ADD FOREIGN KEY (movieId) REFERENCES links(movieId);`,
+`ALTER TABLE movie_years
+ADD FOREIGN KEY (movieId) REFERENCES links(movieId);`,
+`ALTER TABLE movies_genres_sep
+ADD FOREIGN KEY (movieId) REFERENCES links(movieId);`,
+`ALTER TABLE ratings
+ADD FOREIGN KEY (movieId) REFERENCES links(movieId);`,
+`ALTER TABLE tags
+ADD FOREIGN KEY (movieId) REFERENCES links(movieId);`
+];
+
 module.exports = {
     create_list, 
     drop_all,
@@ -478,5 +494,6 @@ module.exports = {
     drop_personality_data,
     drop_database,
     create_database,
-    select_database
+    select_database,
+    alter_foreign_key_list
 }

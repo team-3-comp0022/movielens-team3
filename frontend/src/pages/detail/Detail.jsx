@@ -266,7 +266,7 @@ const Detail = () => {
                                     <h5>Total no. of reviewers: {dbItems[1][0].total_viewers}</h5>              
                                     <h5>No. of reviewers in subset: {dbItems[1][0].subset_viewers}</h5> 
                                     <br />
-                                    <h5>Accuracy of prediction: {dbItems[1][0].Accuracy && dbItems[1][0].Accuracy * 100 || 0}%</h5>              
+                                    <h5>Margin of error: {dbItems[1][0].Accuracy && dbItems[1][0].Accuracy * 100 || 0}%</h5>              
 
                                     <br />
 
@@ -274,31 +274,31 @@ const Detail = () => {
                                     <h5 className="genres__item"  style={{backgroundColor:"rgba(255, 99, 132, 0.4)"}}>Actual Agreeableness: {(dbItems[2][0] && dbItems[2][0].actual_agreeableness) || 0}</h5>
                                     <h5 className="genres__item"  style={{backgroundColor:"rgba(255, 205, 86, 0.4)"}}>Difference Agreeableness: {(dbItems[2][0] && dbItems[2][0].difference_agreeableness) || 0}</h5>
                                     <h5 className="genres__item"  style={{backgroundColor:"rgba(75, 192, 192, 0.4)"}}>Predicted Agreeableness: {(dbItems[2][0] && dbItems[2][0].predicted_agreeableness) || 0}</h5>
-                                    <h5 className="genres__item"  style={{backgroundColor:"rgba(75, 192, 192, 0.4)"}}>Accuracy: {(dbItems[2][0] && dbItems[2][0].agreeAcc) * 100 || 0}%</h5>
+                                    <h5 className="genres__item"  style={{backgroundColor:"rgba(75, 192, 192, 0.4)"}}>Margin of error: {(dbItems[2][0] && dbItems[2][0].agreeAcc) * 100 || 0}%</h5>
                                     <br />
 
                                     <h5 className="genres__item"  style={{backgroundColor:"rgba(255, 99, 132, 0.4)"}}>Actual Conscientiousness: {(dbItems[2][0] && dbItems[2][0].actual_conscientiousness) || 0}</h5>
                                     <h5 className="genres__item"  style={{backgroundColor:"rgba(255, 205, 86, 0.4)"}}>Difference Conscientiousness: {(dbItems[2][0] && dbItems[2][0].difference_conscientiousness) || 0}</h5>
                                     <h5 className="genres__item"  style={{backgroundColor:"rgba(75, 192, 192, 0.4)"}}>Predicted Conscientiousness: {(dbItems[2][0] && dbItems[2][0].predicted_conscientiousness) || 0}</h5>
-                                    <h5 className="genres__item"  style={{backgroundColor:"rgba(75, 192, 192, 0.4)"}}>Accuracy: {(dbItems[2][0] && dbItems[2][0].conAcc) * 100 || 0}%</h5>
+                                    <h5 className="genres__item"  style={{backgroundColor:"rgba(75, 192, 192, 0.4)"}}>Margin of error: {(dbItems[2][0] && dbItems[2][0].conAcc) * 100 || 0}%</h5>
                                     <br />
 
                                     <h5 className="genres__item"  style={{backgroundColor:"rgba(255, 99, 132, 0.4)"}}>Actual Emotional Stability: {(dbItems[2][0] && dbItems[2][0].actual_emotional_stability) || 0}</h5>
                                     <h5 className="genres__item"  style={{backgroundColor:"rgba(255, 205, 86, 0.4)"}}>Difference Emotional Stability: {(dbItems[2][0] && dbItems[2][0].difference_emotional_stability) || 0}</h5>
                                     <h5 className="genres__item"  style={{backgroundColor:"rgba(75, 192, 192, 0.4)"}}>Predicted Emotional Stability: {(dbItems[2][0] && dbItems[2][0].predicted_emotional_stability) || 0}</h5>
-                                    <h5 className="genres__item"  style={{backgroundColor:"rgba(75, 192, 192, 0.4)"}}>Accuracy: {(dbItems[2][0] && dbItems[2][0].emoAcc) * 100 || 0}%</h5>
+                                    <h5 className="genres__item"  style={{backgroundColor:"rgba(75, 192, 192, 0.4)"}}>Margin of error: {(dbItems[2][0] && dbItems[2][0].emoAcc) * 100 || 0}%</h5>
                                     <br />
 
                                     <h5 className="genres__item"  style={{backgroundColor:"rgba(255, 99, 132, 0.4)"}}>Actual Extraversion: {(dbItems[2][0] && dbItems[2][0].actual_extraversion) || 0}</h5>
                                     <h5 className="genres__item"  style={{backgroundColor:"rgba(255, 205, 86,0.4)"}}>Difference Extraversion: {(dbItems[2][0] && dbItems[2][0].difference_extraversion) || 0}</h5>
                                     <h5 className="genres__item"  style={{backgroundColor:"rgba(75, 192, 192, 0.4)"}}>Predicted Extraversion: {(dbItems[2][0] && dbItems[2][0].predicted_extraversion) || 0}</h5>
-                                    <h5 className="genres__item"  style={{backgroundColor:"rgba(75, 192, 192, 0.4)"}}>Accuracy: {(dbItems[2][0] && dbItems[2][0].extrAcc) * 100 || 0}%</h5>
+                                    <h5 className="genres__item"  style={{backgroundColor:"rgba(75, 192, 192, 0.4)"}}>Margin of error: {(dbItems[2][0] && dbItems[2][0].extrAcc) * 100 || 0}%</h5>
                                     <br />
 
                                     <h5 className="genres__item"  style={{backgroundColor:"rgba(255, 99, 132, 0.4)"}}>Actual Openness: {(dbItems[2][0] && dbItems[2][0].actual_openness) || 0}</h5>
                                     <h5 className="genres__item"  style={{backgroundColor:"rgba(255, 205, 86, 0.4)"}}>Difference Openness: {(dbItems[2][0] && dbItems[2][0].difference_openness) || 0}</h5>
                                     <h5 className="genres__item"  style={{backgroundColor:"rgba(75, 192, 192, 0.4)"}}>Predicted Openness: {(dbItems[2][0] && dbItems[2][0].predicted_openness) || 0}</h5>
-                                    <h5 className="genres__item"  style={{backgroundColor:"rgba(75, 192, 192, 0.4)"}}>Accuracy: {(dbItems[2][0] && dbItems[2][0].openAcc) * 100 || 0}%</h5>
+                                    <h5 className="genres__item"  style={{backgroundColor:"rgba(75, 192, 192, 0.4)"}}>Margin of error: {(dbItems[2][0] && dbItems[2][0].openAcc) * 100 || 0}%</h5>
                                     <br />
 
                     <div className="grid">     
@@ -340,7 +340,7 @@ const Detail = () => {
 
 
                                     <br />
-                                    <h4>Overall Accuracy = {(dbItems[2][0] && dbItems[2][0].totalAcc) * 100 || 0}%</h4>
+                                    <h4>Overall Margin of error = {(dbItems[2][0] && dbItems[2][0].totalAcc) * 100 || 0}%</h4>
                                     <br />
                                     <h3>PREDICTED PERSONALITY TYPES</h3>
                                     <h5 className="genres__item"  style={{backgroundColor:"rgba(255, 159, 64, 0.4)"}}> Actual Agreeableness: {(dbItems[3][0] && dbItems[3][0][0].real_agreeableness) || 0}</h5>

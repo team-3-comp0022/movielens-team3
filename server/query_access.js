@@ -39,9 +39,9 @@ var connection = mysql.createConnection({
 // `
 
 function initialise_data(){
-    deleteDatabase()
-    makeDatabase()
-    useDatabase()
+    // deleteDatabase()
+    // makeDatabase()
+    // useDatabase()
     makeTables()
     addData()
     const sleep = (waitTimeInMs) => new Promise(resolve => setTimeout(resolve, waitTimeInMs));
@@ -65,7 +65,8 @@ getReportData(862, function(result){
 });
 */
 
-// initialise_data()
+//initialise_data()
+// alterForeignKey()
 // deleteTables()
 
 //TESTNG FIFTH QUEREY AND SIXTH QUERY
@@ -201,6 +202,19 @@ function useDatabase(){
         if (err) throw err
         
         console.log('Successfully dropped database')
+    });
+}
+
+/* create tables */
+function alterForeignKey(){
+    const alter_list = queries.alter_foreign_key_list
+
+    alter_list.forEach(function (query) {
+        connection.query(query, function (err, rows, fields) {
+            if (err) throw err
+        
+            console.log('---------Success altering tables')
+        });
     });
 }
 
