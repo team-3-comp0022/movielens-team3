@@ -39,9 +39,9 @@ var connection = mysql.createConnection({
 // `
 
 function initialise_data(){
-    deleteDatabase()
-    makeDatabase()
-    useDatabase()
+    //deleteDatabase()
+    // makeDatabase()
+    // useDatabase()
     makeTables()
     addData()
     const sleep = (waitTimeInMs) => new Promise(resolve => setTimeout(resolve, waitTimeInMs));
@@ -65,7 +65,7 @@ getReportData(862, function(result){
 });
 */
 
-// initialise_data()
+initialise_data()
 // deleteTables()
 
 //TESTNG FIFTH QUEREY AND SIXTH QUERY
