@@ -8,13 +8,14 @@
 
 
 const create_list = [`
-CREATE TABLE ratings (
-    userId int,
-    movieId int,
-    rating int,
-    timestamp int,
-    PRIMARY KEY (userId, movieId)
-    )
+CREATE TABLE ratings ( 
+    ratingsId int AUTO_INCREMENT, 
+    userId int, 
+    movieId int, 
+    rating int, 
+    timestamp int, 
+    PRIMARY KEY (ratingsId) 
+    ) 
 `,`
 CREATE TABLE links (
     movieId int PRIMARY KEY,
@@ -28,21 +29,23 @@ CREATE TABLE movies (
     genres varchar(100)
 )
 `, `
-CREATE TABLE tags (
-    userId int,
-    movieId int,
-    tag varchar(100),
-    timestamp int,
-    PRIMARY KEY (userId, movieId) 
-)
+CREATE TABLE tags ( 
+    tagId int AUTO_INCREMENT, 
+    userId int, 
+    movieId int, 
+    tag varchar(100), 
+    timestamp int, 
+    PRIMARY KEY (tagId)  
+    ) 
 ` ,`
-CREATE TABLE ratings_personality (
-    userid varchar(40),
-    movie_id int,
-    rating int,
-    tstamp DATETIME,
-    PRIMARY KEY (userId, movie_id, rating, tstamp)
-)
+CREATE TABLE ratings_personality ( 
+    ratperId int AUTO_INCREMENT, 
+    userid varchar(40), 
+    movie_id int, 
+    rating int, 
+    tstamp DATETIME, 
+    PRIMARY KEY (ratperId) 
+) 
 `,  `
 CREATE TABLE personality_data (
     userid varchar(40) PRIMARY KEY,
@@ -436,21 +439,25 @@ GROUP BY lk.imdbId
 ORDER BY Polarity DESC; 
 `;
 
-const alter_foreign_key_list = [`ALTER TABLE personality_predictions_movies
+const alter_foreign_key_list = [`ALTER TABLE personality_predictions_movies 
 ADD FOREIGN KEY (userid) REFERENCES personality_user(userid);`,
-`ALTER TABLE ratings_personality
+`ALTER TABLE personality_predictions_movies 
+ADD FOREIGN KEY (all_movies) REFERENCES movies_titles(movieId);`, 
+`ALTER TABLE ratings_personality 
 ADD FOREIGN KEY (userid) REFERENCES personality_user(userid);`,
-`ALTER TABLE movies_titles
-ADD FOREIGN KEY (movieId) REFERENCES links(movieId);`,
-`ALTER TABLE movie_years
-ADD FOREIGN KEY (movieId) REFERENCES links(movieId);`,
-`ALTER TABLE movies_genres_sep
-ADD FOREIGN KEY (movieId) REFERENCES links(movieId);`,
-`ALTER TABLE ratings
-ADD FOREIGN KEY (movieId) REFERENCES links(movieId);`,
-`ALTER TABLE tags
-ADD FOREIGN KEY (movieId) REFERENCES links(movieId);`
-];
+`ALTER TABLE ratings_personality 
+ADD FOREIGN KEY (movie_id) REFERENCES movies_titles(movieId);`, 
+`ALTER TABLE links 
+ADD FOREIGN KEY (movieId) REFERENCES movies_titles(movieId);`, 
+`ALTER TABLE movie_years 
+ADD FOREIGN KEY (movieId) REFERENCES movies_titles(movieId);`, 
+`ALTER TABLE movies_genres_sep 
+ADD FOREIGN KEY (movieId) REFERENCES movies_titles(movieId);`, 
+`ALTER TABLE ratings 
+ADD FOREIGN KEY (movieId) REFERENCES movies_titles(movieId);`, 
+`ALTER TABLE tags 
+ADD FOREIGN KEY (movieId) REFERENCES movies_titles(movieId);` 
+]; 
 
 module.exports = {
     create_list, 
