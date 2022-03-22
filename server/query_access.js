@@ -54,6 +54,7 @@ function initialise_data(){
     sleep(4000).then(() => {
         makeYearTable()
     });
+
 }
 
 /*
@@ -65,13 +66,13 @@ getReportData(862, function(result){
 });
 */
 
-//initialise_data()
+// initialise_data()
 // alterForeignKey()
 // deleteTables()
 
 //TESTNG FIFTH QUEREY AND SIXTH QUERY
 
-// fifthQuery("0114709",function(result){
+// fifthQuery("862",function(result){
 //     console.log("FIFTH QUERY--------------------------------------------------")
 //     solution = result;//returns array of Ids
 //     console.log(solution)//use it
