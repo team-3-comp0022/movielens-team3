@@ -55,9 +55,6 @@ function initialise_data(){
         makeYearTable()
     });
 
-    sleep(4000).then(() => {
-        alterForeignKey()
-    });
 }
 
 /*
