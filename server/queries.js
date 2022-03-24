@@ -441,7 +441,7 @@ ORDER BY Polarity DESC;
 
 const alter_foreign_key_list = [`ALTER TABLE personality_predictions_movies 
 ADD FOREIGN KEY (userid) REFERENCES personality_user(userid);`,
-`ALTER TABLE personality_predictions_movies 
+`ALTER TABLE ratings_personality 
 ADD FOREIGN KEY (userid) REFERENCES personality_user(userid);`,
 `ALTER TABLE links 
 ADD FOREIGN KEY (movieId) REFERENCES movies_titles(movieId);`, 

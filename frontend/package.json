@@ -13,6 +13,7 @@
     "chart.js": "^3.7.1",
     "classnames": "^2.3.1",
     "dotenv": "^16.0.0",
+    "eslint-config-react-app": "6",
     "express": "^4.17.2",
     "fast-csv": "^4.3.6",
     "mysql": "^2.18.1",
@@ -58,7 +59,6 @@
   },
   "devDependencies": {
     "bpk-component-barchart": "^4.2.1",
-    "eslint-config-react-app": "^7.0.0",
     "eslint-plugin-jest": "^24.7.0",
     "react-app-rewired": "^2.2.1"
   }
