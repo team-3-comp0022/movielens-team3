@@ -10,6 +10,4 @@ RUN npm install
 
 CMD [ "npm", "start" ]
 
-EXPOSE 3001
-
 # Source: https://nodejs.org/en/docs/guides/nodejs-docker-webapp/
