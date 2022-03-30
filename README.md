@@ -1,4 +1,5 @@
-# Movielens-team3 - Jan Kolarik, Alexandra Irimia, Shea Magennis
+# Movielens-Team3
+By: Jan Kolarik, Alexandra Irimia, Shea Magennis, Alex Heim
 
 To run:
 ### `docker-compose up -d --build`
